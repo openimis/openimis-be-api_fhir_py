@@ -16,6 +16,7 @@ from api_fhir.models.element import Element
 from api_fhir.models.fhirdate import FHIRDate
 from api_fhir.models.humanName import HumanName, NameUse
 from api_fhir.models.identifier import Identifier, IdentifierUse
+from api_fhir.models.imisModelEnums import ImisGenderCodes, ImisMaritialStatus
 from api_fhir.models.meta import Meta
 from api_fhir.models.money import Money
 from api_fhir.models.narrative import Narrative

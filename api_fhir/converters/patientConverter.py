@@ -7,7 +7,7 @@ from api_fhir.constant import IDENTIFIER_TYPE_SYSTEM, IDENTIFIER_TYPE_ACCESSION_
     MARIAL_STATUS_DIVORCED, MARIAL_STATUS_WIDOWED, ISO_DATE_FORMAT
 from api_fhir.converters import BaseFHIRConverter
 from api_fhir.models import Patient, HumanName, Identifier, IdentifierUse, NameUse, \
-    AdministrativeGender, ContactPointSystem, ContactPointUse
+    AdministrativeGender, ContactPointSystem, ContactPointUse, ImisGenderCodes, ImisMaritialStatus
 import core
 
 from api_fhir.models.address import AddressUse, AddressType
@@ -149,11 +149,11 @@ class PatientConverter(BaseFHIRConverter):
     def build_fhir_gender(cls, fhir_patient, imis_insuree):
         if hasattr(imis_insuree, "gender") and imis_insuree.gender is not None:
             code = imis_insuree.gender.code
-            if code == "M":
+            if code == ImisGenderCodes.MALE.value:
                 fhir_patient.gender = AdministrativeGender.MALE.value
-            elif code == "F":
+            elif code == ImisGenderCodes.FEMALE.value:
                 fhir_patient.gender = AdministrativeGender.FEMALE.value
-            elif code == "O":
+            elif code == ImisGenderCodes.OTHER.value:
                 fhir_patient.gender = AdministrativeGender.OTHER.value
         else:
             fhir_patient.gender = AdministrativeGender.UNKNOWN.value
@@ -164,30 +164,30 @@ class PatientConverter(BaseFHIRConverter):
             gender = fhir_patient.get("gender")
             imis_gender_code = None
             if gender == AdministrativeGender.MALE.value:
-                imis_gender_code = "M"
+                imis_gender_code = ImisGenderCodes.MALE.value
             elif gender == AdministrativeGender.FEMALE.value:
-                imis_gender_code = "F"
+                imis_gender_code = ImisGenderCodes.FEMALE.value
             elif gender == AdministrativeGender.FEMALE.value:
-                imis_gender_code = "O"
+                imis_gender_code = ImisGenderCodes.OTHER.value
             if imis_gender_code is not None:
                 imis_insuree.gender = Gender.objects.get(pk=imis_gender_code)
 
     @classmethod
     def build_fhir_marital_status(cls, fhir_patient, imis_insuree):
         if imis_insuree.marital is not None:
-            if imis_insuree.marital == "M":
+            if imis_insuree.marital == ImisMaritialStatus.MARRIED.value:
                 fhir_patient.maritalStatus = cls.build_codeable_concept(MARIAL_STATUS_MARRIED,
                                                                         MARIAL_STATUS_SYSTEM).__dict__
-            elif imis_insuree.marital == "S":
+            elif imis_insuree.marital == ImisMaritialStatus.SINGLE.value:
                 fhir_patient.maritalStatus = cls.build_codeable_concept(MARIAL_STATUS_NEVER_MARRIED,
                                                                         MARIAL_STATUS_SYSTEM).__dict__
-            elif imis_insuree.marital == "D":
+            elif imis_insuree.marital == ImisMaritialStatus.DIVORCED.value:
                 fhir_patient.maritalStatus = cls.build_codeable_concept(MARIAL_STATUS_DIVORCED,
                                                                         MARIAL_STATUS_SYSTEM).__dict__
-            elif imis_insuree.marital == "W":
+            elif imis_insuree.marital == ImisMaritialStatus.WIDOWED.value:
                 fhir_patient.maritalStatus = cls.build_codeable_concept(MARIAL_STATUS_WIDOWED,
                                                                         MARIAL_STATUS_SYSTEM).__dict__
-            elif imis_insuree.marital == "N":
+            elif imis_insuree.marital == ImisMaritialStatus.NOT_SPECIFIED.value:
                 fhir_patient.maritalStatus = cls.build_codeable_concept(MARIAL_STATUS_UNKNOWN,
                                                                         MARIAL_STATUS_SYSTEM).__dict__
 
@@ -198,15 +198,15 @@ class PatientConverter(BaseFHIRConverter):
             if maritalStatus.get("system") == MARIAL_STATUS_SYSTEM:
                 code = maritalStatus.get("code")
                 if code == MARIAL_STATUS_MARRIED:
-                    imis_insuree.marital = "M"
+                    imis_insuree.marital = ImisMaritialStatus.MARRIED.value
                 elif code == MARIAL_STATUS_NEVER_MARRIED:
-                    imis_insuree.marital = "S"
+                    imis_insuree.marital = ImisMaritialStatus.SINGLE.value
                 elif code == MARIAL_STATUS_DIVORCED:
-                    imis_insuree.marital = "D"
+                    imis_insuree.marital = ImisMaritialStatus.DIVORCED.value
                 elif code == MARIAL_STATUS_WIDOWED:
-                    imis_insuree.marital = "W"
+                    imis_insuree.marital = ImisMaritialStatus.WIDOWED.value
                 elif code == MARIAL_STATUS_UNKNOWN:
-                    imis_insuree.marital = "N"
+                    imis_insuree.marital = ImisMaritialStatus.NOT_SPECIFIED.value
 
     @classmethod
     def build_fhir_telecom(cls, fhir_patient, imis_insuree):
