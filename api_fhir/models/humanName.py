@@ -1,4 +1,5 @@
 import json
+from enum import Enum
 
 from api_fhir.models.element import Element
 
@@ -20,9 +21,19 @@ class HumanName(Element):
 
         self.text = None  # Type `str`.
 
-        self.use = None  # Type `str` (usual | official | temp | nickname | anonymous | old | maiden).
+        self.use = None  # Type `NameUse`.
 
         super(HumanName, self).__init__()
 
     class Meta:
         app_label = 'api_fhir'
+
+
+class NameUse(Enum):
+    USUAL = "usual"
+    OFFICIAL = "official"
+    TEMP = "temp"
+    NICKNAME = "nickname"
+    ANONYMOUS = "anonymous"
+    OLD = "old"
+    MAIDEN = "maiden"

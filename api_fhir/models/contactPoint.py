@@ -1,3 +1,5 @@
+from enum import Enum
+
 from api_fhir.models.element import Element
 
 
@@ -20,3 +22,19 @@ class ContactPoint(Element):
 
     class Meta:
         app_label = 'api_fhir'
+
+class ContactPointSystem(Enum):
+    PHONE = "phone"
+    FAX = "fax"
+    EMAIL = "email"
+    PAGER = "pager"
+    URL = "url"
+    SMS = "sms"
+    OTHER = "other"
+
+class ContactPointUse(Enum):
+    HOME = "home"
+    WORK = "work"
+    TEMP = "temp"
+    OLD = "old"
+    MOBILE = "mobile"

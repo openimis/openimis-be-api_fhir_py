@@ -1,3 +1,5 @@
+from enum import Enum
+
 from api_fhir.models.element import Element
 
 
@@ -30,3 +32,14 @@ class Address(Element):
 
     class Meta:
         app_label = 'api_fhir'
+
+class AddressUse(Enum):
+    HOME = "home"
+    WORK = "work"
+    TEMP = "temp"
+    OLD = "old"
+
+class AddressType(Enum):
+    POSTAL = "postal"
+    PHYSICAL = "physical"
+    BOTH = "both"
