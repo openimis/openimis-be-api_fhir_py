@@ -23,7 +23,7 @@ class BaseFHIRSerializer(serializers.Serializer):
         request = self.context.get("request")
         audit_user_id = request.query_params.get('auditUserId', None)
         if audit_user_id is None:
-            audit_user_id = ApiFhirConfiguration.getDefaultAuditUserId()
+            audit_user_id = ApiFhirConfiguration.get_default_audit_user_id()
         return audit_user_id
 
 

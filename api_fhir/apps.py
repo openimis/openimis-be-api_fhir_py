@@ -10,7 +10,12 @@ MODULE_NAME = "api_fhir"
 this = sys.modules[MODULE_NAME]
 
 DEFAULT_CFG = {
-    "default_audit_user_id": 1
+    "default_audit_user_id": 1,
+    "gender_codes": {
+        "male": "M",
+        "female": "F",
+        "other": "O"
+    }
 }
 
 class ApiFhirConfig(AppConfig):
@@ -23,4 +28,5 @@ class ApiFhirConfig(AppConfig):
 
     def __configure_module(self, cfg):
         this.default_audit_user_id = cfg['default_audit_user_id']
+        this.gender_codes = cfg['gender_codes']
         logger.info('Module $s configured successfully', MODULE_NAME)

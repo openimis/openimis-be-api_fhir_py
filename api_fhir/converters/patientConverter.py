@@ -1,3 +1,4 @@
+from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
 from insuree.models import Insuree, Gender
 
 from api_fhir.constant import IDENTIFIER_TYPE_SYSTEM, IDENTIFIER_TYPE_ACCESSION_ID_CODE, \
@@ -6,7 +7,7 @@ from api_fhir.constant import IDENTIFIER_TYPE_SYSTEM, IDENTIFIER_TYPE_ACCESSION_
     MARIAL_STATUS_DIVORCED, MARIAL_STATUS_WIDOWED, ISO_DATE_FORMAT
 from api_fhir.converters import BaseFHIRConverter
 from api_fhir.models import Patient, HumanName, Identifier, IdentifierUse, NameUse, \
-    AdministrativeGender, ContactPointSystem, ContactPointUse, ImisGenderCodes, ImisMaritialStatus
+    AdministrativeGender, ContactPointSystem, ContactPointUse, ImisMaritialStatus
 import core
 
 from api_fhir.models.address import AddressUse, AddressType
@@ -143,11 +144,11 @@ class PatientConverter(BaseFHIRConverter):
     def build_fhir_gender(cls, fhir_patient, imis_insuree):
         if hasattr(imis_insuree, "gender") and imis_insuree.gender is not None:
             code = imis_insuree.gender.code
-            if code == ImisGenderCodes.MALE.value:
+            if code == ApiFhirConfiguration.get_male_gender_code():
                 fhir_patient.gender = AdministrativeGender.MALE.value
-            elif code == ImisGenderCodes.FEMALE.value:
+            elif code == ApiFhirConfiguration.get_female_gender_code():
                 fhir_patient.gender = AdministrativeGender.FEMALE.value
-            elif code == ImisGenderCodes.OTHER.value:
+            elif code == ApiFhirConfiguration.get_other_gender_code():
                 fhir_patient.gender = AdministrativeGender.OTHER.value
         else:
             fhir_patient.gender = AdministrativeGender.UNKNOWN.value
@@ -158,11 +159,11 @@ class PatientConverter(BaseFHIRConverter):
             gender = fhir_patient.get("gender")
             imis_gender_code = None
             if gender == AdministrativeGender.MALE.value:
-                imis_gender_code = ImisGenderCodes.MALE.value
+                imis_gender_code = ApiFhirConfiguration.get_male_gender_code()
             elif gender == AdministrativeGender.FEMALE.value:
-                imis_gender_code = ImisGenderCodes.FEMALE.value
+                imis_gender_code = ApiFhirConfiguration.get_female_gender_code()
             elif gender == AdministrativeGender.FEMALE.value:
-                imis_gender_code = ImisGenderCodes.OTHER.value
+                imis_gender_code = ApiFhirConfiguration.get_other_gender_code()
             if imis_gender_code is not None:
                 imis_insuree.gender = Gender.objects.get(pk=imis_gender_code)
 
