@@ -8,7 +8,7 @@ class BaseFHIRConverter(object):
         raise NotImplementedError('`toFhirObj()` must be implemented.')
 
     @classmethod
-    def to_imis_obj(cls, data, current_user):
+    def to_imis_obj(cls, data, audit_user_id):
         raise NotImplementedError('`toImisObj()` must be implemented.')
 
     @classmethod

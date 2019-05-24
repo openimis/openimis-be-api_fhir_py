@@ -1,7 +1,6 @@
 import copy
 
 from insuree.models import Insuree, Gender
-from rest_framework.exceptions import NotAuthenticated
 
 from api_fhir.converters import PatientConverter
 from api_fhir.serializers import BaseFHIRSerializer
@@ -31,13 +30,7 @@ class PatientSerializer(BaseFHIRSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.current_address = validated_data.get('current_address', instance.current_address)
         instance.geolocation = validated_data.get('geolocation', instance.geolocation)
-
-        current_user = self.getLoggedUser()
-        if current_user is not None:
-            instance.audit_user_id = 1 # TODO the audit_user_id isn't covered because current_user.id currently is of UUID type not an integer
-        else:
-            raise NotAuthenticated
-
+        instance.audit_user_id = self.getAuditUserId()
         instance.save()
         return instance
 

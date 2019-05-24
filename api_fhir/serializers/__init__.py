@@ -1,3 +1,4 @@
+from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
 from rest_framework import serializers
 from api_fhir.converters import BaseFHIRConverter
 
@@ -9,8 +10,8 @@ class BaseFHIRSerializer(serializers.Serializer):
         return self.fhirConverter.to_fhir_obj(obj).__dict__
 
     def to_internal_value(self, data):
-        user = self.getLoggedUser()
-        return self.fhirConverter.to_imis_obj(data, user).__dict__
+        audit_user_id = self.getAuditUserId()
+        return self.fhirConverter.to_imis_obj(data, audit_user_id).__dict__
 
     def create(self, validated_data):
         raise NotImplementedError('`update()` must be implemented.')
@@ -18,12 +19,12 @@ class BaseFHIRSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         raise NotImplementedError('`update()` must be implemented.')
 
-    def getLoggedUser(self):
-        user = None
+    def getAuditUserId(self):
         request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
-        return user
+        audit_user_id = request.query_params.get('auditUserId', None)
+        if audit_user_id is None:
+            audit_user_id = ApiFhirConfiguration.getDefaultAuditUserId()
+        return audit_user_id
 
 
 from api_fhir.serializers.patientSerializer import PatientSerializer

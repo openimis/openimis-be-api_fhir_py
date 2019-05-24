@@ -1,5 +1,4 @@
 from insuree.models import Insuree, Gender
-from rest_framework.exceptions import NotAuthenticated
 
 from api_fhir.constant import IDENTIFIER_TYPE_SYSTEM, IDENTIFIER_TYPE_ACCESSION_ID_CODE, \
     IDENTIFIER_TYPE_SOCIAL_BENEFICIARY_ID_CODE, IDENTIFIER_TYPE_PASSPORT_NUMBER_CODE, ISO_DATETIME_FORMAT, \
@@ -27,9 +26,9 @@ class PatientConverter(BaseFHIRConverter):
         return fhir_patient
 
     @classmethod
-    def to_imis_obj(cls, fhir_patient, current_user):
+    def to_imis_obj(cls, fhir_patient, audit_user_id):
         errors = []
-        imis_insuree = cls.createDefaultInsuree()
+        imis_insuree = cls.createDefaultInsuree(audit_user_id)
         # TODO the familyid isn't covered because that value is missing in the model
         # TODO the photoId isn't covered because that value is missing in the model
         cls.build_imis_names(imis_insuree, fhir_patient, errors)
@@ -39,21 +38,16 @@ class PatientConverter(BaseFHIRConverter):
         cls.build_imis_marital(imis_insuree, fhir_patient)
         cls.build_imis_contacts(imis_insuree, fhir_patient)
         cls.build_imis_addresses(imis_insuree, fhir_patient)
-
-        if current_user is not None:
-            imis_insuree.audit_user_id = 1  # TODO current_user.id currently is of UUID type not an integer
-        else:
-            raise NotAuthenticated
-
         cls.check_errors(errors)
         return imis_insuree
 
     @classmethod
-    def createDefaultInsuree(cls):
+    def createDefaultInsuree(cls, audit_user_id):
         imis_insuree = Insuree()
         imis_insuree.head = False
         imis_insuree.card_issued = False
         imis_insuree.validity_from = core.datetime.datetime.now()
+        imis_insuree.audit_user_id = audit_user_id
         return imis_insuree
 
     @classmethod
