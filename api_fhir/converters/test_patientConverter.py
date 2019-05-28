@@ -20,7 +20,7 @@ class PatientConverterTestCase(TestCase):
     __TEST_PASSPORT = "TEST_PASSPORT"
     __TEST_GENDER_CODE = "M"
     __TEST_GENDER = None
-    __TEST_PHONE = "TEST_PHONE"
+    __TEST_PHONE = "813-996-476"
     __TEST_EMAIL = "TEST@TEST.com"
     __TEST_ADDRESS = "TEST_ADDRESS"
     __TEST_GEOLOCATION = "TEST_GEOLOCATION"
