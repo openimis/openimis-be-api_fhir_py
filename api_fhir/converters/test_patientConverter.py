@@ -149,16 +149,3 @@ class PatientConverterTestCase(TestCase):
         addresses.append(geolocation.__dict__)
         fhir_patient.address = addresses
         return fhir_patient.__dict__
-
-
-
-
-
-
-
-
-
-
-
-
-
