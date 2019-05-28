@@ -25,6 +25,7 @@ setup(
         'djangorestframework',
         'openimis-be-core',
         'openimis-be-insuree',
+        'openimis-be-location'
     ],
     classifiers=[
         'Environment :: Web Environment',
