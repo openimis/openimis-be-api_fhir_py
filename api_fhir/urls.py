@@ -6,5 +6,5 @@ router = DefaultRouter()
 router.register(r'Insuree', views.InsureeViewSet)
 
 urlpatterns = [
-    path('fhir/', include(router.urls)),
+    path('', include(router.urls)),
 ]
