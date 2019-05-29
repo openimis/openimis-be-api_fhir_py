@@ -15,6 +15,7 @@ setup(
     license='GNU AGPL v3',
     description='The openIMIS Backend FHIR API reference module.',
     long_description=README,
+    long_description_content_type='text/markdown',
     url='https://openimis.org/',
     author='Arkadiusz Lalo',
     author_email='alalo@soldevelo.com',
