@@ -2,8 +2,8 @@ from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
 from insuree.models import Insuree, Gender
 
 from api_fhir.converters import BaseFHIRConverter
-from api_fhir.models import Patient, HumanName, Identifier, IdentifierUse, NameUse, \
-    AdministrativeGender, ContactPointSystem, ContactPointUse, ImisMaritialStatus
+from api_fhir.models import Patient, HumanName, NameUse, AdministrativeGender, ContactPointSystem, ContactPointUse, \
+    ImisMaritialStatus
 import core
 
 from api_fhir.models.address import AddressUse, AddressType
@@ -80,12 +80,15 @@ class PatientConverter(BaseFHIRConverter):
     def build_imis_identifiers(cls, imis_insuree, fhir_patient):
         if fhir_patient.get('identifier') is not None:
             for identifier in fhir_patient.get('identifier'):
-                if identifier.get("type") is not None \
-                        and identifier.get("type").get("system") == ApiFhirConfiguration.get_fhir_identifier_type_system():
-                    if identifier.get("type").get("code") == ApiFhirConfiguration.get_fhir_chfid_type_code():
+                identifier_type = identifier.get("type")
+                if identifier_type is not None \
+                        and identifier_type.get('coding') is not None \
+                        and identifier_type.get('coding')[0].get("system") == ApiFhirConfiguration\
+                        .get_fhir_identifier_type_system():
+                    if identifier_type.get('coding')[0].get("code") == ApiFhirConfiguration.get_fhir_chfid_type_code():
                         if identifier.get("value") is not None:
                             imis_insuree.chf_id = identifier.get("value")
-                    elif identifier.get("type").get("code") == ApiFhirConfiguration.get_fhir_passport_type_code():
+                    elif identifier_type.get('coding')[0].get("code") == ApiFhirConfiguration.get_fhir_passport_type_code():
                         if identifier.get("value") is not None:
                             imis_insuree.passport = identifier.get("value")
 
@@ -114,15 +117,6 @@ class PatientConverter(BaseFHIRConverter):
                                                    ApiFhirConfiguration.get_fhir_identifier_type_system(),
                                                    ApiFhirConfiguration.get_fhir_passport_type_code())
             identifiers.append(identifier.__dict__)
-
-    @classmethod
-    def build_fhir_identifier(cls, value, type_system, type_code):
-        identifier = Identifier()
-        identifier.use = IdentifierUse.USUAL.value
-        type = cls.build_codeable_concept(type_code, type_system)
-        identifier.type = type.__dict__
-        identifier.value = value
-        return identifier
 
     @classmethod
     def build_fhir_birth_date(cls, fhir_patient, imis_insuree):
@@ -196,18 +190,19 @@ class PatientConverter(BaseFHIRConverter):
     def build_imis_marital(cls, imis_insuree, fhir_patient):
         if fhir_patient.get("maritalStatus") is not None:
             maritalStatus = fhir_patient.get("maritalStatus")
-            if maritalStatus.get("system") == ApiFhirConfiguration.get_fhir_marital_status_system():
-                code = maritalStatus.get("code")
-                if code == ApiFhirConfiguration.get_fhir_married_code():
-                    imis_insuree.marital = ImisMaritialStatus.MARRIED.value
-                elif code == ApiFhirConfiguration.get_fhir_never_married_code():
-                    imis_insuree.marital = ImisMaritialStatus.SINGLE.value
-                elif code == ApiFhirConfiguration.get_fhir_divorced_code():
-                    imis_insuree.marital = ImisMaritialStatus.DIVORCED.value
-                elif code == ApiFhirConfiguration.get_fhir_widowed_code():
-                    imis_insuree.marital = ImisMaritialStatus.WIDOWED.value
-                elif code == ApiFhirConfiguration.get_fhir_unknown_marital_status_code():
-                    imis_insuree.marital = ImisMaritialStatus.NOT_SPECIFIED.value
+            for maritialCoding in maritalStatus.get('coding'):
+                if maritialCoding.get("system") == ApiFhirConfiguration.get_fhir_marital_status_system():
+                    code = maritialCoding.get("code")
+                    if code == ApiFhirConfiguration.get_fhir_married_code():
+                        imis_insuree.marital = ImisMaritialStatus.MARRIED.value
+                    elif code == ApiFhirConfiguration.get_fhir_never_married_code():
+                        imis_insuree.marital = ImisMaritialStatus.SINGLE.value
+                    elif code == ApiFhirConfiguration.get_fhir_divorced_code():
+                        imis_insuree.marital = ImisMaritialStatus.DIVORCED.value
+                    elif code == ApiFhirConfiguration.get_fhir_widowed_code():
+                        imis_insuree.marital = ImisMaritialStatus.WIDOWED.value
+                    elif code == ApiFhirConfiguration.get_fhir_unknown_marital_status_code():
+                        imis_insuree.marital = ImisMaritialStatus.NOT_SPECIFIED.value
 
     @classmethod
     def build_fhir_telecom(cls, fhir_patient, imis_insuree):

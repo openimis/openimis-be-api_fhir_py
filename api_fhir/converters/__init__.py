@@ -1,5 +1,5 @@
 from api_fhir.exceptions import FhirRequestProcessException
-from api_fhir.models import CodeableConcept, ContactPoint, Address
+from api_fhir.models import CodeableConcept, ContactPoint, Address, Coding, Identifier, IdentifierUse
 
 
 class BaseFHIRConverter(object):
@@ -30,10 +30,21 @@ class BaseFHIRConverter(object):
 
     @classmethod
     def build_codeable_concept(cls, code, system):
-        type = CodeableConcept()
-        type.system = system
-        type.code = code
-        return type
+        codeable_concept = CodeableConcept()
+        coding = Coding()
+        coding.system = system
+        coding.code = code
+        codeable_concept.coding = [coding.__dict__]
+        return codeable_concept
+
+    @classmethod
+    def build_fhir_identifier(cls, value, type_system, type_code):
+        identifier = Identifier()
+        identifier.use = IdentifierUse.USUAL.value
+        type = cls.build_codeable_concept(type_code, type_system)
+        identifier.type = type.__dict__
+        identifier.value = value
+        return identifier
 
     @classmethod
     def build_fhir_contact_point(cls, value, contact_point_system, contact_point_use):

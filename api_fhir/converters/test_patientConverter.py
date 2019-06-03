@@ -55,7 +55,8 @@ class PatientConverterTestCase(TestCase):
 
         self.assertEqual(AdministrativeGender.MALE.value, fhir_patient.gender)
 
-        self.assertEqual(ApiFhirConfiguration.get_fhir_divorced_code(), fhir_patient.maritalStatus.get("code"))
+        self.assertEqual(ApiFhirConfiguration.get_fhir_divorced_code(), fhir_patient.maritalStatus.get("coding")[0]
+                         .get('code'))
 
         self.assertEqual(2, len(fhir_patient.telecom))
         for telecom in fhir_patient.telecom:
