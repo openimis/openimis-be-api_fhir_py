@@ -45,6 +45,27 @@ class ApiFhirConfiguration(object):
         return api_fhir.fhir_identifier_type_config.get('fhir_code_for_imis_passport_type', "PPN")
 
     @classmethod
+    def get_fhir_facility_id_type(cls):
+        return api_fhir.fhir_identifier_type_config.get('fhir_code_for_imis_facility_id_type', "FI")
+
+    @classmethod
+    def get_fhir_location_role_type_system(cls):
+        return api_fhir.fhir_location_role_type.get('system',
+                                                    "https://hl7.org/fhir/STU3/v3/ServiceDeliveryLocationRoleType/vs.html")
+
+    @classmethod
+    def get_fhir_code_for_hospital(cls):
+        return api_fhir.fhir_location_role_type.get('fhir_code_for_hospital', "HOSP")
+
+    @classmethod
+    def get_fhir_code_for_dispensary(cls):
+        return api_fhir.fhir_location_role_type.get('fhir_code_for_dispensary', "PHARM")
+
+    @classmethod
+    def get_fhir_code_for_health_center(cls):
+        return api_fhir.fhir_location_role_type.get('fhir_code_for_health_center', "CARD")
+
+    @classmethod
     def get_fhir_marital_status_system(cls):
         return api_fhir.fhir_marital_status_config.get('system',
                                                        "https://www.hl7.org/fhir/STU3/valueset-marital-status.html")

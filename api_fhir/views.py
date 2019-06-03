@@ -3,7 +3,7 @@ from location.models import HealthFacility
 
 from rest_framework import viewsets
 
-from api_fhir.serializers import PatientSerializer
+from api_fhir.serializers import PatientSerializer, LocationSerializer
 
 
 class InsureeViewSet(viewsets.ModelViewSet):
@@ -12,4 +12,4 @@ class InsureeViewSet(viewsets.ModelViewSet):
 
 class HFViewSet(viewsets.ModelViewSet):
     queryset = HealthFacility.objects.all()
-    serializer_class = LocationSerializer
+    serializer_class = LocationSerializer()

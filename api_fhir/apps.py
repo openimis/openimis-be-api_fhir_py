@@ -22,7 +22,8 @@ DEFAULT_CFG = {
         "system": "https://hl7.org/fhir/valueset-identifier-type.html",
         "fhir_code_for_imis_db_id_type": "ACSN",
         "fhir_code_for_imis_chfid_type": "SB",
-        "fhir_code_for_imis_passport_type": "PPN"
+        "fhir_code_for_imis_passport_type": "PPN",
+        "fhir_code_for_imis_facility_id_type": "FI"
     },
     "fhir_marital_status_config": {
         "system": "https://www.hl7.org/fhir/STU3/valueset-marital-status.html",
@@ -31,6 +32,12 @@ DEFAULT_CFG = {
         "fhir_code_for_divorced": "D",
         "fhir_code_for_widowed": "W",
         "fhir_code_for_unknown": "U"
+    },
+    "fhir_location_role_type": {
+        "system": "https://www.hl7.org/fhir/STU3/v3/ServiceDeliveryLocationRoleType/vs.html",
+        "fhir_code_for_hospital": "HOSP",
+        "fhir_code_for_dispensary": "PHARM",
+        "fhir_code_for_health_center": "CARD",
     }
 }
 
@@ -49,4 +56,5 @@ class ApiFhirConfig(AppConfig):
         this.iso_datetime_format = cfg['iso_datetime_format']
         this.fhir_identifier_type_config = cfg['fhir_identifier_type_config']
         this.fhir_marital_status_config = cfg['fhir_marital_status_config']
+        this.fhir_location_role_type = cfg['fhir_location_role_type']
         logger.info('Module $s configured successfully', MODULE_NAME)
