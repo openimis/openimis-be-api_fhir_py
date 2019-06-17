@@ -33,6 +33,8 @@ DEFAULT_CFG = {
         "fhir_code_for_widowed": "W",
         "fhir_code_for_unknown": "U"
     },
+    "default_value_of_patient_head_attribute": False,
+    "default_value_of_patient_card_issued_attribute": False,
     "fhir_location_role_type": {
         "system": "https://www.hl7.org/fhir/STU3/v3/ServiceDeliveryLocationRoleType/vs.html",
         "fhir_code_for_hospital": "HOSP",
@@ -58,6 +60,8 @@ class ApiFhirConfig(AppConfig):
         this.iso_datetime_format = cfg['iso_datetime_format']
         this.fhir_identifier_type_config = cfg['fhir_identifier_type_config']
         this.fhir_marital_status_config = cfg['fhir_marital_status_config']
+        this.default_value_of_patient_head_attribute = cfg['default_value_of_patient_head_attribute']
+        this.default_value_of_patient_card_issued_attribute = cfg['default_value_of_patient_card_issued_attribute']
         this.fhir_location_role_type = cfg['fhir_location_role_type']
         this.default_value_of_location_offline_attribute = cfg['default_value_of_location_offline_attribute']
         this.default_value_of_location_care_type = cfg['default_value_of_location_care_type']

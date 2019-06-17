@@ -91,6 +91,14 @@ class ApiFhirConfiguration(object):
         return api_fhir.fhir_marital_status_config.get('fhir_code_for_unknown', "U")
 
     @classmethod
+    def get_default_value_of_patient_head_attribute(cls):
+        return api_fhir.fhir_marital_status_config.get('default_value_of_patient_head_attribute', False)
+
+    @classmethod
+    def get_default_value_of_patient_card_issued_attribute(cls):
+        return api_fhir.fhir_marital_status_config.get('default_value_of_patient_card_issued_attribute', False)
+
+    @classmethod
     def get_default_value_of_location_offline_attribute(cls):
         return api_fhir.fhir_marital_status_config.get('default_value_of_location_offline_attribute', False)
 

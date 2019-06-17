@@ -28,6 +28,7 @@ class PatientConverter(BaseFHIRConverter):
         imis_insuree = cls.createDefaultInsuree(audit_user_id)
         # TODO the familyid isn't covered because that value is missing in the model
         # TODO the photoId isn't covered because that value is missing in the model
+        # TODO the typeofid isn't covered because that value is missing in the model
         cls.build_imis_names(imis_insuree, fhir_patient, errors)
         cls.build_imis_identifiers(imis_insuree, fhir_patient)
         cls.build_imis_birth_date(imis_insuree, fhir_patient, errors)
@@ -41,8 +42,8 @@ class PatientConverter(BaseFHIRConverter):
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):
         imis_insuree = Insuree()
-        imis_insuree.head = False
-        imis_insuree.card_issued = False
+        imis_insuree.head = ApiFhirConfiguration.get_default_value_of_patient_head_attribute()
+        imis_insuree.card_issued = ApiFhirConfiguration.get_default_value_of_patient_card_issued_attribute()
         imis_insuree.validity_from = core.datetime.datetime.now()
         imis_insuree.audit_user_id = audit_user_id
         return imis_insuree
