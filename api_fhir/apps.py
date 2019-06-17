@@ -36,9 +36,11 @@ DEFAULT_CFG = {
     "fhir_location_role_type": {
         "system": "https://www.hl7.org/fhir/STU3/v3/ServiceDeliveryLocationRoleType/vs.html",
         "fhir_code_for_hospital": "HOSP",
-        "fhir_code_for_dispensary": "PHARM",
-        "fhir_code_for_health_center": "CARD",
-    }
+        "fhir_code_for_dispensary": "CSC",
+        "fhir_code_for_health_center": "PC",
+    },
+    "default_value_of_location_offline_attribute": False,
+    "default_value_of_location_care_type": "B"
 }
 
 class ApiFhirConfig(AppConfig):
@@ -57,4 +59,6 @@ class ApiFhirConfig(AppConfig):
         this.fhir_identifier_type_config = cfg['fhir_identifier_type_config']
         this.fhir_marital_status_config = cfg['fhir_marital_status_config']
         this.fhir_location_role_type = cfg['fhir_location_role_type']
+        this.default_value_of_location_offline_attribute = cfg['default_value_of_location_offline_attribute']
+        this.default_value_of_location_care_type = cfg['default_value_of_location_care_type']
         logger.info('Module $s configured successfully', MODULE_NAME)

@@ -1,3 +1,4 @@
+from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
 from api_fhir.exceptions import FhirRequestProcessException
 from api_fhir.models import CodeableConcept, ContactPoint, Address, Coding, Identifier, IdentifierUse
 
@@ -38,6 +39,14 @@ class BaseFHIRConverter(object):
         return codeable_concept
 
     @classmethod
+    def build_fhir_id_identifier(cls, identifiers, imis_object):
+        if imis_object.id is not None:
+            identifier = cls.build_fhir_identifier(imis_object.id,
+                                                   ApiFhirConfiguration.get_fhir_identifier_type_system(),
+                                                   ApiFhirConfiguration.get_fhir_id_type_code())
+            identifiers.append(identifier.__dict__)
+
+    @classmethod
     def build_fhir_identifier(cls, value, type_system, type_code):
         identifier = Identifier()
         identifier.use = IdentifierUse.USUAL.value
@@ -64,3 +73,4 @@ class BaseFHIRConverter(object):
 
 
 from api_fhir.converters.patientConverter import PatientConverter
+from api_fhir.converters.locationConverter import LocationConverter

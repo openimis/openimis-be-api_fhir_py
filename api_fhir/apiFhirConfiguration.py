@@ -59,11 +59,11 @@ class ApiFhirConfiguration(object):
 
     @classmethod
     def get_fhir_code_for_dispensary(cls):
-        return api_fhir.fhir_location_role_type.get('fhir_code_for_dispensary', "PHARM")
+        return api_fhir.fhir_location_role_type.get('fhir_code_for_dispensary', "CSC")
 
     @classmethod
     def get_fhir_code_for_health_center(cls):
-        return api_fhir.fhir_location_role_type.get('fhir_code_for_health_center', "CARD")
+        return api_fhir.fhir_location_role_type.get('fhir_code_for_health_center', "PC")
 
     @classmethod
     def get_fhir_marital_status_system(cls):
@@ -89,3 +89,11 @@ class ApiFhirConfiguration(object):
     @classmethod
     def get_fhir_unknown_marital_status_code(cls):
         return api_fhir.fhir_marital_status_config.get('fhir_code_for_unknown', "U")
+
+    @classmethod
+    def get_default_value_of_location_offline_attribute(cls):
+        return api_fhir.fhir_marital_status_config.get('default_value_of_location_offline_attribute', False)
+
+    @classmethod
+    def get_default_value_of_location_care_type(cls):
+        return api_fhir.fhir_marital_status_config.get('default_value_of_location_care_type', "B")

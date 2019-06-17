@@ -2,7 +2,7 @@ import copy
 
 from location.models import HealthFacility
 
-from api_fhir.converters.locationConverter import LocationConverter
+from api_fhir.converters import LocationConverter
 from api_fhir.serializers import BaseFHIRSerializer
 
 
@@ -15,6 +15,19 @@ class LocationSerializer(BaseFHIRSerializer):
         return HealthFacility.objects.create(**copied_data)
 
     def update(self, instance, validated_data):
-        # TODO add update statements
+        # TODO legalForm isn't covered because that value is missing in the model
+        # TODO LocationId isn't covered because that value is missing in the model
+        # TODO offline isn't covered in the current version of API
+        # TODO care_type isn't covered in the current version of API
+        instance.code = validated_data.get('code', instance.code)
+        instance.name = validated_data.get('name', instance.name)
+        instance.level = validated_data.get('level', instance.level)
+        instance.address = validated_data.get('address', instance.address)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.fax = validated_data.get('fax', instance.fax)
+        instance.email = validated_data.get('email', instance.email)
         instance.save()
         return instance
+
+    class Meta:
+        app_label = 'api_fhir'

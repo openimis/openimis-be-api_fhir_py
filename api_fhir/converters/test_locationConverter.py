@@ -4,6 +4,7 @@ from location.models import HealthFacility
 from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
 from api_fhir.converters.locationConverter import LocationConverter
 from api_fhir.models import ContactPointSystem, Location, Address, ContactPointUse
+from api_fhir.models.address import AddressUse, AddressType
 
 
 class LocationConverterTestCase(TestCase):
@@ -30,7 +31,7 @@ class LocationConverterTestCase(TestCase):
         self.assertEqual(imis_hf.name, fhir_location.name)
         self.assertEqual(ApiFhirConfiguration.get_fhir_code_for_hospital(), fhir_location.type.get('coding')[0]
                          .get('code'))
-        self.assertEqual(imis_hf.address, fhir_location.address.get("test"))
+        self.assertEqual(imis_hf.address, fhir_location.address.get("text"))
         self.assertEqual(3, len(fhir_location.telecom))
         for telecom in fhir_location.telecom:
             if telecom.get("system") == ContactPointSystem.PHONE.value:
@@ -74,9 +75,8 @@ class LocationConverterTestCase(TestCase):
         location.type = LocationConverter.build_codeable_concept(
             ApiFhirConfiguration.get_fhir_code_for_hospital(),
             ApiFhirConfiguration.get_fhir_location_role_type_system()).__dict__
-        address = Address()
-        address.text = self.__TEST_ADDRESS
-        location.address = address
+        location.address = LocationConverter.build_fhir_address(self.__TEST_ADDRESS, AddressUse.HOME.value,
+                                                       AddressType.PHYSICAL.value).__dict__
         telecom = []
         phone = LocationConverter.build_fhir_contact_point(self.__TEST_PHONE, ContactPointSystem.PHONE.value,
                                                            ContactPointUse.HOME.value)
@@ -89,4 +89,4 @@ class LocationConverterTestCase(TestCase):
         telecom.append(email.__dict__)
         location.telecom = telecom
 
-        return location
+        return location.__dict__

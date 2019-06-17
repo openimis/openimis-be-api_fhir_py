@@ -5,7 +5,7 @@ from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
 from api_fhir.converters import PatientConverter
 import core
 
-from api_fhir.models import NameUse, AdministrativeGender, ImisMaritialStatus, ContactPointSystem, Patient, HumanName, \
+from api_fhir.models import NameUse, AdministrativeGender, ImisMaritalStatus, ContactPointSystem, Patient, HumanName, \
     ContactPointUse
 from api_fhir.models.address import AddressType, AddressUse
 
@@ -87,7 +87,7 @@ class PatientConverterTestCase(TestCase):
                                                            ApiFhirConfiguration.get_iso_date_format())
         self.assertEqual(expected_date, imis_insuree.dob)
         self.assertEqual(self.__TEST_GENDER_CODE, imis_insuree.gender.code)
-        self.assertEqual(ImisMaritialStatus.DIVORCED.value, imis_insuree.marital)
+        self.assertEqual(ImisMaritalStatus.DIVORCED.value, imis_insuree.marital)
         self.assertEqual(self.__TEST_PHONE, imis_insuree.phone)
         self.assertEqual(self.__TEST_EMAIL, imis_insuree.email)
         self.assertEqual(self.__TEST_ADDRESS, imis_insuree.current_address)
@@ -104,7 +104,7 @@ class PatientConverterTestCase(TestCase):
         imis_insuree.dob = core.datetime.datetime.strptime(self.__TEST_DOB,
                                                            ApiFhirConfiguration.get_iso_date_format())
         imis_insuree.gender = self.__TEST_GENDER
-        imis_insuree.marital = ImisMaritialStatus.DIVORCED.value
+        imis_insuree.marital = ImisMaritalStatus.DIVORCED.value
         imis_insuree.phone = self.__TEST_PHONE
         imis_insuree.email = self.__TEST_EMAIL
         imis_insuree.current_address = self.__TEST_ADDRESS
