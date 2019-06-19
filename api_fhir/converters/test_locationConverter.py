@@ -1,9 +1,9 @@
 from django.test import TestCase
 from location.models import HealthFacility
 
-from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
+from api_fhir.configurations import Stu3IdentifierConfig, Stu3LocationConfig
 from api_fhir.converters.locationConverter import LocationConverter
-from api_fhir.models import ContactPointSystem, Location, Address, ContactPointUse
+from api_fhir.models import ContactPointSystem, Location, ContactPointUse
 from api_fhir.models.address import AddressUse, AddressType
 
 
@@ -24,12 +24,12 @@ class LocationConverterTestCase(TestCase):
 
         self.assertEqual(2, len(fhir_location.identifier))
         for identifier in fhir_location.identifier:
-            if identifier.get("type").get("code") == ApiFhirConfiguration.get_fhir_id_type_code():
+            if identifier.get("type").get("code") == Stu3IdentifierConfig.get_fhir_id_type_code():
                 self.assertEqual(imis_hf.id, identifier.get("value"))
-            elif identifier.get("type").get("code") == ApiFhirConfiguration.get_fhir_facility_id_type():
+            elif identifier.get("type").get("code") == Stu3IdentifierConfig.get_fhir_facility_id_type():
                 self.assertEqual(imis_hf.code, identifier.get("value"))
         self.assertEqual(imis_hf.name, fhir_location.name)
-        self.assertEqual(ApiFhirConfiguration.get_fhir_code_for_hospital(), fhir_location.type.get('coding')[0]
+        self.assertEqual(Stu3LocationConfig.get_fhir_code_for_hospital(), fhir_location.type.get('coding')[0]
                          .get('code'))
         self.assertEqual(imis_hf.address, fhir_location.address.get("text"))
         self.assertEqual(3, len(fhir_location.telecom))
@@ -68,13 +68,13 @@ class LocationConverterTestCase(TestCase):
     def __create_fhir_location_test_instance(self):
         location = Location()
         identifiers = [LocationConverter.build_fhir_identifier(self.__TEST_HF_CODE,
-                                                               ApiFhirConfiguration.get_fhir_identifier_type_system(),
-                                                               ApiFhirConfiguration.get_fhir_facility_id_type()).__dict__]
+                                                               Stu3IdentifierConfig.get_fhir_identifier_type_system(),
+                                                               Stu3IdentifierConfig.get_fhir_facility_id_type()).__dict__]
         location.identifier = identifiers
         location.name = self.__TEST_HF_NAME
         location.type = LocationConverter.build_codeable_concept(
-            ApiFhirConfiguration.get_fhir_code_for_hospital(),
-            ApiFhirConfiguration.get_fhir_location_role_type_system()).__dict__
+            Stu3LocationConfig.get_fhir_code_for_hospital(),
+            Stu3LocationConfig.get_fhir_location_role_type_system()).__dict__
         location.address = LocationConverter.build_fhir_address(self.__TEST_ADDRESS, AddressUse.HOME.value,
                                                        AddressType.PHYSICAL.value).__dict__
         telecom = []

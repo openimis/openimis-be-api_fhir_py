@@ -1,4 +1,4 @@
-from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
+from api_fhir.configurations import Stu3IdentifierConfig
 from api_fhir.exceptions import FhirRequestProcessException
 from api_fhir.models import CodeableConcept, ContactPoint, Address, Coding, Identifier, IdentifierUse
 
@@ -39,11 +39,19 @@ class BaseFHIRConverter(object):
         return codeable_concept
 
     @classmethod
+    def get_first_coding_from_codeable_concept(cls, codeable_concept):
+        result = Coding().__dict__
+        coding = codeable_concept.get('coding')
+        if coding and isinstance(coding, list) and len(coding) > 0:
+            result = codeable_concept.get('coding')[0]
+        return result
+
+    @classmethod
     def build_fhir_id_identifier(cls, identifiers, imis_object):
         if imis_object.id is not None:
             identifier = cls.build_fhir_identifier(imis_object.id,
-                                                   ApiFhirConfiguration.get_fhir_identifier_type_system(),
-                                                   ApiFhirConfiguration.get_fhir_id_type_code())
+                                                   Stu3IdentifierConfig.get_fhir_identifier_type_system(),
+                                                   Stu3IdentifierConfig.get_fhir_id_type_code())
             identifiers.append(identifier.__dict__)
 
     @classmethod

@@ -1,11 +1,12 @@
 from location.models import HealthFacility
 
-from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
+from api_fhir.configurations import GeneralConfiguration, Stu3IdentifierConfig, Stu3LocationConfig
 from api_fhir.converters import BaseFHIRConverter
 from api_fhir.models import Location, ContactPointSystem, ContactPointUse
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.models.imisModelEnums import ImisHfLevel
-import core
+from api_fhir.utils import TimeUtils
+
 
 class LocationConverter(BaseFHIRConverter):
     @classmethod
@@ -35,9 +36,9 @@ class LocationConverter(BaseFHIRConverter):
         imis_hf = HealthFacility()
         # TODO legalForm isn't covered because that value is missing in the model (value need to be nullable in DB)
         # TODO LocationId isn't covered because that value is missing in the model (value need to be nullable in DB)
-        imis_hf.offline = ApiFhirConfiguration.get_default_value_of_location_offline_attribute()
-        imis_hf.care_type = ApiFhirConfiguration.get_default_value_of_location_care_type()
-        imis_hf.validity_from = core.datetime.datetime.now()
+        imis_hf.offline = GeneralConfiguration.get_default_value_of_location_offline_attribute()
+        imis_hf.care_type = GeneralConfiguration.get_default_value_of_location_care_type()
+        imis_hf.validity_from = TimeUtils.now()
         imis_hf.audit_user_id = audit_user_id
         return imis_hf
 
@@ -52,8 +53,8 @@ class LocationConverter(BaseFHIRConverter):
     def build_fhir_hf_code_identifier(cls, identifiers, imis_hf):
         if imis_hf is not None:
             identifier = cls.build_fhir_identifier(imis_hf.code,
-                                                   ApiFhirConfiguration.get_fhir_identifier_type_system(),
-                                                   ApiFhirConfiguration.get_fhir_facility_id_type())
+                                                   Stu3IdentifierConfig.get_fhir_identifier_type_system(),
+                                                   Stu3IdentifierConfig.get_fhir_facility_id_type())
             identifiers.append(identifier.__dict__)
 
     @classmethod
@@ -61,12 +62,13 @@ class LocationConverter(BaseFHIRConverter):
         if fhir_location.get('identifier') is not None:
             for identifier in fhir_location.get('identifier'):
                 identifier_type = identifier.get("type")
-                if identifier_type is not None \
-                        and identifier_type.get('coding') is not None \
-                        and identifier_type.get('coding')[0].get("system") == ApiFhirConfiguration \
-                        .get_fhir_identifier_type_system():
-                    if identifier_type.get('coding')[0].get("code") == ApiFhirConfiguration.get_fhir_facility_id_type():
-                        if identifier.get("value") is not None:
+                if identifier_type:
+                    coding_list = identifier_type.get('coding')
+                    if coding_list:
+                        first_code = cls.get_first_coding_from_codeable_concept(identifier_type)
+                        if first_code.get("system") == Stu3IdentifierConfig.get_fhir_identifier_type_system() \
+                                and first_code.get("code") == Stu3IdentifierConfig.get_fhir_facility_id_type() \
+                                and identifier.get("value"):
                             imis_hf.code = identifier.get("value")
         cls.valid_condition(imis_hf.code is None, 'Missing hf code', errors)
 
@@ -84,27 +86,27 @@ class LocationConverter(BaseFHIRConverter):
     def build_fhir_location_type(cls, fhir_location, imis_hf):
         code = ""
         if imis_hf.level == ImisHfLevel.HEALTH_CENTER.value:
-            code = ApiFhirConfiguration.get_fhir_code_for_health_center()
+            code = Stu3LocationConfig.get_fhir_code_for_health_center()
         elif imis_hf.level == ImisHfLevel.HOSPITAL.value:
-            code = ApiFhirConfiguration.get_fhir_code_for_hospital()
+            code = Stu3LocationConfig.get_fhir_code_for_hospital()
         elif imis_hf.level == ImisHfLevel.DISPENSARY.value:
-            code = ApiFhirConfiguration.get_fhir_code_for_dispensary()
+            code = Stu3LocationConfig.get_fhir_code_for_dispensary()
 
         fhir_location.type = \
-            cls.build_codeable_concept(code, ApiFhirConfiguration.get_fhir_location_role_type_system()).__dict__
+            cls.build_codeable_concept(code, Stu3LocationConfig.get_fhir_location_role_type_system()).__dict__
 
     @classmethod
     def build_imis_hf_level(cls, imis_hf, fhir_location, errors):
         if not cls.valid_condition(fhir_location.get('type') is None,
                                    'Missing patient `type` attribute', errors):
             for maritialCoding in fhir_location.get('type').get('coding'):
-                if maritialCoding.get("system") == ApiFhirConfiguration.get_fhir_location_role_type_system():
+                if maritialCoding.get("system") == Stu3LocationConfig.get_fhir_location_role_type_system():
                     code = maritialCoding.get("code")
-                    if code == ApiFhirConfiguration.get_fhir_code_for_health_center():
+                    if code == Stu3LocationConfig.get_fhir_code_for_health_center():
                         imis_hf.level = ImisHfLevel.HEALTH_CENTER.value
-                    elif code == ApiFhirConfiguration.get_fhir_code_for_hospital():
+                    elif code == Stu3LocationConfig.get_fhir_code_for_hospital():
                         imis_hf.level = ImisHfLevel.HOSPITAL.value
-                    elif code == ApiFhirConfiguration.get_fhir_code_for_dispensary():
+                    elif code == Stu3LocationConfig.get_fhir_code_for_dispensary():
                         imis_hf.level = ImisHfLevel.DISPENSARY.value
 
             cls.valid_condition(imis_hf.level is None, 'Missing hf level', errors)
