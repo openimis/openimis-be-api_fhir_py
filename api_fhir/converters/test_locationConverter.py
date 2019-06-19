@@ -67,10 +67,10 @@ class LocationConverterTestCase(TestCase):
 
     def __create_fhir_location_test_instance(self):
         location = Location()
-        identifiers = [LocationConverter.build_fhir_identifier(self.__TEST_HF_CODE,
-                                                               Stu3IdentifierConfig.get_fhir_identifier_type_system(),
-                                                               Stu3IdentifierConfig.get_fhir_facility_id_type()).__dict__]
-        location.identifier = identifiers
+        identifier = LocationConverter.build_fhir_identifier(self.__TEST_HF_CODE,
+                                                           Stu3IdentifierConfig.get_fhir_identifier_type_system(),
+                                                           Stu3IdentifierConfig.get_fhir_facility_id_type()).__dict__
+        location.identifier = [identifier]
         location.name = self.__TEST_HF_NAME
         location.type = LocationConverter.build_codeable_concept(
             Stu3LocationConfig.get_fhir_code_for_hospital(),
