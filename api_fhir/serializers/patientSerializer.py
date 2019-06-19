@@ -18,6 +18,8 @@ class PatientSerializer(BaseFHIRSerializer):
         # TODO the familyid isn't covered because that value is missing in the model
         # TODO the photoId isn't covered because that value is missing in the model
         # TODO the typeofid isn't covered because that value is missing in the model
+        # TODO the head isn't covered in the current version of API
+        # TODO the card_issued isn't covered in the current version of API
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.other_names = validated_data.get('other_names', instance.other_names)
         instance.chf_id = validated_data.get('chf_id', instance.chf_id)

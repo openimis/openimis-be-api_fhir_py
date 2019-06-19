@@ -1,11 +1,11 @@
 from django.test import TestCase
 from insuree.models import Insuree, Gender
 
-from api_fhir.apiFhirConfiguration import ApiFhirConfiguration
+from api_fhir.configurations import Stu3IdentifierConfig, Stu3MaritalConfig, GeneralConfiguration
 from api_fhir.converters import PatientConverter
 import core
 
-from api_fhir.models import NameUse, AdministrativeGender, ImisMaritialStatus, ContactPointSystem, Patient, HumanName, \
+from api_fhir.models import NameUse, AdministrativeGender, ImisMaritalStatus, ContactPointSystem, Patient, HumanName, \
     ContactPointUse
 from api_fhir.models.address import AddressType, AddressUse
 
@@ -44,18 +44,19 @@ class PatientConverterTestCase(TestCase):
 
         self.assertEqual(3, len(fhir_patient.identifier))
         for identifier in fhir_patient.identifier:
-            if identifier.get("type").get("code") == ApiFhirConfiguration.get_fhir_chfid_type_code():
+            if identifier.get("type").get("code") == Stu3IdentifierConfig.get_fhir_chfid_type_code():
                 self.assertEqual(imis_insuree.chf_id, identifier.get("value"))
-            elif identifier.get("type").get("code") == ApiFhirConfiguration.get_fhir_id_type_code():
+            elif identifier.get("type").get("code") == Stu3IdentifierConfig.get_fhir_id_type_code():
                 self.assertEqual(imis_insuree.id, identifier.get("value"))
-            elif identifier.get("type").get("code") == ApiFhirConfiguration.get_fhir_passport_type_code():
+            elif identifier.get("type").get("code") == Stu3IdentifierConfig.get_fhir_passport_type_code():
                 self.assertEqual(imis_insuree.passport, identifier.get("value"))
 
         self.assertEqual(imis_insuree.dob.isoformat(), fhir_patient.birthDate)
 
         self.assertEqual(AdministrativeGender.MALE.value, fhir_patient.gender)
 
-        self.assertEqual(ApiFhirConfiguration.get_fhir_divorced_code(), fhir_patient.maritalStatus.get("code"))
+        self.assertEqual(Stu3MaritalConfig.get_fhir_divorced_code(),
+                         fhir_patient.maritalStatus.get("coding")[0].get('code'))
 
         self.assertEqual(2, len(fhir_patient.telecom))
         for telecom in fhir_patient.telecom:
@@ -82,11 +83,10 @@ class PatientConverterTestCase(TestCase):
         self.assertEqual(self.__TEST_CHF_ID, imis_insuree.chf_id)
         self.assertEqual(self.__TEST_PASSPORT, imis_insuree.passport)
         self.assertEqual(self.__TEST_PASSPORT, imis_insuree.passport)
-        expected_date = core.datetime.datetime.strptime(self.__TEST_DOB,
-                                                           ApiFhirConfiguration.get_iso_date_format())
+        expected_date = core.datetime.datetime.strptime(self.__TEST_DOB, GeneralConfiguration.get_iso_date_format())
         self.assertEqual(expected_date, imis_insuree.dob)
         self.assertEqual(self.__TEST_GENDER_CODE, imis_insuree.gender.code)
-        self.assertEqual(ImisMaritialStatus.DIVORCED.value, imis_insuree.marital)
+        self.assertEqual(ImisMaritalStatus.DIVORCED.value, imis_insuree.marital)
         self.assertEqual(self.__TEST_PHONE, imis_insuree.phone)
         self.assertEqual(self.__TEST_EMAIL, imis_insuree.email)
         self.assertEqual(self.__TEST_ADDRESS, imis_insuree.current_address)
@@ -100,10 +100,9 @@ class PatientConverterTestCase(TestCase):
         imis_insuree.id = self.__TEST_ID
         imis_insuree.chf_id = self.__TEST_CHF_ID
         imis_insuree.passport = self.__TEST_PASSPORT
-        imis_insuree.dob = core.datetime.datetime.strptime(self.__TEST_DOB,
-                                                           ApiFhirConfiguration.get_iso_date_format())
+        imis_insuree.dob = core.datetime.datetime.strptime(self.__TEST_DOB, GeneralConfiguration.get_iso_date_format())
         imis_insuree.gender = self.__TEST_GENDER
-        imis_insuree.marital = ImisMaritialStatus.DIVORCED.value
+        imis_insuree.marital = ImisMaritalStatus.DIVORCED.value
         imis_insuree.phone = self.__TEST_PHONE
         imis_insuree.email = self.__TEST_EMAIL
         imis_insuree.current_address = self.__TEST_ADDRESS
@@ -119,19 +118,19 @@ class PatientConverterTestCase(TestCase):
         fhir_patient.name = [name.__dict__]
         identifiers = []
         chf_id = PatientConverter.build_fhir_identifier(self.__TEST_CHF_ID,
-                                                        ApiFhirConfiguration.get_fhir_identifier_type_system(),
-                                                        ApiFhirConfiguration.get_fhir_chfid_type_code())
+                                                        Stu3IdentifierConfig.get_fhir_identifier_type_system(),
+                                                        Stu3IdentifierConfig.get_fhir_chfid_type_code())
         identifiers.append(chf_id.__dict__)
         passport = PatientConverter.build_fhir_identifier(self.__TEST_PASSPORT,
-                                               ApiFhirConfiguration.get_fhir_identifier_type_system(),
-                                               ApiFhirConfiguration.get_fhir_passport_type_code())
+                                                          Stu3IdentifierConfig.get_fhir_identifier_type_system(),
+                                                          Stu3IdentifierConfig.get_fhir_passport_type_code())
         identifiers.append(passport.__dict__)
         fhir_patient.identifier = identifiers
         fhir_patient.birthDate = self.__TEST_DOB
         fhir_patient.gender = AdministrativeGender.MALE.value
         fhir_patient.maritalStatus = PatientConverter.build_codeable_concept(
-            ApiFhirConfiguration.get_fhir_divorced_code(),
-            ApiFhirConfiguration.get_fhir_marital_status_system()).__dict__
+            Stu3MaritalConfig.get_fhir_divorced_code(),
+            Stu3MaritalConfig.get_fhir_marital_status_system()).__dict__
         telecom = []
         phone = PatientConverter.build_fhir_contact_point(self.__TEST_PHONE, ContactPointSystem.PHONE.value,
                                                           ContactPointUse.HOME.value)
