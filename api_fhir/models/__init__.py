@@ -88,7 +88,6 @@ class Property(PropertyMixin):
                     instance._values[self.definition.name].append(item)
             else:
                 raise PropertyError("The value of property {} need to be a list".format(self.definition.name))
-
         else:
             if isinstance(value, list):
                 raise PropertyError("The value of property {} shouldn't be a list".format(self.definition.name))
@@ -171,12 +170,10 @@ class FHIRBaseObject(object):
                 resourceType = obj.pop('resourceType')
                 class_ = eval_type(resourceType)
                 value = class_()._fromDict(obj)
-
             elif isinstance(obj, dict):
                 # Complex type
                 value = prop_type()
                 value._fromDict(obj)
-
             elif isinstance(obj, list):
                 # Could be a list of dicts or simple values;
                 value = []
@@ -265,3 +262,4 @@ from api_fhir.models.reference import Reference
 from api_fhir.models.sampledData import SampledData
 from api_fhir.models.signature import Signature
 from api_fhir.models.timing import Timing, TimingRepeat
+from api_fhir.models.operationOutcome import OperationOutcome, OperationOutcomeIssue, IssueSeverity
