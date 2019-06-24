@@ -1,16 +1,10 @@
-from api_fhir.models.element import Element
+from api_fhir.models import Element, Property
 
 
 class Period(Element):
 
-    resource_type = "Period"
-
-    def __init__(self):
-        self.end = None  # Type `FHIRDate` (represented as `str` in JSON).
-
-        self.start = None  # Type `FHIRDate` (represented as `str` in JSON).
-
-        super(Period, self).__init__()
+    end = Property('end', 'FHIRDate')
+    start = Property('start', 'FHIRDate')
 
     class Meta:
         app_label = 'api_fhir'

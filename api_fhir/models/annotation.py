@@ -1,20 +1,12 @@
-from api_fhir.models.element import Element
+from api_fhir.models import Element, Property
 
 
 class Annotation(Element):
 
-    resource_type = "Annotation"
-
-    def __init__(self):
-        self.authorReference = None  # Type `Reference` (represented as `dict` in JSON).
-
-        self.authorString = None  # Type `str`.
-
-        self.text = None  # Type `str`.
-
-        self.time = None  # Type `FHIRDate` (represented as `str` in JSON).
-
-        super(Annotation, self).__init__()
+    authorReference = Property('authorReference', 'Reference')
+    authorString = Property('authorString', str)
+    text = Property('text', str)
+    time = Property('time', 'FHIRDate')
 
     class Meta:
         app_label = 'api_fhir'

@@ -1,61 +1,34 @@
 from enum import Enum
 
-from api_fhir.models import DomainResource, BackboneElement
+from api_fhir.models import Property, BackboneElement, DomainResource
 
 
-class Location(DomainResource):
-
-    resource_type = "Location"
-
-    def __init__(self):
-        self.identifier = None  # List of `Identifier` items (represented as `dict` in JSON).
-
-        self.status = None  # Type `LocationStatus`.
-
-        self.operationalStatus = None  # Type `Coding` (represented as `dict` in JSON).
-
-        self.name = None  # Type `str`.
-
-        self.alias = None  # List of `str` items.
-
-        self.description = None  # Type `str`.
-
-        self.mode = None  # Type `LocationMode`.
-
-        self.type = None  # Type `CodeableConcept` (represented as `dict` in JSON).
-
-        self.telecom = None  # List of `ContactPoint` items (represented as `dict` in JSON).
-
-        self.address = None  # Type `Address` (represented as `dict` in JSON).
-
-        self.physicalType = None  # Type `CodeableConcept` (represented as `dict` in JSON).
-
-        self.position = None  # Type `LocationPosition` (represented as `dict` in JSON).
-
-        self.managingOrganization = None  # Type `Reference` referencing `Organization` (represented as `dict` in JSON).
-
-        self.partOf = None  # Type `Reference` referencing `Location` (represented as `dict` in JSON).
-
-        self.endpoint = None  # List of `Reference` items referencing `Endpoint` (represented as `dict` in JSON).
-
-        super(Location, self).__init__()
+class LocationPosition(BackboneElement):
+    altitude = Property('altitude', float)
+    latitude = Property('latitude', float)
+    longitude = Property('longitude', float)
 
     class Meta:
         app_label = 'api_fhir'
 
 
-class LocationPosition(BackboneElement):
+class Location(DomainResource):
 
-    resource_type = "LocationPosition"
-
-    def __init__(self):
-        self.altitude = None  # Type `float`.
-
-        self.latitude = None  # Type `float`.
-
-        self.longitude = None  # Type `float`.
-
-        super(LocationPosition, self).__init__()
+    identifier = Property('identifier', 'Identifier', count_max='*')
+    status = Property('status', str)  # LocationStatus
+    operationalStatus = Property('operationalStatus', 'Coding')
+    name = Property('name', str)
+    alias = Property('alias', str, count_max='*')
+    description = Property('description', str)
+    mode = Property('mode', str)  # LocationMode
+    type = Property('type', 'CodeableConcept')
+    telecom = Property('telecom', 'ContactPoint', count_max='*')
+    address = Property('address', 'Address')
+    physicalType = Property('physicalType', 'CodeableConcept')
+    position = Property('position', 'LocationPosition')
+    managingOrganization = Property('managingOrganization', 'Reference')  # referencing `Organization`
+    partOf = Property('partOf', 'Reference')  # referencing `Location`
+    endpoint = Property('endpoint', 'Reference', count_max='*')  # referencing `Endpoint`
 
     class Meta:
         app_label = 'api_fhir'

@@ -1,12 +1,12 @@
-class Resource(object):
-    def __init__(self):
-        self.id = None  # Type `str` (id)
+from api_fhir.models import FHIRBaseObject, Property
 
-        self.meta = None  # Type `Meta`
 
-        self.implicitRules = None  # Type `str`
+class Resource(FHIRBaseObject):
 
-        self.language = None  # Type `str` (code)
+    id = Property('id', str)
+    meta = Property('meta', 'Meta')
+    implicitRules = Property('implicitRules', str)
+    language = Property('language', str)  # code
 
     class Meta:
         app_label = 'api_fhir'

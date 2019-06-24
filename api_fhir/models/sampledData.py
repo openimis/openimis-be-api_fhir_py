@@ -1,26 +1,15 @@
-from api_fhir.models.element import Element
+from api_fhir.models import Element, Property
 
 
 class SampledData(Element):
 
-    resource_type = "SampledData"
-
-    def __init__(self):
-        self.data = None  # Type `str` ("E" | "U" | "L").
-
-        self.dimensions = None  # Type `int`.
-
-        self.factor = None  # Type `float`.
-
-        self.lowerLimit = None  # Type `float`.
-
-        self.origin = None  # Type `Quantity` (represented as `dict` in JSON).
-
-        self.period = None  # Type `float`.
-
-        self.upperLimit = None  # Type `float`.
-
-        super(SampledData, self).__init__()
+    data = Property('data', str)  # "E" | "U" | "L"
+    dimensions = Property('dimensions', int)
+    factor = Property('factor', float)
+    lowerLimit = Property('lowerLimit', float)
+    origin = Property('origin', 'Quantity')
+    period = Property('period', float)
+    upperLimit = Property('upperLimit', float)
 
     class Meta:
         app_label = 'api_fhir'

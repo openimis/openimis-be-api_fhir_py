@@ -55,16 +55,18 @@ class PatientConverter(BaseFHIRConverter):
         name.use = NameUse.USUAL.value
         name.family = imisInsuree.last_name
         name.given = [imisInsuree.other_names]
-        fhirPatient.name = [name.__dict__]
+        fhirPatient.name = [name]
 
     @classmethod
     def build_imis_names(cls, imis_insuree, fhir_patient, errors):
-        if not cls.valid_condition(fhir_patient.get('name') is None, 'Missing patient `name` attribute', errors):
-            for name in fhir_patient.get('name'):
-                if name['use'] == NameUse.USUAL.value:
-                    imis_insuree.last_name = name['family']
-                    if name.get('given') is not None and len(name.get('given')) > 0:
-                        imis_insuree.other_names = name['given'][0]
+        names = fhir_patient.name
+        if not cls.valid_condition(names is None, 'Missing patient `name` attribute', errors):
+            for name in names:
+                if name.use == NameUse.USUAL.value:
+                    imis_insuree.last_name = name.family
+                    given_names = name.given
+                    if given_names and len(given_names ) > 0:
+                        imis_insuree.other_names = given_names[0]
                     break
             cls.valid_condition(imis_insuree.last_name is None, 'Missing patient family name', errors)
             cls.valid_condition(imis_insuree.other_names is None, 'Missing patient given name', errors)
@@ -79,16 +81,17 @@ class PatientConverter(BaseFHIRConverter):
 
     @classmethod
     def build_imis_identifiers(cls, imis_insuree, fhir_patient):
-        if fhir_patient.get('identifier') is not None:
-            for identifier in fhir_patient.get('identifier'):
-                identifier_type = identifier.get("type")
+        identifiers = fhir_patient.identifier
+        if identifiers is not None:
+            for identifier in identifiers:
+                identifier_type = identifier.type
                 if identifier_type:
-                    coding_list = identifier_type.get('coding')
+                    coding_list = identifier_type.coding
                     if coding_list:
-                        first_code = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_code.get("system") == Stu3IdentifierConfig.get_fhir_identifier_type_system():
-                            code = first_code.get("code")
-                            value = identifier.get("value")
+                        first_coding = cls.get_first_coding_from_codeable_concept(identifier_type)
+                        if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system():
+                            code = first_coding.code
+                            value = identifier.value
                             if value and code == Stu3IdentifierConfig.get_fhir_chfid_type_code():
                                 imis_insuree.chf_id = value
                             if value and code == Stu3IdentifierConfig.get_fhir_passport_type_code():
@@ -100,7 +103,7 @@ class PatientConverter(BaseFHIRConverter):
             identifier = cls.build_fhir_identifier(imis_insuree.chf_id,
                                                    Stu3IdentifierConfig.get_fhir_identifier_type_system(),
                                                    Stu3IdentifierConfig.get_fhir_chfid_type_code())
-            identifiers.append(identifier.__dict__)
+            identifiers.append(identifier)
 
     @classmethod
     def build_fhir_passport_identifier(cls, identifiers, imis_insuree):
@@ -110,7 +113,7 @@ class PatientConverter(BaseFHIRConverter):
             identifier = cls.build_fhir_identifier(imis_insuree.passport,
                                                    Stu3IdentifierConfig.get_fhir_identifier_type_system(),
                                                    Stu3IdentifierConfig.get_fhir_passport_type_code())
-            identifiers.append(identifier.__dict__)
+            identifiers.append(identifier)
 
     @classmethod
     def build_fhir_birth_date(cls, fhir_patient, imis_insuree):
@@ -118,10 +121,9 @@ class PatientConverter(BaseFHIRConverter):
 
     @classmethod
     def build_imis_birth_date(cls, imis_insuree, fhir_patient, errors):
-        if not cls.valid_condition(fhir_patient.get('birthDate') is None,
-                                   'Missing patient `birthDate` attribute', errors):
-            dob = TimeUtils.str_to_date(fhir_patient.get('birthDate'))
-            imis_insuree.dob = dob
+        birth_date = fhir_patient.birthDate
+        if not cls.valid_condition(birth_date is None, 'Missing patient `birthDate` attribute', errors):
+            imis_insuree.dob = TimeUtils.str_to_date(birth_date)
 
     @classmethod
     def build_fhir_gender(cls, fhir_patient, imis_insuree):
@@ -138,8 +140,8 @@ class PatientConverter(BaseFHIRConverter):
 
     @classmethod
     def build_imis_gender(cls, imis_insuree, fhir_patient):
-        if fhir_patient.get("gender") is not None:
-            gender = fhir_patient.get("gender")
+        gender = fhir_patient.gender
+        if gender is not None:
             imis_gender_code = None
             if gender == AdministrativeGender.MALE.value:
                 imis_gender_code = GeneralConfiguration.get_male_gender_code()
@@ -156,31 +158,31 @@ class PatientConverter(BaseFHIRConverter):
             if imis_insuree.marital == ImisMaritalStatus.MARRIED.value:
                 fhir_patient.maritalStatus = \
                     cls.build_codeable_concept(Stu3MaritalConfig.get_fhir_married_code(),
-                                               Stu3MaritalConfig.get_fhir_marital_status_system()).__dict__
+                                               Stu3MaritalConfig.get_fhir_marital_status_system())
             elif imis_insuree.marital == ImisMaritalStatus.SINGLE.value:
                 fhir_patient.maritalStatus = \
                     cls.build_codeable_concept(Stu3MaritalConfig.get_fhir_never_married_code(),
-                                               Stu3MaritalConfig.get_fhir_marital_status_system()).__dict__
+                                               Stu3MaritalConfig.get_fhir_marital_status_system())
             elif imis_insuree.marital == ImisMaritalStatus.DIVORCED.value:
                 fhir_patient.maritalStatus = \
                     cls.build_codeable_concept(Stu3MaritalConfig.get_fhir_divorced_code(),
-                                               Stu3MaritalConfig.get_fhir_marital_status_system()).__dict__
+                                               Stu3MaritalConfig.get_fhir_marital_status_system())
             elif imis_insuree.marital == ImisMaritalStatus.WIDOWED.value:
                 fhir_patient.maritalStatus = \
                     cls.build_codeable_concept(Stu3MaritalConfig.get_fhir_widowed_code(),
-                                               Stu3MaritalConfig.get_fhir_marital_status_system()).__dict__
+                                               Stu3MaritalConfig.get_fhir_marital_status_system())
             elif imis_insuree.marital == ImisMaritalStatus.NOT_SPECIFIED.value:
                 fhir_patient.maritalStatus = \
                     cls.build_codeable_concept(Stu3MaritalConfig.get_fhir_unknown_marital_status_code(),
-                                               Stu3MaritalConfig.get_fhir_marital_status_system()).__dict__
+                                               Stu3MaritalConfig.get_fhir_marital_status_system())
 
     @classmethod
     def build_imis_marital(cls, imis_insuree, fhir_patient):
-        if fhir_patient.get("maritalStatus") is not None:
-            maritalStatus = fhir_patient.get("maritalStatus")
-            for maritialCoding in maritalStatus.get('coding'):
-                if maritialCoding.get("system") == Stu3MaritalConfig.get_fhir_marital_status_system():
-                    code = maritialCoding.get("code")
+        marital_status = fhir_patient.maritalStatus
+        if marital_status is not None:
+            for maritialCoding in marital_status.coding:
+                if maritialCoding.system == Stu3MaritalConfig.get_fhir_marital_status_system():
+                    code = maritialCoding.code
                     if code == Stu3MaritalConfig.get_fhir_married_code():
                         imis_insuree.marital = ImisMaritalStatus.MARRIED.value
                     elif code == Stu3MaritalConfig.get_fhir_never_married_code():
@@ -198,21 +200,22 @@ class PatientConverter(BaseFHIRConverter):
         if imis_insuree.phone is not None:
             phone = cls.build_fhir_contact_point(imis_insuree.phone, ContactPointSystem.PHONE.value,
                                              ContactPointUse.HOME.value)
-            telecom.append(phone.__dict__)
+            telecom.append(phone)
         if imis_insuree.email is not None:
             email = cls.build_fhir_contact_point(imis_insuree.email, ContactPointSystem.EMAIL.value,
                                              ContactPointUse.HOME.value)
-            telecom.append(email.__dict__)
+            telecom.append(email)
         fhir_patient.telecom = telecom
 
     @classmethod
     def build_imis_contacts(cls, imis_insuree, fhir_patient):
-        if fhir_patient.get('telecom') is not None:
-            for contact_point in fhir_patient.get('telecom'):
-                if contact_point.get("system") == ContactPointSystem.PHONE.value:
-                    imis_insuree.phone = contact_point.get("value")
-                elif contact_point.get("system") == ContactPointSystem.EMAIL.value:
-                    imis_insuree.email = contact_point.get("value")
+        telecom = fhir_patient.telecom
+        if telecom is not None:
+            for contact_point in telecom:
+                if contact_point.system == ContactPointSystem.PHONE.value:
+                    imis_insuree.phone = contact_point.value
+                elif contact_point.system == ContactPointSystem.EMAIL.value:
+                    imis_insuree.email = contact_point.value
 
     @classmethod
     def build_fhir_addresses(cls, fhir_patient, imis_insuree):
@@ -220,21 +223,22 @@ class PatientConverter(BaseFHIRConverter):
         if imis_insuree.current_address is not None:
             current_address = cls.build_fhir_address(imis_insuree.current_address, AddressUse.HOME.value,
                                                      AddressType.PHYSICAL.value)
-            addresses.append(current_address.__dict__)
+            addresses.append(current_address)
         if imis_insuree.geolocation is not None:
             geolocation = cls.build_fhir_address(imis_insuree.geolocation, AddressUse.HOME.value,
                                                  AddressType.BOTH.value)
-            addresses.append(geolocation.__dict__)
+            addresses.append(geolocation)
         fhir_patient.address = addresses
 
     @classmethod
     def build_imis_addresses(cls, imis_insuree, fhir_patient):
-        if fhir_patient.get('address') is not None:
-            for address in fhir_patient.get('address'):
-                if address.get("type") == AddressType.PHYSICAL.value:
-                    imis_insuree.current_address = address.get("text")
-                elif address.get("type") == AddressType.BOTH.value:
-                    imis_insuree.geolocation = address.get("text")
+        addresses = fhir_patient.address
+        if addresses is not None:
+            for address in addresses:
+                if address.type == AddressType.PHYSICAL.value:
+                    imis_insuree.current_address = address.text
+                elif address.type == AddressType.BOTH.value:
+                    imis_insuree.geolocation = address.text
 
     class Meta:
         app_label = 'api_fhir'

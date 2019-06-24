@@ -55,21 +55,22 @@ class LocationConverter(BaseFHIRConverter):
             identifier = cls.build_fhir_identifier(imis_hf.code,
                                                    Stu3IdentifierConfig.get_fhir_identifier_type_system(),
                                                    Stu3IdentifierConfig.get_fhir_facility_id_type())
-            identifiers.append(identifier.__dict__)
+            identifiers.append(identifier)
 
     @classmethod
     def build_imis_hf_identiftier(cls, imis_hf, fhir_location, errors):
-        if fhir_location.get('identifier') is not None:
-            for identifier in fhir_location.get('identifier'):
-                identifier_type = identifier.get("type")
+        identifiers = fhir_location.identifier
+        if identifiers is not None:
+            for identifier in identifiers:
+                identifier_type = identifier.type
                 if identifier_type:
-                    coding_list = identifier_type.get('coding')
+                    coding_list = identifier_type.coding
                     if coding_list:
                         first_code = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_code.get("system") == Stu3IdentifierConfig.get_fhir_identifier_type_system() \
-                                and first_code.get("code") == Stu3IdentifierConfig.get_fhir_facility_id_type() \
-                                and identifier.get("value"):
-                            imis_hf.code = identifier.get("value")
+                        if first_code.system == Stu3IdentifierConfig.get_fhir_identifier_type_system() \
+                                and first_code.code == Stu3IdentifierConfig.get_fhir_facility_id_type() \
+                                and identifier.value:
+                            imis_hf.code = identifier.value
         cls.valid_condition(imis_hf.code is None, 'Missing hf code', errors)
 
     @classmethod
@@ -78,9 +79,10 @@ class LocationConverter(BaseFHIRConverter):
 
     @classmethod
     def build_imis_hf_name(cls, imis_hf, fhir_location, errors):
-        if not cls.valid_condition(fhir_location.get('name') is None,
+        name = fhir_location.name
+        if not cls.valid_condition(name is None,
                                    'Missing patient `name` attribute', errors):
-            imis_hf.name = fhir_location.get('name')
+            imis_hf.name = name
 
     @classmethod
     def build_fhir_location_type(cls, fhir_location, imis_hf):
@@ -93,15 +95,16 @@ class LocationConverter(BaseFHIRConverter):
             code = Stu3LocationConfig.get_fhir_code_for_dispensary()
 
         fhir_location.type = \
-            cls.build_codeable_concept(code, Stu3LocationConfig.get_fhir_location_role_type_system()).__dict__
+            cls.build_codeable_concept(code, Stu3LocationConfig.get_fhir_location_role_type_system())
 
     @classmethod
     def build_imis_hf_level(cls, imis_hf, fhir_location, errors):
-        if not cls.valid_condition(fhir_location.get('type') is None,
+        location_type = fhir_location.type
+        if not cls.valid_condition(location_type is None,
                                    'Missing patient `type` attribute', errors):
-            for maritialCoding in fhir_location.get('type').get('coding'):
-                if maritialCoding.get("system") == Stu3LocationConfig.get_fhir_location_role_type_system():
-                    code = maritialCoding.get("code")
+            for maritialCoding in location_type.coding:
+                if maritialCoding.system == Stu3LocationConfig.get_fhir_location_role_type_system():
+                    code = maritialCoding.code
                     if code == Stu3LocationConfig.get_fhir_code_for_health_center():
                         imis_hf.level = ImisHfLevel.HEALTH_CENTER.value
                     elif code == Stu3LocationConfig.get_fhir_code_for_hospital():
@@ -114,14 +117,14 @@ class LocationConverter(BaseFHIRConverter):
     @classmethod
     def build_fhir_location_address(cls, fhir_location, imis_hf):
         fhir_location.address = cls.build_fhir_address(imis_hf.address, AddressUse.HOME.value,
-                                                       AddressType.PHYSICAL.value).__dict__
+                                                       AddressType.PHYSICAL.value)
 
     @classmethod
     def build_imis_hf_address(cls, imis_hf, fhir_location):
-        address = fhir_location.get('address')
+        address = fhir_location.address
         if address is not None:
-            if address.get("type") == AddressType.PHYSICAL.value:
-                imis_hf.address = address.get("text")
+            if address.type == AddressType.PHYSICAL.value:
+                imis_hf.address = address.text
 
     @classmethod
     def build_fhir_location_telcome(cls, fhir_location, imis_hf):
@@ -129,27 +132,28 @@ class LocationConverter(BaseFHIRConverter):
         if imis_hf.phone is not None:
             phone = LocationConverter.build_fhir_contact_point(imis_hf.phone, ContactPointSystem.PHONE.value,
                                                                ContactPointUse.HOME.value)
-            telecom.append(phone.__dict__)
+            telecom.append(phone)
         if imis_hf.fax is not None:
             fax = LocationConverter.build_fhir_contact_point(imis_hf.fax, ContactPointSystem.FAX.value,
                                                              ContactPointUse.HOME.value)
-            telecom.append(fax.__dict__)
+            telecom.append(fax)
         if imis_hf.email is not None:
             email = LocationConverter.build_fhir_contact_point(imis_hf.email, ContactPointSystem.EMAIL.value,
                                                                ContactPointUse.HOME.value)
-            telecom.append(email.__dict__)
+            telecom.append(email)
         fhir_location.telecom = telecom
 
     @classmethod
     def build_imis_hf_contacts(cls, imis_hf, fhir_location):
-        if fhir_location.get('telecom') is not None:
-            for contact_point in fhir_location.get('telecom'):
-                if contact_point.get("system") == ContactPointSystem.PHONE.value:
-                    imis_hf.phone = contact_point.get("value")
-                elif contact_point.get("system") == ContactPointSystem.FAX.value:
-                    imis_hf.fax = contact_point.get("value")
-                elif contact_point.get("system") == ContactPointSystem.EMAIL.value:
-                    imis_hf.email = contact_point.get("value")
+        telecom = fhir_location.telecom
+        if telecom is not None:
+            for contact_point in telecom:
+                if contact_point.system == ContactPointSystem.PHONE.value:
+                    imis_hf.phone = contact_point.value
+                elif contact_point.system == ContactPointSystem.FAX.value:
+                    imis_hf.fax = contact_point.value
+                elif contact_point.system == ContactPointSystem.EMAIL.value:
+                    imis_hf.email = contact_point.value
 
     class Meta:
         app_label = 'api_fhir'

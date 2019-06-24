@@ -1,20 +1,12 @@
-from api_fhir.models.element import Element
+from api_fhir.models import Element, Property
 
 
 class Reference(Element):
 
-    resource_type = "Reference"
-
-    def __init__(self):
-        self.display = None  # Type `str`.
-
-        self.identifier = None  # Type `Identifier` (represented as `dict` in JSON).
-
-        self.reference = None  # Type `str`.
-
-        self.type = None  # Type `str` (e.g. "Patient").
-
-        super(Reference, self).__init__()
+    display = Property('display', str)
+    identifier = Property('identifier', 'Identifier')
+    reference = Property('reference', str)
+    type = Property('type', str)  # e.g. "Patient"
 
     class Meta:
         app_label = 'api_fhir'
