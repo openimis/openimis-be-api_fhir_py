@@ -8,6 +8,7 @@ class ImisMaritalStatus(Enum):
     WIDOWED = "W"
     NOT_SPECIFIED = "N"
 
+
 class ImisHfLevel(Enum):
     HEALTH_CENTER = "C"
     HOSPITAL = "H"

@@ -1,22 +1,13 @@
-from api_fhir.models.element import Element
+from api_fhir.models import Element, Property
 
 
 class Meta(Element):
 
-    resource_type = "Meta"
-
-    def __init__(self):
-        self.lastUpdated = None  # Type `FHIRDate` (represented as `str` in JSON)
-
-        self.profile = None  # List of `str` items.
-
-        self.security = None  # List of `Coding` items (represented as `dict` in JSON).
-
-        self.tag = None  # List of `Coding` items (represented as `dict` in JSON).
-
-        self.versionId = None  # Type `str`.
-
-        super(Meta, self).__init__()
+    lastUpdated = Property('lastUpdated', 'FHIRDate')
+    profile = Property('profile', str, count_max='*')
+    security = Property('security', 'Coding', count_max='*')
+    tag = Property('tag', 'Coding', count_max='*')
+    versionId = Property('versionId', str)
 
     class Meta:
         app_label = 'api_fhir'

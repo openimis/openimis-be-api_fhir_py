@@ -1,27 +1,19 @@
 from enum import Enum
 
-from api_fhir.models.element import Element
+from api_fhir.models import Element, Property
 
 
 class ContactPoint(Element):
 
-    resource_type = "ContactPoint"
-
-    def __init__(self):
-        self.period = None  # Type `Period` (represented as `dict` in JSON).
-
-        self.rank = None  # Type `int` (1 = highest).
-
-        self.system = None  # Type `str` (phone | fax | email | pager | url | sms | other).
-
-        self.use = None  # Type `str` (home | work | temp | old | mobile).
-
-        self.value = None  # Type `str`.
-
-        super(ContactPoint, self).__init__()
+    period = Property('period', 'Period')
+    rank = Property('rank', int)  # 1 = highest
+    system = Property('system', str)  # ContactPointSystem (phone | fax | email | pager | url | sms | other)
+    use = Property('use', str)  # ContactPointUse (home | work | temp | old | mobile)
+    value = Property('value', str)
 
     class Meta:
         app_label = 'api_fhir'
+
 
 class ContactPointSystem(Enum):
     PHONE = "phone"
@@ -31,6 +23,7 @@ class ContactPointSystem(Enum):
     URL = "url"
     SMS = "sms"
     OTHER = "other"
+
 
 class ContactPointUse(Enum):
     HOME = "home"

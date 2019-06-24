@@ -1,16 +1,19 @@
 from api_fhir.configurations import GeneralConfiguration
 from rest_framework import serializers
 from api_fhir.converters import BaseFHIRConverter
+from api_fhir.models import FHIRBaseObject
 
 
 class BaseFHIRSerializer(serializers.Serializer):
     fhirConverter = BaseFHIRConverter()
 
     def to_representation(self, obj):
-        return self.fhirConverter.to_fhir_obj(obj).__dict__
+        return self.fhirConverter.to_fhir_obj(obj).toDict()
 
     def to_internal_value(self, data):
         audit_user_id = self.getAuditUserId()
+        if isinstance(data, dict):
+            data = FHIRBaseObject.fromDict(data)
         return self.fhirConverter.to_imis_obj(data, audit_user_id).__dict__
 
     def create(self, validated_data):

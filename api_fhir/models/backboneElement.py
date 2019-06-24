@@ -1,14 +1,9 @@
-from api_fhir.models.element import Element
+from api_fhir.models import Element, Property
 
 
 class BackboneElement(Element):
 
-    resource_type = "BackboneElement"
-
-    def __init__(self):
-        self.modifierExtension = None  # List of `Extension` items (represented as `dict` in JSON).
-
-        super(BackboneElement, self).__init__()
+    modifierExtension = Property('modifierExtension', 'Extension', count_max='*')
 
     class Meta:
         app_label = 'api_fhir'
