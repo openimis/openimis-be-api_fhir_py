@@ -32,3 +32,4 @@ class BaseFHIRSerializer(serializers.Serializer):
 
 from api_fhir.serializers.patientSerializer import PatientSerializer
 from api_fhir.serializers.locationSerializer import LocationSerializer
+from api_fhir.serializers.claimAdminSerializer import ClaimAdminSerializer
