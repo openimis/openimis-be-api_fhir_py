@@ -1,11 +1,16 @@
-class FhirRequestProcessException(Exception):
-    def __init__(self, message):
-        super(FhirRequestProcessException, self).__init__(message)
+from rest_framework.exceptions import APIException
 
 
-class FHIRException(Exception):
+class FHIRException(APIException):
     def __init__(self, message):
         super(FHIRException, self).__init__(message)
+
+
+class FHIRRequestProcessException(FHIRException):
+    def __init__(self, errors):
+        base_massage = "The request cannot be processed due to the following issues:\n"
+        message = base_massage + ",\n".join(errors)
+        super(FHIRRequestProcessException, self).__init__(message)
 
 
 class InvalidAttributeError(FHIRException):
@@ -37,3 +42,6 @@ class UnsupportedFormatError(Exception):
     def __init__(self, data_format):
         message = "The format '{}' is not supported".format(data_format)
         super(UnsupportedFormatError, self).__init__(message)
+
+
+from api_fhir.exceptions.fhir_api_exception_handler import fhir_api_exception_handler

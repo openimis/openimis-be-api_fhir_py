@@ -93,6 +93,21 @@ class MaritalConfiguration(BaseConfiguration):
         raise NotImplementedError('`get_fhir_unknown_marital_status_code()` must be implemented.')
 
 
+class IssueTypeConfiguration(BaseConfiguration):
+
+    @classmethod
+    def build_configuration(cls, cfg):
+        raise NotImplementedError('`build_configuration()` must be implemented.')
+
+    @classmethod
+    def get_fhir_code_for_exception(cls):
+        raise NotImplementedError('`get_fhir_code_for_exception()` must be implemented.')
+
+    @classmethod
+    def get_fhir_code_for_not_found(cls):
+        raise NotImplementedError('`get_fhir_code_for_not_found()` must be implemented.')
+
+
 class BaseApiFhirConfiguration(BaseConfiguration):
 
     @classmethod
@@ -100,6 +115,7 @@ class BaseApiFhirConfiguration(BaseConfiguration):
         cls.get_identifier_configuration().build_configuration(cfg)
         cls.get_location_type_configuration().build_configuration(cfg)
         cls.get_marital_type_configuration().build_configuration(cfg)
+        cls.get_issue_type_configuration().build_configuration(cfg)
 
     @classmethod
     def get_identifier_configuration(cls):
@@ -113,10 +129,15 @@ class BaseApiFhirConfiguration(BaseConfiguration):
     def get_marital_type_configuration(cls):
         raise NotImplementedError('`get_marital_type_configuration()` must be implemented.')
 
+    @classmethod
+    def get_issue_type_configuration(cls):
+        raise NotImplementedError('`get_issue_type_configuration()` must be implemented.')
+
 
 from api_fhir.configurations.generalConfiguration import GeneralConfiguration
 from api_fhir.configurations.stu3IdentifierConfig import Stu3IdentifierConfig
 from api_fhir.configurations.stu3LocationConfig import Stu3LocationConfig
 from api_fhir.configurations.stu3MaritalConfig import Stu3MaritalConfig
+from api_fhir.configurations.stu3IssueTypeConfig import Stu3IssueTypeConfig
 from api_fhir.configurations.stu3ApiFhirConfig import Stu3ApiFhirConfig
 from api_fhir.configurations.moduleConfiguration import ModuleConfiguration

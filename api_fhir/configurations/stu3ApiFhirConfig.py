@@ -1,5 +1,5 @@
 from api_fhir.configurations import BaseApiFhirConfiguration, Stu3IdentifierConfig, \
-    Stu3LocationConfig, Stu3MaritalConfig
+    Stu3LocationConfig, Stu3MaritalConfig, Stu3IssueTypeConfig
 
 
 class Stu3ApiFhirConfig(BaseApiFhirConfiguration):
@@ -15,6 +15,10 @@ class Stu3ApiFhirConfig(BaseApiFhirConfiguration):
     @classmethod
     def get_marital_type_configuration(cls):
         return Stu3MaritalConfig
+
+    @classmethod
+    def get_issue_type_configuration(cls):
+        return Stu3IssueTypeConfig
 
     class Meta:
         app_label = 'api_fhir'

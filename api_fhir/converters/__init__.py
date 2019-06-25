@@ -1,5 +1,5 @@
 from api_fhir.configurations import Stu3IdentifierConfig
-from api_fhir.exceptions import FhirRequestProcessException
+from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.models import CodeableConcept, ContactPoint, Address, Coding, Identifier, IdentifierUse
 
 
@@ -25,17 +25,21 @@ class BaseFHIRConverter(object):
         if errors is None:
             errors = []
         if len(errors) > 0:
-            base_massage = "The request cannot be processed due to the following issues:\n"
-            message = base_massage + ",\n".join(errors)
-            raise FhirRequestProcessException(message)
+            raise FHIRRequestProcessException(errors)
 
     @classmethod
-    def build_codeable_concept(cls, code, system):
+    def build_simple_codeable_concept(cls, text):
+        return cls.build_codeable_concept(None, None, text)
+
+    @classmethod
+    def build_codeable_concept(cls, code, system, text=None):
         codeable_concept = CodeableConcept()
-        coding = Coding()
-        coding.system = system
-        coding.code = code
-        codeable_concept.coding = [coding]
+        if code or system:
+            coding = Coding()
+            coding.system = system
+            coding.code = code
+            codeable_concept.coding = [coding]
+        codeable_concept.text = text
         return codeable_concept
 
     @classmethod
@@ -82,3 +86,4 @@ class BaseFHIRConverter(object):
 
 from api_fhir.converters.patientConverter import PatientConverter
 from api_fhir.converters.locationConverter import LocationConverter
+from api_fhir.converters.operationOutcomeConverter import OperationOutcomeConverter

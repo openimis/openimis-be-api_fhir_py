@@ -1,0 +1,12 @@
+{
+  "resourceType": "OperationOutcome",
+  "issue": [
+    {
+      "code": "exception",
+      "details": {
+        "text": "The request cannot be processed due to the following issues:\nError message"
+      },
+      "severity": "error"
+    }
+  ]
+}

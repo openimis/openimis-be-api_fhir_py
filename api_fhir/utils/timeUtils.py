@@ -3,7 +3,7 @@ import core
 from api_fhir.configurations import GeneralConfiguration
 
 
-class TimeUtils:
+class TimeUtils(object):
 
     @classmethod
     def now(cls):
