@@ -268,3 +268,6 @@ from api_fhir.models.sampledData import SampledData
 from api_fhir.models.signature import Signature
 from api_fhir.models.timing import Timing, TimingRepeat
 from api_fhir.models.operationOutcome import OperationOutcome, OperationOutcomeIssue, IssueSeverity
+from api_fhir.models.daysOfWeek import DaysOfWeek
+from api_fhir.models.endpoint import Endpoint
+from api_fhir.models.practitionerRole import PractitionerRole, PractitionerAvailableTime, PractitionerNotAvailable
