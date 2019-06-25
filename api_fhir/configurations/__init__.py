@@ -103,6 +103,10 @@ class IssueTypeConfiguration(BaseConfiguration):
     def get_fhir_code_for_exception(cls):
         raise NotImplementedError('`get_fhir_code_for_exception()` must be implemented.')
 
+    @classmethod
+    def get_fhir_code_for_not_found(cls):
+        raise NotImplementedError('`get_fhir_code_for_not_found()` must be implemented.')
+
 
 class BaseApiFhirConfiguration(BaseConfiguration):
 

@@ -6,11 +6,11 @@ class FHIRException(APIException):
         super(FHIRException, self).__init__(message)
 
 
-class FhirRequestProcessException(FHIRException):
+class FHIRRequestProcessException(FHIRException):
     def __init__(self, errors):
         base_massage = "The request cannot be processed due to the following issues:\n"
         message = base_massage + ",\n".join(errors)
-        super(FhirRequestProcessException, self).__init__(message)
+        super(FHIRRequestProcessException, self).__init__(message)
 
 
 class InvalidAttributeError(FHIRException):

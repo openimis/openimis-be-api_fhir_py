@@ -43,7 +43,8 @@ DEFAULT_CFG = {
         "fhir_code_for_health_center": "PC",
     },
     "stu3_fhir_issue_type_config": {
-        "fhir_code_for_exception": "exception"
+        "fhir_code_for_exception": "exception",
+        "fhir_code_for_not_found": "not-found"
     }
 }
 

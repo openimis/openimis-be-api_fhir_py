@@ -1,5 +1,5 @@
 from api_fhir.configurations import Stu3IdentifierConfig
-from api_fhir.exceptions import FhirRequestProcessException
+from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.models import CodeableConcept, ContactPoint, Address, Coding, Identifier, IdentifierUse
 
 
@@ -25,7 +25,7 @@ class BaseFHIRConverter(object):
         if errors is None:
             errors = []
         if len(errors) > 0:
-            raise FhirRequestProcessException(errors)
+            raise FHIRRequestProcessException(errors)
 
     @classmethod
     def build_simple_codeable_concept(cls, text):

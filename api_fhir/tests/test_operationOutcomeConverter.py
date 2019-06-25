@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from api_fhir.configurations import Stu3IssueTypeConfig
 from api_fhir.converters import OperationOutcomeConverter, BaseFHIRConverter
-from api_fhir.exceptions import FhirRequestProcessException
+from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.models import FHIRBaseObject, CodeableConcept
 from api_fhir.models.operationOutcome import IssueSeverity
 
@@ -36,7 +36,7 @@ class OperationOutcomeConverterTestCase(TestCase):
     def create_test_fhir_request_process_exception(self):
         errors = []
         BaseFHIRConverter.valid_condition(self.__VALID_CONDITION, self.__ERROR_MESSAGE, errors)
-        return FhirRequestProcessException(errors)
+        return FHIRRequestProcessException(errors)
 
     def verify_fhir_outcome(self, fhir_outcome):
         issues = fhir_outcome.issue

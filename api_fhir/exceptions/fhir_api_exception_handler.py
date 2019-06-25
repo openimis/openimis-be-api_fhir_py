@@ -1,6 +1,8 @@
+from rest_framework import status
+
 from api_fhir.configurations import ModuleConfiguration
-from api_fhir.exceptions import FHIRException
 from api_fhir.utils import FunctionUtils
+from rest_framework.response import Response
 
 from rest_framework.views import exception_handler
 
@@ -22,9 +24,24 @@ def call_default_exception_handler(exc, context):
 def fhir_api_exception_handler(exc, context):
     response = call_default_exception_handler(exc, context)
 
-    if response and isinstance(exc, FHIRException):
+    request_path = __get_path_from_context(context)
+    if 'api_fhir' in request_path:
         from api_fhir.converters import OperationOutcomeConverter
         fhir_outcome = OperationOutcomeConverter.to_fhir_obj(exc)
+        if not response:
+            response = __create_server_error_response()
         response.data = fhir_outcome.toDict()
 
     return response
+
+
+def __get_path_from_context(context):
+    result = ""
+    request = context.get("request")
+    if request and request._request:
+        result = request._request.path
+    return result
+
+
+def __create_server_error_response():
+    return Response(None, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -11,5 +11,9 @@ class Stu3IssueTypeConfig(IssueTypeConfiguration):
     def get_fhir_code_for_exception(cls):
         return cls.get_config().stu3_fhir_identifier_type_config.get('fhir_code_for_exception', "exception")
 
+    @classmethod
+    def get_fhir_code_for_not_found(cls):
+        return cls.get_config().stu3_fhir_identifier_type_config.get('fhir_code_for_not_found', "not-found")
+
     class Meta:
         app_label = 'api_fhir'

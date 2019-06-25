@@ -33,7 +33,7 @@ class PropertyMixin(object):
         if value is not None:
             local_type = self.eval_property_type()
             if local_type is FHIRDate and not FHIRDate.validate_type(value):
-                raise ValueError('Value "{}" is not a valid value of FHIRDate'.format(value))
+                raise ValueError('Value `{}` is not a valid value of FHIRDate'.format(value))
             elif issubclass(local_type, PropertyMixin) and (not inspect.isclass(local_type) or
                                                             not isinstance(value, local_type)):
                 raise PropertyTypeError(value.__class__.__name__, self.definition)
@@ -106,8 +106,7 @@ class FHIRBaseObject(object):
             setattr(self, attr, value)
 
     def __setattr__(self, attr, value):
-        if attr not in self._get_properties() and not attr.startswith('_'):
-            raise InvalidAttributeError(attr, type(self).__name__)
+        self.valid_fhir_attribute(attr)
         super().__setattr__(attr, value)
 
     @classmethod
@@ -125,12 +124,18 @@ class FHIRBaseObject(object):
 
     @classmethod
     def _get_property_details_for_name(cls, name):
+        cls.valid_fhir_attribute(name)
         property_ = getattr(cls, name)
         type_ = property_.definition.type
         if isinstance(type_, str):
             type_ = eval_type(type_)
 
         return property_, type_
+
+    @classmethod
+    def valid_fhir_attribute(cls, name):
+        if name not in cls._get_properties() and not name.startswith('_'):
+            raise InvalidAttributeError(name, cls.__name__)
 
     @classmethod
     def loads(cls, string, format_='json'):
