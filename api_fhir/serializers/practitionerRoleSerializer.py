@@ -2,13 +2,13 @@ import copy
 
 from claim.models import ClaimAdmin
 
-from api_fhir.converters import ClaimAdminConverter
+from api_fhir.converters import PractitionerRoleConverter
 from api_fhir.serializers import BaseFHIRSerializer
 
 
-class ClaimAdminSerializer(BaseFHIRSerializer):
+class PractitionerRoleSerializer(BaseFHIRSerializer):
 
-    fhirConverter = ClaimAdminConverter()
+    fhirConverter = PractitionerRoleConverter()
 
     def create(self, validated_data):
         copied_data = copy.deepcopy(validated_data)

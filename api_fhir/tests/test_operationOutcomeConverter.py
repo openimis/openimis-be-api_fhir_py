@@ -4,8 +4,7 @@ from unittest import TestCase
 from api_fhir.configurations import Stu3IssueTypeConfig
 from api_fhir.converters import OperationOutcomeConverter, BaseFHIRConverter
 from api_fhir.exceptions import FHIRRequestProcessException
-from api_fhir.models import FHIRBaseObject, CodeableConcept
-from api_fhir.models.operationOutcome import IssueSeverity
+from api_fhir.models import FHIRBaseObject, CodeableConcept, IssueSeverity
 
 
 class OperationOutcomeConverterTestCase(TestCase):

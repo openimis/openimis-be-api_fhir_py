@@ -1,7 +1,7 @@
 from api_fhir.converters import BaseFHIRConverter
 
 
-class ClaimAdminConverter(BaseFHIRConverter):
+class PractitionerConverter(BaseFHIRConverter):
 
     @classmethod
     def to_fhir_obj(cls, obj):
