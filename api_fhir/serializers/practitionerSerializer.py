@@ -2,13 +2,13 @@ import copy
 
 from claim.models import ClaimAdmin
 
-from api_fhir.converters import PractitionerRoleConverter
+from api_fhir.converters import PractitionerConverter
 from api_fhir.serializers import BaseFHIRSerializer
 
 
 class PractitionerSerializer(BaseFHIRSerializer):
 
-    fhirConverter = PractitionerRoleConverter()
+    fhirConverter = PractitionerConverter()
 
     def create(self, validated_data):
         copied_data = copy.deepcopy(validated_data)
@@ -16,7 +16,14 @@ class PractitionerSerializer(BaseFHIRSerializer):
         return ClaimAdmin.objects.create(**copied_data)
 
     def update(self, instance, validated_data):
-        pass  # TODO need to be implemented
+        instance.code = validated_data.get('code', instance.code)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.other_names = validated_data.get('other_names', instance.other_names)
+        instance.dob = validated_data.get('dob', instance.dob)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.email_id = validated_data.get('email_id', instance.email_id)
+        instance.save()
+        return instance
 
     class Meta:
         app_label = 'api_fhir'

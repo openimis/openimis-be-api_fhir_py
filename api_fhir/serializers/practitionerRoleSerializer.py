@@ -1,8 +1,7 @@
-import copy
-
 from claim.models import ClaimAdmin
 
 from api_fhir.converters import PractitionerRoleConverter
+from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.serializers import BaseFHIRSerializer
 
 
@@ -11,12 +10,20 @@ class PractitionerRoleSerializer(BaseFHIRSerializer):
     fhirConverter = PractitionerRoleConverter()
 
     def create(self, validated_data):
-        copied_data = copy.deepcopy(validated_data)
-        del copied_data['_state']
-        return ClaimAdmin.objects.create(**copied_data)
+        claim_admin_id = validated_data.get('id')
+        claim_admin = None
+        if claim_admin_id:
+            claim_admin = ClaimAdmin.objects.get(pk=claim_admin_id)
+        if not claim_admin:
+            raise FHIRRequestProcessException(['Missing Practitioner for id {}'.format(claim_admin_id)])
+        claim_admin.health_facility_id = validated_data.get('health_facility_id', claim_admin.health_facility_id)
+        claim_admin.save()
+        return claim_admin
 
     def update(self, instance, validated_data):
-        pass  # TODO need to be implemented
+        instance.health_facility_id = validated_data.get('health_facility_id', instance.health_facility_id)
+        instance.save()
+        return instance
 
     class Meta:
         app_label = 'api_fhir'

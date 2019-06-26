@@ -22,6 +22,10 @@ class PractitionerRoleViewSet(viewsets.ModelViewSet):
     queryset = ClaimAdmin.objects.all()
     serializer_class = PractitionerRoleSerializer
 
+    def perform_destroy(self, instance):
+        instance.health_facility_id = None
+        instance.save()
+
 
 class PractitionerViewSet(viewsets.ModelViewSet):
     queryset = ClaimAdmin.objects.all()

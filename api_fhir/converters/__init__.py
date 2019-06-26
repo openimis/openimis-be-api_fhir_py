@@ -1,9 +1,12 @@
+from abc import ABC
+
 from api_fhir.configurations import Stu3IdentifierConfig
+from api_fhir.converters.referenceConverterMixin import ReferenceConverterMixin
 from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.models import CodeableConcept, ContactPoint, Address, Coding, Identifier, IdentifierUse
 
 
-class BaseFHIRConverter(object):
+class BaseFHIRConverter(ReferenceConverterMixin, ABC):
     @classmethod
     def to_fhir_obj(cls, obj):
         raise NotImplementedError('`toFhirObj()` must be implemented.')
@@ -84,8 +87,9 @@ class BaseFHIRConverter(object):
         return current_address
 
 
+from api_fhir.converters.personConverterMixin import PersonConverterMixin
 from api_fhir.converters.patientConverter import PatientConverter
 from api_fhir.converters.locationConverter import LocationConverter
 from api_fhir.converters.operationOutcomeConverter import OperationOutcomeConverter
-from api_fhir.converters.practitionerRoleConverter import PractitionerRoleConverter
 from api_fhir.converters.practitionerConverter import PractitionerConverter
+from api_fhir.converters.practitionerRoleConverter import PractitionerRoleConverter

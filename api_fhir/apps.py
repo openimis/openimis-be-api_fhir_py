@@ -26,7 +26,8 @@ DEFAULT_CFG = {
         "fhir_code_for_imis_db_id_type": "ACSN",
         "fhir_code_for_imis_chfid_type": "SB",
         "fhir_code_for_imis_passport_type": "PPN",
-        "fhir_code_for_imis_facility_id_type": "FI"
+        "fhir_code_for_imis_facility_id_type": "FI",
+        "fhir_code_for_imis_claim_admin_code_type": "PLAC"
     },
     "stu3_fhir_marital_status_config": {
         "system": "https://www.hl7.org/fhir/STU3/valueset-marital-status.html",
