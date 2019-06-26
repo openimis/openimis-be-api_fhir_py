@@ -5,11 +5,11 @@ from api_fhir.converters import PatientConverter
 from api_fhir.models import HumanName, NameUse, Identifier, AdministrativeGender, ContactPoint, ContactPointSystem, \
     Address, AddressType, ImisMaritalStatus, Patient, ContactPointUse, AddressUse
 from api_fhir.utils import TimeUtils
-from mixin.dbIdTestMixins import DbIdTestMixins
+from mixin.dbIdTestMixin import DbIdTestMixin
 from mixin.genericTestMixin import GenericTestMixin
 
 
-class PatientTestMixin(GenericTestMixin, DbIdTestMixins):
+class PatientTestMixin(GenericTestMixin, DbIdTestMixin):
 
     __TEST_LAST_NAME = "TEST_LAST_NAME"
     __TEST_OTHER_NAME = "TEST_OTHER_NAME"

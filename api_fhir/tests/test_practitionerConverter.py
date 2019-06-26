@@ -26,8 +26,8 @@ class PractitionerConverterTestCase(PractitionerTestMixin):
 
     def test_create_object_from_json(self):
         self.__set_up()
-        fhir_patient = FHIRBaseObject.loads(self._test_practitioner_json_representation, 'json')
-        self.verify_fhir_instance(fhir_patient)
+        fhir_practitioner = FHIRBaseObject.loads(self._test_practitioner_json_representation, 'json')
+        self.verify_fhir_instance(fhir_practitioner)
 
     def test_fhir_object_to_json(self):
         self.__set_up()

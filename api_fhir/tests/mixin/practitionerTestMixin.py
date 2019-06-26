@@ -5,11 +5,11 @@ from api_fhir.converters import PractitionerConverter
 from api_fhir.models import HumanName, NameUse, Identifier, ContactPoint, ContactPointSystem, Practitioner, \
     ContactPointUse
 from api_fhir.utils import TimeUtils
-from mixin.dbIdTestMixins import DbIdTestMixins
+from mixin.dbIdTestMixin import DbIdTestMixin
 from mixin.genericTestMixin import GenericTestMixin
 
 
-class PractitionerTestMixin(GenericTestMixin, DbIdTestMixins):
+class PractitionerTestMixin(GenericTestMixin, DbIdTestMixin):
 
     __TEST_LAST_NAME = "Smith"
     __TEST_OTHER_NAME = "John"

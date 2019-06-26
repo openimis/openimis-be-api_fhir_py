@@ -2,7 +2,7 @@ from api_fhir.configurations import Stu3IdentifierConfig
 from api_fhir.converters import BaseFHIRConverter
 
 
-class DbIdTestMixins(object):
+class DbIdTestMixin(object):
 
     def get_test_db_id(self):
         raise NotImplementedError('`test_imis_instance()` must be implemented.')
