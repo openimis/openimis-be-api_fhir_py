@@ -1,15 +1,14 @@
 from insuree.models import Insuree, Gender
 
 from api_fhir.configurations import Stu3IdentifierConfig, GeneralConfiguration, Stu3MaritalConfig
-from api_fhir.converters import BaseFHIRConverter
-from api_fhir.models import Patient, HumanName, NameUse, AdministrativeGender, ContactPointSystem, ContactPointUse, \
-    ImisMaritalStatus
+from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin
+from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus
 
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.utils import TimeUtils
 
 
-class PatientConverter(BaseFHIRConverter):
+class PatientConverter(BaseFHIRConverter, PersonConverterMixin):
     @classmethod
     def to_fhir_obj(cls, imis_insuree):
         fhir_patient = Patient()
@@ -40,6 +39,14 @@ class PatientConverter(BaseFHIRConverter):
         return imis_insuree
 
     @classmethod
+    def get_imis_object_id(cls, imis_insuree):
+        return imis_insuree.id
+
+    @classmethod
+    def get_fhir_resource_type(cls):
+        return Patient
+
+    @classmethod
     def createDefaultInsuree(cls, audit_user_id):
         imis_insuree = Insuree()
         imis_insuree.head = GeneralConfiguration.get_default_value_of_patient_head_attribute()
@@ -49,25 +56,15 @@ class PatientConverter(BaseFHIRConverter):
         return imis_insuree
 
     @classmethod
-    def build_human_names(cls, fhirPatient, imisInsuree):
-        # last name
-        name = HumanName()
-        name.use = NameUse.USUAL.value
-        name.family = imisInsuree.last_name
-        name.given = [imisInsuree.other_names]
-        fhirPatient.name = [name]
+    def build_human_names(cls, fhir_patient, imis_insuree):
+        name = cls.build_fhir_names_for_person(imis_insuree)
+        fhir_patient.name = [name]
 
     @classmethod
     def build_imis_names(cls, imis_insuree, fhir_patient, errors):
         names = fhir_patient.name
         if not cls.valid_condition(names is None, 'Missing patient `name` attribute', errors):
-            for name in names:
-                if name.use == NameUse.USUAL.value:
-                    imis_insuree.last_name = name.family
-                    given_names = name.given
-                    if given_names and len(given_names ) > 0:
-                        imis_insuree.other_names = given_names[0]
-                    break
+            imis_insuree.last_name, imis_insuree.other_names = cls.build_imis_last_and_other_name(names)
             cls.valid_condition(imis_insuree.last_name is None, 'Missing patient family name', errors)
             cls.valid_condition(imis_insuree.other_names is None, 'Missing patient given name', errors)
 
@@ -196,26 +193,11 @@ class PatientConverter(BaseFHIRConverter):
 
     @classmethod
     def build_fhir_telecom(cls, fhir_patient, imis_insuree):
-        telecom = []
-        if imis_insuree.phone is not None:
-            phone = cls.build_fhir_contact_point(imis_insuree.phone, ContactPointSystem.PHONE.value,
-                                             ContactPointUse.HOME.value)
-            telecom.append(phone)
-        if imis_insuree.email is not None:
-            email = cls.build_fhir_contact_point(imis_insuree.email, ContactPointSystem.EMAIL.value,
-                                             ContactPointUse.HOME.value)
-            telecom.append(email)
-        fhir_patient.telecom = telecom
+        fhir_patient.telecom = cls.build_fhir_telecom_for_person(phone=imis_insuree.phone, email=imis_insuree.email)
 
     @classmethod
     def build_imis_contacts(cls, imis_insuree, fhir_patient):
-        telecom = fhir_patient.telecom
-        if telecom is not None:
-            for contact_point in telecom:
-                if contact_point.system == ContactPointSystem.PHONE.value:
-                    imis_insuree.phone = contact_point.value
-                elif contact_point.system == ContactPointSystem.EMAIL.value:
-                    imis_insuree.email = contact_point.value
+        imis_insuree.phone, imis_insuree.email = cls.build_imis_phone_num_and_email(fhir_patient.telecom)
 
     @classmethod
     def build_fhir_addresses(cls, fhir_patient, imis_insuree):

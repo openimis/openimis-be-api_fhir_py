@@ -9,6 +9,7 @@ from api_fhir.utils import TimeUtils
 
 
 class LocationConverter(BaseFHIRConverter):
+
     @classmethod
     def to_fhir_obj(cls, imis_hf):
         fhir_location = Location()
@@ -30,6 +31,14 @@ class LocationConverter(BaseFHIRConverter):
         cls.build_imis_hf_contacts(imis_hf, fhir_location)
         cls.check_errors(errors)
         return imis_hf
+
+    @classmethod
+    def get_imis_object_id(cls, imis_hf):
+        return imis_hf.id
+
+    @classmethod
+    def get_fhir_resource_type(cls):
+        return Location
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):

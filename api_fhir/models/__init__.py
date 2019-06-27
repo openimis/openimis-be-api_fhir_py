@@ -170,7 +170,7 @@ class FHIRBaseObject(object):
         for attr, obj in object_dict.items():
 
             prop, prop_type = self._get_property_details_for_name(attr)
-
+            value = None
             if inspect.isclass(prop_type) and issubclass(prop_type, Resource):
                 resourceType = obj.pop('resourceType')
                 class_ = eval_type(resourceType)
@@ -189,11 +189,14 @@ class FHIRBaseObject(object):
                         value.append(i)
             elif prop_type is FHIRDate:
                 value = obj
-            else:
-                value = prop_type(obj)
+            elif obj:
+                try:
+                    value = prop_type(obj)
+                except TypeError:
+                    raise PropertyTypeError(type(obj).__name__, prop.definition)
 
-            setattr(self, prop.definition.name, value)
-
+            if value:
+                setattr(self, prop.definition.name, value)
         return self
 
     def dumps(self, format_='json'):
@@ -268,3 +271,7 @@ from api_fhir.models.sampledData import SampledData
 from api_fhir.models.signature import Signature
 from api_fhir.models.timing import Timing, TimingRepeat
 from api_fhir.models.operationOutcome import OperationOutcome, OperationOutcomeIssue, IssueSeverity
+from api_fhir.models.daysOfWeek import DaysOfWeek
+from api_fhir.models.endpoint import Endpoint
+from api_fhir.models.practitionerRole import PractitionerRole, PractitionerAvailableTime, PractitionerNotAvailable
+from api_fhir.models.practitioner import Practitioner, PractitionerQualification

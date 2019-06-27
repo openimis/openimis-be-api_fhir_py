@@ -28,5 +28,9 @@ class Stu3IdentifierConfig(IdentifierConfiguration):
     def get_fhir_facility_id_type(cls):
         return cls.get_config().stu3_fhir_identifier_type_config.get('fhir_code_for_imis_facility_id_type', "FI")
 
+    @classmethod
+    def get_fhir_claim_admin_code_type(cls):
+        return cls.get_config().stu3_fhir_identifier_type_config.get('fhir_code_for_imis_claim_admin_code_type', "PLAC")
+
     class Meta:
         app_label = 'api_fhir'

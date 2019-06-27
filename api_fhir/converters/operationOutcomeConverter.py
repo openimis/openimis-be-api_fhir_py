@@ -18,13 +18,9 @@ class OperationOutcomeConverter(BaseFHIRConverter):
             result = cls.build_for_404()
         elif isinstance(obj, KeyError):
             result = cls.build_for_key_error(obj)
-        elif isinstance(obj, ValueError) or isinstance(obj, AttributeError):
+        elif isinstance(obj, Exception):
             result = cls.build_for_generic_error(obj)
         return result
-
-    @classmethod
-    def to_imis_obj(cls, data, audit_user_id):
-        raise NotImplementedError('`toImisObj()` must be implemented.')
 
     @classmethod
     def build_for_fhir_exception(cls, obj):
