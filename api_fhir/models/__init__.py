@@ -5,6 +5,7 @@ import sys
 import math
 from api_fhir.exceptions import PropertyTypeError, PropertyError, PropertyMaxSizeError, InvalidAttributeError, \
     UnsupportedFormatError, FHIRException
+from django.utils.translation import gettext
 
 SUPPORTED_FORMATS = ['json']
 
@@ -12,7 +13,7 @@ SUPPORTED_FORMATS = ['json']
 class PropertyDefinition(object):
 
     def __init__(self, name, property_type, count_max=1, count_min=0, required=False):
-        assert name.find(' ') < 0, "property shouldn't contain space in `{}`.".format(name)
+        assert name.find(' ') < 0, gettext("property shouldn't contain space in `{}`.").format(name)
         self.name = name
         self.type = property_type
         self.count_max = math.inf if count_max == '*' else int(count_max)
@@ -33,12 +34,12 @@ class PropertyMixin(object):
         if value is not None:
             local_type = self.eval_property_type()
             if local_type is FHIRDate and not FHIRDate.validate_type(value):
-                raise ValueError('Value `{}` is not a valid value of FHIRDate'.format(value))
+                raise ValueError(gettext('Value "{}" is not a valid value of FHIRDate').format(value))
             elif issubclass(local_type, PropertyMixin) and (not inspect.isclass(local_type) or
                                                             not isinstance(value, local_type)):
                 raise PropertyTypeError(value.__class__.__name__, self.definition)
         elif self.definition.required:
-            raise PropertyError("The value of property {} could't be none".format(self.definition.name))
+            raise PropertyError(gettext("The value of property {} could't be none").format(self.definition.name))
 
     def eval_property_type(self):
         property_type = self.definition.type
@@ -69,7 +70,7 @@ class PropertyList(list, PropertyMixin):
 class Property(PropertyMixin):
 
     def __init__(self, name, property_type, count_max=1, count_min=0, required=False):
-        assert name.find(' ') < 0, "property shouldn't contain space in `{}`.".format(name)
+        assert name.find(' ') < 0, gettext("property shouldn't contain space in `{}`.").format(name)
         self.definition = PropertyDefinition(name, property_type, count_max, count_min, required)
 
     def __get__(self, instance, owner):
@@ -87,10 +88,10 @@ class Property(PropertyMixin):
                 for item in value:
                     instance._values[self.definition.name].append(item)
             else:
-                raise PropertyError("The value of property {} need to be a list".format(self.definition.name))
+                raise PropertyError(gettext("The value of property {} need to be a list").format(self.definition.name))
         else:
             if isinstance(value, list):
-                raise PropertyError("The value of property {} shouldn't be a list".format(self.definition.name))
+                raise PropertyError(gettext("The value of property {} shouldn't be a list").format(self.definition.name))
             else:
                 self.validate_type(value)
                 instance._values[self.definition.name] = value
@@ -154,15 +155,16 @@ class FHIRBaseObject(object):
         if resource_type != cls.__name__:
             class_ = eval_type(resource_type)
             if class_ is object or not issubclass(class_, cls):
-                raise FHIRException('Cannot marshall a {} from a {}: not a subclass!'.format(class_, cls.__name__))
+                raise FHIRException(gettext('Cannot marshall a {} from a {}: not a subclass!').format(class_,
+                                                                                                      cls.__name__))
             return class_()._fromDict(json_dict)
         return cls()._fromDict(json_dict)
 
     @classmethod
     def fromDict(cls, object_dict):
+        if not object_dict.get('resourceType'):
+            raise FHIRException(gettext('Missing `resourceType` attribute'))
         resource_type = object_dict.pop('resourceType')
-        if not resource_type:
-            raise FHIRException('Missing `resourceType` attribute')
         class_ = eval_type(resource_type)
         return class_()._fromDict(object_dict)
 

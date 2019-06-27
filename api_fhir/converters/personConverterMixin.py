@@ -1,3 +1,5 @@
+from django.utils.translation import gettext
+
 from api_fhir.converters import BaseFHIRConverter
 from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.models import HumanName, NameUse, ContactPointSystem, ContactPointUse
@@ -8,7 +10,7 @@ class PersonConverterMixin(object):
     @classmethod
     def build_fhir_names_for_person(cls, person_obj):
         if not hasattr(person_obj, 'last_name') and not hasattr(person_obj, 'other_names'):
-            raise FHIRRequestProcessException(['Missing `last_name` and `other_names` for IMIS object'])
+            raise FHIRRequestProcessException([gettext('Missing `last_name` and `other_names` for IMIS object')])
         name = HumanName()
         name.use = NameUse.USUAL.value
         name.family = person_obj.last_name

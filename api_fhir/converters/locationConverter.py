@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from location.models import HealthFacility
 
 from api_fhir.configurations import GeneralConfiguration, Stu3IdentifierConfig, Stu3LocationConfig
@@ -80,7 +81,7 @@ class LocationConverter(BaseFHIRConverter):
                                 and first_code.code == Stu3IdentifierConfig.get_fhir_facility_id_type() \
                                 and identifier.value:
                             imis_hf.code = identifier.value
-        cls.valid_condition(imis_hf.code is None, 'Missing hf code', errors)
+        cls.valid_condition(imis_hf.code is None, gettext('Missing hf code'), errors)
 
     @classmethod
     def build_fhir_location_name(cls, fhir_location, imis_hf):
@@ -90,7 +91,7 @@ class LocationConverter(BaseFHIRConverter):
     def build_imis_hf_name(cls, imis_hf, fhir_location, errors):
         name = fhir_location.name
         if not cls.valid_condition(name is None,
-                                   'Missing patient `name` attribute', errors):
+                                   gettext('Missing patient `name` attribute'), errors):
             imis_hf.name = name
 
     @classmethod
@@ -110,7 +111,7 @@ class LocationConverter(BaseFHIRConverter):
     def build_imis_hf_level(cls, imis_hf, fhir_location, errors):
         location_type = fhir_location.type
         if not cls.valid_condition(location_type is None,
-                                   'Missing patient `type` attribute', errors):
+                                   gettext('Missing patient `type` attribute'), errors):
             for maritialCoding in location_type.coding:
                 if maritialCoding.system == Stu3LocationConfig.get_fhir_location_role_type_system():
                     code = maritialCoding.code
@@ -121,7 +122,7 @@ class LocationConverter(BaseFHIRConverter):
                     elif code == Stu3LocationConfig.get_fhir_code_for_dispensary():
                         imis_hf.level = ImisHfLevel.DISPENSARY.value
 
-            cls.valid_condition(imis_hf.level is None, 'Missing hf level', errors)
+            cls.valid_condition(imis_hf.level is None, gettext('Missing hf level'), errors)
 
     @classmethod
     def build_fhir_location_address(cls, fhir_location, imis_hf):
