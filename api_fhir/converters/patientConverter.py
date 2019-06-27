@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from insuree.models import Insuree, Gender
 
 from api_fhir.configurations import Stu3IdentifierConfig, GeneralConfiguration, Stu3MaritalConfig
@@ -63,10 +64,10 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin):
     @classmethod
     def build_imis_names(cls, imis_insuree, fhir_patient, errors):
         names = fhir_patient.name
-        if not cls.valid_condition(names is None, 'Missing patient `name` attribute', errors):
+        if not cls.valid_condition(names is None, gettext('Missing patient `name` attribute'), errors):
             imis_insuree.last_name, imis_insuree.other_names = cls.build_imis_last_and_other_name(names)
-            cls.valid_condition(imis_insuree.last_name is None, 'Missing patient family name', errors)
-            cls.valid_condition(imis_insuree.other_names is None, 'Missing patient given name', errors)
+            cls.valid_condition(imis_insuree.last_name is None, gettext('Missing patient family name'), errors)
+            cls.valid_condition(imis_insuree.other_names is None, gettext('Missing patient given name'), errors)
 
     @classmethod
     def build_fhir_identifiers(cls, fhir_patient, imis_insuree):
@@ -119,7 +120,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin):
     @classmethod
     def build_imis_birth_date(cls, imis_insuree, fhir_patient, errors):
         birth_date = fhir_patient.birthDate
-        if not cls.valid_condition(birth_date is None, 'Missing patient `birthDate` attribute', errors):
+        if not cls.valid_condition(birth_date is None, gettext('Missing patient `birthDate` attribute'), errors):
             imis_insuree.dob = TimeUtils.str_to_date(birth_date)
 
     @classmethod

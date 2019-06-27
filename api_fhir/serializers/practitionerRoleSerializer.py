@@ -1,4 +1,5 @@
 from claim.models import ClaimAdmin
+from django.utils.translation import gettext
 
 from api_fhir.converters import PractitionerRoleConverter
 from api_fhir.exceptions import FHIRRequestProcessException
@@ -15,7 +16,7 @@ class PractitionerRoleSerializer(BaseFHIRSerializer):
         if claim_admin_id:
             claim_admin = ClaimAdmin.objects.get(pk=claim_admin_id)
         if not claim_admin:
-            raise FHIRRequestProcessException(['Missing Practitioner for id {}'.format(claim_admin_id)])
+            raise FHIRRequestProcessException([gettext('Missing Practitioner for id {}').format(claim_admin_id)])
         claim_admin.health_facility_id = validated_data.get('health_facility_id', claim_admin.health_facility_id)
         claim_admin.save()
         return claim_admin

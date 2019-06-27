@@ -1,4 +1,5 @@
 from claim.models import ClaimAdmin
+from django.utils.translation import gettext
 from location.models import HealthFacility
 
 from api_fhir.converters import BaseFHIRConverter, PractitionerConverter, LocationConverter
@@ -43,7 +44,8 @@ class PractitionerRoleConverter(BaseFHIRConverter):
         claim_admin = None
         imis_claim_admin_id = PractitionerConverter.get_resource_id_from_reference(practitioner)
         if not cls.valid_condition(imis_claim_admin_id is None,
-                                   'Could not fetch Practitioner id from reference'.format(practitioner), errors):
+                                   gettext('Could not fetch Practitioner id from reference').format(practitioner),
+                                   errors):
             claim_admin = ClaimAdmin.objects.get(pk=imis_claim_admin_id)
         return claim_admin
 
@@ -60,7 +62,8 @@ class PractitionerRoleConverter(BaseFHIRConverter):
             location = cls.get_first_location(location_references)
             location_id = LocationConverter.get_resource_id_from_reference(location)
             if not cls.valid_condition(location_id is None,
-                                       'Could not fetch Location id from reference'.format(location), errors):
+                                       gettext('Could not fetch Location id from reference').format(location),
+                                       errors):
                 health_facility = HealthFacility.objects.get(pk=location_id)
         return health_facility
 
