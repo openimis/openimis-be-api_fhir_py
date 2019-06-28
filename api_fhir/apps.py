@@ -48,6 +48,9 @@ DEFAULT_CFG = {
         "fhir_code_for_exception": "exception",
         "fhir_code_for_not_found": "not-found",
         "fhir_code_for_informational": "informational"
+    },
+    "stu3_fhir_claim_config": {
+        "fhir_claim_information_guarantee_id_code": "guarantee_id"
     }
 }
 

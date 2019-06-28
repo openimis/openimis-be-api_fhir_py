@@ -34,7 +34,9 @@ class ClaimSerializer(BaseFHIRSerializer):
                                    end_date=validated_data.get('date_to'),
                                    insuree_chf_id=insuree_chf_code,
                                    health_facility_code=health_facility_code,
-                                   claim_admin_code=claim_admin_code  # TODO WIP add items and services
+                                   claim_admin_code=claim_admin_code,
+                                   visit_type=validated_data.get('visit_type'),
+                                   guarantee_no=validated_data.get('guarantee_id')  # TODO WIP add items and services
                                    )
         request = self.context.get("request")
         ClaimSubmitService(request.user).submit(claim_submit)

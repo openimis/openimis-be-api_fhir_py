@@ -1,9 +1,9 @@
 from claim.models import Claim, ClaimDiagnosisCode
 from django.utils.translation import gettext
 
-from api_fhir.configurations import Stu3IdentifierConfig
+from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
 from api_fhir.converters import BaseFHIRConverter, LocationConverter, PatientConverter, PractitionerConverter
-from api_fhir.models import Claim as FHIRClaim, Period, ClaimDiagnosis, Money, ImisClaimIcdTypes
+from api_fhir.models import Claim as FHIRClaim, Period, ClaimDiagnosis, Money, ImisClaimIcdTypes, ClaimInformation
 from api_fhir.utils import TimeUtils
 
 
@@ -20,6 +20,8 @@ class ClaimConverter(BaseFHIRConverter):
         cls.build_fhir_diagnoses(fhir_claim, imis_claim)
         cls.build_fhir_total(fhir_claim, imis_claim)
         fhir_claim.enterer = PractitionerConverter.build_fhir_resource_reference(imis_claim.admin)
+        cls.build_fhir_type(fhir_claim, imis_claim)
+        cls.build_fhir_information(fhir_claim, imis_claim)
         return fhir_claim
 
     @classmethod
@@ -34,6 +36,8 @@ class ClaimConverter(BaseFHIRConverter):
         cls.build_imis_diagnoses(imis_claim, fhir_claim, errors)
         cls.build_imis_total_claimed(imis_claim, fhir_claim, errors)
         cls.build_imis_claim_admin(imis_claim, fhir_claim, errors)
+        cls.build_imis_visit_type(imis_claim, fhir_claim)
+        cls.build_imis_guarantee_id(imis_claim, fhir_claim)
         cls.check_errors(errors)
         return imis_claim
 
@@ -131,7 +135,7 @@ class ClaimConverter(BaseFHIRConverter):
                 diagnosis_type = cls.get_diagnosis_type(diagnosis)
                 diagnosis_code = cls.get_diagnosis_code(diagnosis)
                 if diagnosis_type == ImisClaimIcdTypes.ICD_0.value:
-                    imis_claim.icd = diagnosis_code
+                    imis_claim.icd = cls.find_claim_diagnosis_code(diagnosis_code)
                 elif diagnosis_type == ImisClaimIcdTypes.ICD_1.value:
                     imis_claim.icd_1 = diagnosis_code
                 elif diagnosis_type == ImisClaimIcdTypes.ICD_2.value:
@@ -145,10 +149,14 @@ class ClaimConverter(BaseFHIRConverter):
     @classmethod
     def get_diagnosis_type(cls, diagnosis):
         diagnosis_type = None
-        type_concept = diagnosis.type
+        type_concept = cls.get_first_diagnosis_type(diagnosis)
         if type_concept:
             diagnosis_type = type_concept.text
         return diagnosis_type
+
+    @classmethod
+    def get_first_diagnosis_type(cls, diagnosis):
+        return diagnosis.type[0]
 
     @classmethod
     def find_claim_diagnosis_code(cls, icd_code):
@@ -162,7 +170,7 @@ class ClaimConverter(BaseFHIRConverter):
             coding = cls.get_first_coding_from_codeable_concept(concept)
             icd_code = coding.code
             if icd_code:
-                code = cls.find_claim_diagnosis_code(icd_code)
+                code = icd_code
         return code
 
     @classmethod
@@ -187,3 +195,38 @@ class ClaimConverter(BaseFHIRConverter):
         if fhir_claim.enterer:
             imis_claim.admin = PractitionerConverter.get_imis_obj_by_fhir_reference(fhir_claim.enterer)
         cls.valid_condition(imis_claim.admin is None, gettext('Missing the enterer reference'), errors)
+
+    @classmethod
+    def build_fhir_type(cls, fhir_claim, imis_claim):
+        if imis_claim.visit_type:
+            fhir_claim.type = cls.build_simple_codeable_concept(imis_claim.visit_type)
+
+    @classmethod
+    def build_imis_visit_type(cls, imis_claim, fhir_claim):
+        if fhir_claim.type:
+            imis_claim.visit_type = fhir_claim.type.text
+
+    @classmethod
+    def build_fhir_information(cls, fhir_claim, imis_claim):
+        claim_information = []
+        cls.build_fhir_guarantee_id_information(claim_information, imis_claim)
+        fhir_claim.information = claim_information
+
+    @classmethod
+    def build_fhir_guarantee_id_information(cls, claim_information, imis_claim):
+        if imis_claim.guarantee_id:
+            information_concept = ClaimInformation()
+            information_concept.sequence = len(claim_information) + 1
+            guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
+            information_concept.category = cls.build_simple_codeable_concept(guarantee_id_code)
+            information_concept.valueString = imis_claim.guarantee_id
+            claim_information.append(information_concept)
+
+    @classmethod
+    def build_imis_guarantee_id(cls, imis_claim, fhir_claim):
+        if fhir_claim.information:
+            for information in fhir_claim.information:
+                guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
+                category = information.category
+                if category and category.text == guarantee_id_code:
+                    imis_claim.guarantee_id = information.valueString
