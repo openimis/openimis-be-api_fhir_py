@@ -191,13 +191,13 @@ class FHIRBaseObject(object):
                         value.append(i)
             elif prop_type is FHIRDate:
                 value = obj
-            elif obj:
+            elif obj is not None:
                 try:
                     value = prop_type(obj)
                 except TypeError:
                     raise PropertyTypeError(type(obj).__name__, prop.definition)
 
-            if value:
+            if value is not None:
                 setattr(self, prop.definition.name, value)
         return self
 
@@ -234,7 +234,7 @@ class FHIRBaseObject(object):
                 if results:
                     retval[attr] = results
             else:
-                if value:
+                if value is not None:
                     retval[attr] = value
         return retval
 
