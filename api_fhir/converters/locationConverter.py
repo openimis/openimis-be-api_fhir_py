@@ -44,11 +44,12 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
         health_facility = None
-        location_code = LocationConverter._get_resource_id_from_reference(reference)
-        if not cls.valid_condition(location_code is None,
-                                   gettext('Could not fetch Location id from reference').format(reference),
-                                   errors):
-            health_facility = HealthFacility.objects.get(code=location_code)
+        if reference:
+            location_code = cls._get_resource_id_from_reference(reference)
+            if not cls.valid_condition(location_code is None,
+                                       gettext('Could not fetch Location id from reference').format(reference),
+                                       errors):
+                health_facility = HealthFacility.objects.filter(code=location_code).first()
         return health_facility
 
     @classmethod

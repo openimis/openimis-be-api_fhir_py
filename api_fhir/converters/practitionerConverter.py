@@ -28,8 +28,8 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
         return imis_claim_admin
 
     @classmethod
-    def get_reference_obj_id(cls, fhir_practitioner):
-        return fhir_practitioner.code
+    def get_reference_obj_id(cls, imis_claim_admin):
+        return imis_claim_admin.code
 
     @classmethod
     def get_fhir_resource_type(cls):
@@ -38,11 +38,12 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
         claim_admin = None
-        imis_claim_admin_code = PractitionerConverter._get_resource_id_from_reference(reference)
-        if not cls.valid_condition(imis_claim_admin_code is None,
-                                   gettext('Could not fetch Practitioner id from reference').format(reference),
-                                   errors):
-            claim_admin = ClaimAdmin.objects.get(code=imis_claim_admin_code)
+        if reference:
+            imis_claim_admin_code = cls._get_resource_id_from_reference(reference)
+            if not cls.valid_condition(imis_claim_admin_code is None,
+                                       gettext('Could not fetch Practitioner id from reference').format(reference),
+                                       errors):
+                claim_admin = ClaimAdmin.objects.filter(code=imis_claim_admin_code).first()
         return claim_admin
 
     @classmethod
