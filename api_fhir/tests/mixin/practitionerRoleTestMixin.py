@@ -10,14 +10,9 @@ from mixin.practitionerTestMixin import PractitionerTestMixin
 class PractitionerRoleTestMixin(GenericTestMixin, DbIdTestMixin):
 
     _TEST_CLAIM_ADMIN = None
-    _TEST_CLAIM_ADMIN_ID = None
     _TEST_HF = None
-    _TEST_HF_ID = None
     _TEST_LOCATION_REFERENCE = None
     _TEST_PRACTITIONER_REFERENCE = None
-
-    def get_test_db_id(self):
-        return self.__TEST_CLAIM_ADMIN_ID
 
     def set_up(self):
         imis_claim_admin = PractitionerTestMixin().create_test_imis_instance()
@@ -25,8 +20,7 @@ class PractitionerRoleTestMixin(GenericTestMixin, DbIdTestMixin):
         imis_claim_admin.audit_user_id = 1
         imis_claim_admin.save()
         self._TEST_CLAIM_ADMIN = imis_claim_admin
-        self._TEST_CLAIM_ADMIN_ID = imis_claim_admin.id
-        self._TEST_PRACTITIONER_REFERENCE = "Practitioner/" + str(self._TEST_CLAIM_ADMIN_ID)
+        self._TEST_PRACTITIONER_REFERENCE = "Practitioner/" + imis_claim_admin.code
 
         imis_hf = LocationTestMixin().create_test_imis_instance()
         imis_hf.offline = GeneralConfiguration.get_default_value_of_location_offline_attribute()
@@ -35,8 +29,7 @@ class PractitionerRoleTestMixin(GenericTestMixin, DbIdTestMixin):
         imis_hf.audit_user_id = 1
         imis_hf.save()
         self._TEST_HF = imis_hf
-        self._TEST_HF_ID = imis_hf.id
-        self._TEST_LOCATION_REFERENCE = "Location/" + str(self._TEST_HF_ID)
+        self._TEST_LOCATION_REFERENCE = "Location/" + imis_hf.code
 
     def create_test_imis_instance(self):
         self.set_up()
@@ -44,7 +37,7 @@ class PractitionerRoleTestMixin(GenericTestMixin, DbIdTestMixin):
         return self._TEST_CLAIM_ADMIN
 
     def verify_imis_instance(self, imis_obj):
-        self.assertEqual(self._TEST_HF_ID, imis_obj.health_facility.id)
+        self.assertEqual(self._TEST_HF.code, imis_obj.health_facility.code)
 
     def create_test_fhir_instance(self):
         self.set_up()
