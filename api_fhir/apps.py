@@ -45,7 +45,8 @@ DEFAULT_CFG = {
     },
     "stu3_fhir_issue_type_config": {
         "fhir_code_for_exception": "exception",
-        "fhir_code_for_not_found": "not-found"
+        "fhir_code_for_not_found": "not-found",
+        "fhir_code_for_informational": "informational"
     }
 }
 
