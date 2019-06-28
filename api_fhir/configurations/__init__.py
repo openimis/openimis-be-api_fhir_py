@@ -42,6 +42,10 @@ class IdentifierConfiguration(BaseConfiguration):
     def get_fhir_claim_admin_code_type(cls):
         raise NotImplementedError('`get_fhir_claim_admin_code_type()` must be implemented.')
 
+    @classmethod
+    def get_fhir_claim_code_type(cls):
+        raise NotImplementedError('`get_fhir_claim_code_type()` must be implemented.')
+
 
 class LocationConfiguration(BaseConfiguration):
 

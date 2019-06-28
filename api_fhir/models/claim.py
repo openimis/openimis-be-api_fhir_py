@@ -42,7 +42,7 @@ class ClaimDiagnosis(BackboneElement):
 
     sequence = Property('sequence', int, required=True)
     diagnosisCodeableConcept = Property('diagnosisCodeableConcept', 'CodeableConcept')
-    diagnosisReference = Property('diagnosisReference', 'Reference')  # referencing `Condition`  # TODO WIP add missing sub resources?
+    diagnosisReference = Property('diagnosisReference', 'Reference')  # referencing `Condition`
     type = Property('type', 'CodeableConcept', count_max='*')
     packageCode = Property('packageCode', 'CodeableConcept')
 
@@ -52,17 +52,17 @@ class ClaimProcedure(BackboneElement):
     sequence = Property('sequence', int, required=True)
     date = Property('date', 'FHIRDate')
     procedureCodeableConcept = Property('procedureCodeableConcept', 'CodeableConcept')
-    procedureReference = Property('procedureReference', 'Reference')  # referencing `Procedure`  # TODO WIP add missing sub resources?
+    procedureReference = Property('procedureReference', 'Reference')  # referencing `Procedure`
 
 
 class ClaimInsurance(BackboneElement):
 
     sequence = Property('sequence', int, required=True)
     focal = Property('focal', bool, required=True)
-    coverage = Property('coverage', 'Reference', required=True)  # referencing `Coverage`  # TODO WIP add missing sub resources?
+    coverage = Property('coverage', 'Reference', required=True)  # referencing `Coverage`
     businessArrangement = Property('businessArrangement', str)
     preAuthRef = Property('preAuthRef', str, count_max='*')
-    claimResponse = Property('claimResponse', 'Reference')  # referencing `ClaimResponse`  # TODO WIP add missing sub resources?
+    claimResponse = Property('claimResponse', 'Reference')  # referencing `ClaimResponse`
 
 
 class ClaimAccident(BackboneElement):
@@ -85,7 +85,7 @@ class ClaimItemDetailSubDetail(BackboneElement):
     unitPrice = Property('unitPrice', 'Money')
     factor = Property('factor', float)
     net = Property('net', 'Money')
-    udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`  # TODO WIP add missing sub resources?
+    udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`
 
 
 class ClaimItemDetail(BackboneElement):
@@ -100,7 +100,7 @@ class ClaimItemDetail(BackboneElement):
     unitPrice = Property('unitPrice', 'Money')
     factor = Property('factor', float)
     net = Property('net', 'Money')
-    udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`  # TODO WIP add missing sub resources?
+    udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`
     subDetail = Property('subDetail', 'ClaimItemDetailSubDetail', count_max='*')
 
 
@@ -125,10 +125,10 @@ class ClaimItem(BackboneElement):
     unitPrice = Property('unitPrice', 'Money')
     factor = Property('factor', float)
     net = Property('net', 'Money')
-    udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`  # TODO WIP add missing sub resources?
+    udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`
     bodySite = Property('bodySite', 'CodeableConcept')
     subSite = Property('subSite', 'CodeableConcept', count_max='*')
-    encounter = Property('encounter', 'Reference', count_max='*')  # referencing `Encounter`  # TODO WIP add missing sub resources?
+    encounter = Property('encounter', 'Reference', count_max='*')  # referencing `Encounter`
     detail = Property('detail', 'ClaimItemDetail', count_max='*')
 
 
@@ -149,10 +149,10 @@ class Claim(DomainResource):
     priority = Property('priority', 'CodeableConcept')
     fundsReserve = Property('fundsReserve', 'CodeableConcept')
     related = Property('related', 'ClaimRelated', count_max='*')
-    prescription = Property('prescription', 'Reference')  # referencing `MedicationRequest` | `VisionPrescription`  # TODO WIP add missing sub resources?
+    prescription = Property('prescription', 'Reference')  # referencing `MedicationRequest` | `VisionPrescription`
     originalPrescription = Property('originalPrescription', 'Reference')  # referencing `MedicationRequest`
     payee = Property('payee', 'ClaimPayee')
-    referral = Property('referral', 'Reference')  # referencing `ReferralRequest`  # TODO WIP add missing sub resources?
+    referral = Property('referral', 'Reference')  # referencing `ReferralRequest`
     facility = Property('facility', 'Reference')  # referencing `Location`
     careTeam = Property('careTeam', 'ClaimCareTeam')
     information = Property('information', 'ClaimInformation', count_max='*')
