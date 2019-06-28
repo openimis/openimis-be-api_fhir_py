@@ -88,10 +88,10 @@ class Property(PropertyMixin):
                 for item in value:
                     instance._values[self.definition.name].append(item)
             else:
-                raise PropertyError(gettext("The value of property {} need to be a list").format(self.definition.name))
+                raise PropertyError(gettext("The value of property `{}` need to be a list").format(self.definition.name))
         else:
             if isinstance(value, list):
-                raise PropertyError(gettext("The value of property {} shouldn't be a list").format(self.definition.name))
+                raise PropertyError(gettext("The value of property `{}` shouldn't be a list").format(self.definition.name))
             else:
                 self.validate_type(value)
                 instance._values[self.definition.name] = value
@@ -259,7 +259,7 @@ from api_fhir.models.extension import Extension
 from api_fhir.models.fhirdate import FHIRDate
 from api_fhir.models.humanName import HumanName, NameUse
 from api_fhir.models.identifier import Identifier, IdentifierUse
-from api_fhir.models.imisModelEnums import ImisMaritalStatus
+from api_fhir.models.imisModelEnums import ImisMaritalStatus, ImisClaimIcdTypes
 from api_fhir.models.location import LocationPosition, LocationMode, Location, LocationStatus
 from api_fhir.models.meta import Meta
 from api_fhir.models.money import Money
