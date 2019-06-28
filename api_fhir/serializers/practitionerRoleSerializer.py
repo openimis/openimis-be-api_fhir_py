@@ -23,6 +23,7 @@ class PractitionerRoleSerializer(BaseFHIRSerializer):
 
     def update(self, instance, validated_data):
         instance.health_facility_id = validated_data.get('health_facility_id', instance.health_facility_id)
+        instance.audit_user_id = self.get_audit_user_id()
         instance.save()
         return instance
 
