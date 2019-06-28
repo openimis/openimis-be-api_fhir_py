@@ -87,6 +87,7 @@ class ClaimItemDetailSubDetail(BackboneElement):
     net = Property('net', 'Money')
     udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`  # TODO WIP add missing sub resources?
 
+
 class ClaimItemDetail(BackboneElement):
 
     sequence = Property('sequence', int, required=True)
@@ -100,7 +101,7 @@ class ClaimItemDetail(BackboneElement):
     factor = Property('factor', float)
     net = Property('net', 'Money')
     udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`  # TODO WIP add missing sub resources?
-    subDetail = Property(' subDetail', 'ClaimItemDetailSubDetail', count_max='*')
+    subDetail = Property('subDetail', 'ClaimItemDetailSubDetail', count_max='*')
 
 
 class ClaimItem(BackboneElement):
@@ -162,3 +163,4 @@ class Claim(DomainResource):
     employmentImpacted = Property('employmentImpacted', 'Period')
     hospitalization = Property('hospitalization', 'Period')
     item = Property('item', 'ClaimItem', count_max='*')
+    total = Property('total', 'Money')
