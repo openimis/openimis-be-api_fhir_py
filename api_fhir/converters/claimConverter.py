@@ -1,5 +1,5 @@
+from claim import ClaimItemSubmit, ClaimServiceSubmit
 from claim.models import Claim, ClaimDiagnosisCode, ClaimItem, ClaimService
-from medical import models as medical_models
 from django.utils.translation import gettext
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
@@ -41,7 +41,7 @@ class ClaimConverter(BaseFHIRConverter):
         cls.build_imis_claim_admin(imis_claim, fhir_claim, errors)
         cls.build_imis_visit_type(imis_claim, fhir_claim)
         cls.build_imis_information(imis_claim, fhir_claim)
-        cls.build_imis_items_and_services(imis_claim, fhir_claim)
+        cls.build_imis_submit_items_and_services(imis_claim, fhir_claim)
         cls.check_errors(errors)
         return imis_claim
 
@@ -81,13 +81,19 @@ class ClaimConverter(BaseFHIRConverter):
     @classmethod
     def build_imis_patient(cls, imis_claim, fhir_claim, errors):
         if fhir_claim.patient:
-            imis_claim.insuree = PatientConverter.get_imis_obj_by_fhir_reference(fhir_claim.patient)
+            insuree = PatientConverter.get_imis_obj_by_fhir_reference(fhir_claim.patient)
+            if insuree:
+                imis_claim.insuree = insuree
+                imis_claim.insuree_chf_code = insuree.chf_id
         cls.valid_condition(imis_claim.insuree is None, gettext('Missing the patient reference'), errors)
 
     @classmethod
     def build_imis_health_facility(cls, errors, fhir_claim, imis_claim):
         if fhir_claim.facility:
-            imis_claim.health_facility = LocationConverter.get_imis_obj_by_fhir_reference(fhir_claim.facility)
+            health_facility = LocationConverter.get_imis_obj_by_fhir_reference(fhir_claim.facility)
+            if health_facility:
+                imis_claim.health_facility = health_facility
+                imis_claim.health_facility_code = health_facility.code
         cls.valid_condition(imis_claim.health_facility is None, gettext('Missing the facility reference'), errors)
 
     @classmethod
@@ -139,15 +145,20 @@ class ClaimConverter(BaseFHIRConverter):
                 diagnosis_type = cls.get_diagnosis_type(diagnosis)
                 diagnosis_code = cls.get_diagnosis_code(diagnosis)
                 if diagnosis_type == ImisClaimIcdTypes.ICD_0.value:
-                    imis_claim.icd = cls.find_claim_diagnosis_code(diagnosis_code)
+                    imis_claim.icd = cls.get_claim_diagnosis_by_code(diagnosis_code)
+                    imis_claim.icd_code = diagnosis_code
                 elif diagnosis_type == ImisClaimIcdTypes.ICD_1.value:
                     imis_claim.icd_1 = diagnosis_code
+                    imis_claim.icd1_code = cls.get_claim_diagnosis_code_by_id(diagnosis_code)
                 elif diagnosis_type == ImisClaimIcdTypes.ICD_2.value:
                     imis_claim.icd_2 = diagnosis_code
+                    imis_claim.icd2_code = cls.get_claim_diagnosis_code_by_id(diagnosis_code)
                 elif diagnosis_type == ImisClaimIcdTypes.ICD_3.value:
                     imis_claim.icd_3 = diagnosis_code
+                    imis_claim.icd3_code = cls.get_claim_diagnosis_code_by_id(diagnosis_code)
                 elif diagnosis_type == ImisClaimIcdTypes.ICD_4.value:
                     imis_claim.icd_4 = diagnosis_code
+                    imis_claim.icd4_code = cls.get_claim_diagnosis_code_by_id(diagnosis_code)
         cls.valid_condition(imis_claim.icd is None, gettext('Missing the main diagnosis for claim'), errors)
 
     @classmethod
@@ -163,8 +174,17 @@ class ClaimConverter(BaseFHIRConverter):
         return diagnosis.type[0]
 
     @classmethod
-    def find_claim_diagnosis_code(cls, icd_code):
+    def get_claim_diagnosis_by_code(cls, icd_code):
         return ClaimDiagnosisCode.objects.get(code=icd_code)
+
+    @classmethod
+    def get_claim_diagnosis_code_by_id(cls, diagnosis_id):
+        code = None
+        if diagnosis_id is not None:
+            diagnosis = ClaimDiagnosisCode.objects.filter(pk=diagnosis_id).first()
+            if diagnosis:
+                code = diagnosis.code
+        return code
 
     @classmethod
     def get_diagnosis_code(cls, diagnosis):
@@ -197,7 +217,10 @@ class ClaimConverter(BaseFHIRConverter):
     @classmethod
     def build_imis_claim_admin(cls, imis_claim, fhir_claim, errors):
         if fhir_claim.enterer:
-            imis_claim.admin = PractitionerConverter.get_imis_obj_by_fhir_reference(fhir_claim.enterer)
+            admin = PractitionerConverter.get_imis_obj_by_fhir_reference(fhir_claim.enterer)
+            if admin:
+                imis_claim.admin = admin
+                imis_claim.claim_admin_code = admin.code
         cls.valid_condition(imis_claim.admin is None, gettext('Missing the enterer reference'), errors)
 
     @classmethod
@@ -285,52 +308,41 @@ class ClaimConverter(BaseFHIRConverter):
         return items
 
     @classmethod
-    def build_imis_items_and_services(cls, imis_claim, fhir_claim):
+    def build_imis_submit_items_and_services(cls, imis_claim, fhir_claim):
         imis_items = []
         imis_services = []
         if fhir_claim.item:
             for item in fhir_claim.item:
                 if item.category:
                     if item.category.text == Stu3ClaimConfig.get_fhir_claim_item_code():
-                        cls.build_imis_item(imis_items, item)
+                        cls.build_imis_submit_item(imis_items, item)
                     elif item.category.text == Stu3ClaimConfig.get_fhir_claim_service_code():
-                        cls.build_imis_service(imis_services, item)
-
-        imis_claim.items = imis_items
-        imis_claim.services = imis_services
+                        cls.build_imis_submit_service(imis_services, item)
+        imis_claim.submit_items = imis_items
+        imis_claim.submit_services = imis_services
 
     @classmethod
-    def build_imis_item(cls, imis_items, fhir_item):
-        imis_item = ClaimItem()
+    def build_imis_submit_item(cls, imis_items, fhir_item):
+        price_asked = None
+        qty_provided = None
+        item_code = None
         if fhir_item.unitPrice:
-            imis_item.price_asked = fhir_item.unitPrice.value
+            price_asked = fhir_item.unitPrice.value
         if fhir_item.quantity:
-            imis_item.qty_provided = fhir_item.quantity.value
+            qty_provided = fhir_item.quantity.value
         if fhir_item.service:
-            imis_item.item = cls.get_claim_item_by_code(fhir_item.service.text)
-        imis_items.append(imis_item)
+            item_code = fhir_item.service.text
+        imis_items.append(ClaimItemSubmit(item_code, qty_provided, price_asked))
 
     @classmethod
-    def get_claim_item_by_code(cls, code):
-        imis_item = None
-        if code:
-            imis_item = medical_models.Item.objects.filter(code=code).first()
-        return imis_item
-
-    @classmethod
-    def build_imis_service(cls, imis_services, fhir_item):
-        imis_service = ClaimService()
+    def build_imis_submit_service(cls, imis_services, fhir_item):
+        price_asked = None
+        qty_provided = None
+        service_code = None
         if fhir_item.unitPrice:
-            imis_service.price_asked = fhir_item.unitPrice.value
+            price_asked = fhir_item.unitPrice.value
         if fhir_item.quantity:
-            imis_service.qty_provided = fhir_item.quantity.value
+            qty_provided = fhir_item.quantity.value
         if fhir_item.service:
-            imis_service.service = cls.get_claim_service_by_code(fhir_item.service.text)
-        imis_services.append(imis_service)
-
-    @classmethod
-    def get_claim_service_by_code(cls, code):
-        imis_service = None
-        if code:
-            imis_service = medical_models.Service.objects.filter(code=code).first()
-        return imis_service
+            service_code = fhir_item.service.text
+        imis_services.append(ClaimServiceSubmit(service_code, qty_provided, price_asked))
