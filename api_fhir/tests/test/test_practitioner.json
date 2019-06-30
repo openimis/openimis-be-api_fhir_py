@@ -6,7 +6,7 @@
       "type": {
         "coding": [
           {
-            "code": "PLAC",
+            "code": "FILL",
             "system": "https://hl7.org/fhir/valueset-identifier-type.html"
           }
         ]

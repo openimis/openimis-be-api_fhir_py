@@ -1,9 +1,11 @@
-from claim.models import Claim, ClaimDiagnosisCode
+from claim.models import Claim, ClaimDiagnosisCode, ClaimItem, ClaimService
+from medical import models as medical_models
 from django.utils.translation import gettext
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
 from api_fhir.converters import BaseFHIRConverter, LocationConverter, PatientConverter, PractitionerConverter
-from api_fhir.models import Claim as FHIRClaim, Period, ClaimDiagnosis, Money, ImisClaimIcdTypes, ClaimInformation
+from api_fhir.models import Claim as FHIRClaim, ClaimItem as FHIRClaimItem, Period, ClaimDiagnosis, Money, \
+    ImisClaimIcdTypes, ClaimInformation, Quantity
 from api_fhir.utils import TimeUtils
 
 
@@ -22,6 +24,7 @@ class ClaimConverter(BaseFHIRConverter):
         fhir_claim.enterer = PractitionerConverter.build_fhir_resource_reference(imis_claim.admin)
         cls.build_fhir_type(fhir_claim, imis_claim)
         cls.build_fhir_information(fhir_claim, imis_claim)
+        cls.build_fhir_items(fhir_claim, imis_claim)
         return fhir_claim
 
     @classmethod
@@ -37,7 +40,8 @@ class ClaimConverter(BaseFHIRConverter):
         cls.build_imis_total_claimed(imis_claim, fhir_claim, errors)
         cls.build_imis_claim_admin(imis_claim, fhir_claim, errors)
         cls.build_imis_visit_type(imis_claim, fhir_claim)
-        cls.build_imis_guarantee_id(imis_claim, fhir_claim)
+        cls.build_imis_information(imis_claim, fhir_claim)
+        cls.build_imis_items_and_services(imis_claim, fhir_claim)
         cls.check_errors(errors)
         return imis_claim
 
@@ -213,6 +217,15 @@ class ClaimConverter(BaseFHIRConverter):
         fhir_claim.information = claim_information
 
     @classmethod
+    def build_imis_information(cls, imis_claim, fhir_claim):
+        if fhir_claim.information:
+            for information in fhir_claim.information:
+                guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
+                category = information.category
+                if category and category.text == guarantee_id_code:
+                    imis_claim.guarantee_id = information.valueString
+
+    @classmethod
     def build_fhir_guarantee_id_information(cls, claim_information, imis_claim):
         if imis_claim.guarantee_id:
             information_concept = ClaimInformation()
@@ -223,10 +236,101 @@ class ClaimConverter(BaseFHIRConverter):
             claim_information.append(information_concept)
 
     @classmethod
-    def build_imis_guarantee_id(cls, imis_claim, fhir_claim):
-        if fhir_claim.information:
-            for information in fhir_claim.information:
-                guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
-                category = information.category
-                if category and category.text == guarantee_id_code:
-                    imis_claim.guarantee_id = information.valueString
+    def build_fhir_items(cls, fhir_claim, imis_claim):
+        fhir_items = []
+        cls.build_items_for_imis_item(fhir_items, imis_claim)
+        cls.build_items_for_imis_services(fhir_items, imis_claim)
+        fhir_claim.item = fhir_items
+
+    @classmethod
+    def build_items_for_imis_item(cls, fhir_items, imis_claim):
+        for item in cls.get_imis_items_for_claim(imis_claim):
+            if item.item:
+                type = Stu3ClaimConfig.get_fhir_claim_item_code()
+                cls.build_fhir_item(fhir_items, item.price_asked, item.qty_provided, item.item.code, type)
+
+    @classmethod
+    def build_items_for_imis_services(cls, fhir_items, imis_claim):
+        for service in cls.get_imis_services_for_claim(imis_claim):
+            if service.service:
+                type = Stu3ClaimConfig.get_fhir_claim_service_code()
+                cls.build_fhir_item(fhir_items, service.price_asked, service.qty_provided, service.service.code, type)
+
+    @classmethod
+    def build_fhir_item(cls, fhir_items, price, quantity, code, item_type):
+        fhir_item = FHIRClaimItem()
+        fhir_item.sequence = len(fhir_items) + 1
+        unit_price = Money()
+        unit_price.value = price
+        fhir_item.unitPrice = unit_price
+        fhir_quantity = Quantity()
+        fhir_quantity.value = quantity
+        fhir_item.quantity = fhir_quantity
+        fhir_item.service = cls.build_simple_codeable_concept(code)
+        fhir_item.category = cls.build_simple_codeable_concept(item_type)
+        fhir_items.append(fhir_item)
+
+    @classmethod
+    def get_imis_items_for_claim(cls, imis_claim):
+        items = []
+        if imis_claim and imis_claim.id:
+            items = ClaimItem.objects.filter(claim_id=imis_claim.id)
+        return items
+
+    @classmethod
+    def get_imis_services_for_claim(cls, imis_claim):
+        items = []
+        if imis_claim and imis_claim.id:
+            items = ClaimService.objects.filter(claim_id=imis_claim.id)
+        return items
+
+    @classmethod
+    def build_imis_items_and_services(cls, imis_claim, fhir_claim):
+        imis_items = []
+        imis_services = []
+        if fhir_claim.item:
+            for item in fhir_claim.item:
+                if item.category:
+                    if item.category.text == Stu3ClaimConfig.get_fhir_claim_item_code():
+                        cls.build_imis_item(imis_items, item)
+                    elif item.category.text == Stu3ClaimConfig.get_fhir_claim_service_code():
+                        cls.build_imis_service(imis_services, item)
+
+        imis_claim.items = imis_items
+        imis_claim.services = imis_services
+
+    @classmethod
+    def build_imis_item(cls, imis_items, fhir_item):
+        imis_item = ClaimItem()
+        if fhir_item.unitPrice:
+            imis_item.price_asked = fhir_item.unitPrice.value
+        if fhir_item.quantity:
+            imis_item.qty_provided = fhir_item.quantity.value
+        if fhir_item.service:
+            imis_item.item = cls.get_claim_item_by_code(fhir_item.service.text)
+        imis_items.append(imis_item)
+
+    @classmethod
+    def get_claim_item_by_code(cls, code):
+        imis_item = None
+        if code:
+            imis_item = medical_models.Item.objects.filter(code=code).first()
+        return imis_item
+
+    @classmethod
+    def build_imis_service(cls, imis_services, fhir_item):
+        imis_service = ClaimService()
+        if fhir_item.unitPrice:
+            imis_service.price_asked = fhir_item.unitPrice.value
+        if fhir_item.quantity:
+            imis_service.qty_provided = fhir_item.quantity.value
+        if fhir_item.service:
+            imis_service.service = cls.get_claim_service_by_code(fhir_item.service.text)
+        imis_services.append(imis_service)
+
+    @classmethod
+    def get_claim_service_by_code(cls, code):
+        imis_service = None
+        if code:
+            imis_service = medical_models.Service.objects.filter(code=code).first()
+        return imis_service

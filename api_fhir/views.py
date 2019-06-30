@@ -6,8 +6,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.viewsets import GenericViewSet
 
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
-    PractitionerSerializer
-from api_fhir.serializers.claimSerializer import ClaimSerializer
+    PractitionerSerializer, ClaimSerializer
 
 
 class InsureeViewSet(viewsets.ModelViewSet):

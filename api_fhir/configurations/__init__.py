@@ -130,6 +130,14 @@ class ClaimConfiguration(BaseConfiguration):
     def get_fhir_claim_information_guarantee_id_code(cls):
         raise NotImplementedError('`get_fhir_claim_information_guarantee_id_code()` must be implemented.')
 
+    @classmethod
+    def get_fhir_claim_item_code(cls):
+        raise NotImplementedError('`get_fhir_claim_item_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_claim_service_code(cls):
+        raise NotImplementedError('`get_fhir_claim_service_code()` must be implemented.')
+
 
 class BaseApiFhirConfiguration(BaseConfiguration):
 

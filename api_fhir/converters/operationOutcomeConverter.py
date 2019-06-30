@@ -1,4 +1,5 @@
 from claim import ClaimSubmitError
+from django.db import IntegrityError
 from django.http import Http404
 from django.http.response import HttpResponse
 from rest_framework.exceptions import MethodNotAllowed
@@ -30,7 +31,7 @@ class OperationOutcomeConverter(BaseFHIRConverter):
 
     @classmethod
     def build_for_exception(cls, obj):
-        result = cls.build_for_generic_error(obj)
+        result = None
         if isinstance(obj, FHIRException):
             result = cls.build_for_fhir_exception(obj)
         elif isinstance(obj, ClaimSubmitError):
@@ -41,6 +42,10 @@ class OperationOutcomeConverter(BaseFHIRConverter):
             result = cls.build_for_key_MethodNotAllowed(obj)
         elif isinstance(obj, KeyError):
             result = cls.build_for_key_error(obj)
+        elif isinstance(obj, IntegrityError):
+            result = cls.build_for_IntegrityError(obj)
+        else:
+            result = cls.build_for_generic_error(obj)
         return result
 
     @classmethod
@@ -86,6 +91,13 @@ class OperationOutcomeConverter(BaseFHIRConverter):
         severity = IssueSeverity.ERROR.value
         code = Stu3IssueTypeConfig.get_fhir_code_for_exception()
         details_text = obj.msg
+        return cls.build_outcome(severity, code, details_text)
+
+    @classmethod
+    def build_for_IntegrityError(cls, obj):
+        severity = IssueSeverity.FATAL.value
+        code = Stu3IssueTypeConfig.get_fhir_code_for_exception()
+        details_text = obj.args[1]
         return cls.build_outcome(severity, code, details_text)
 
     @classmethod

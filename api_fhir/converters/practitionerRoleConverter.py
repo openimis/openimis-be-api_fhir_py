@@ -20,7 +20,7 @@ class PractitionerRoleConverter(BaseFHIRConverter):
         location_references = fhir_practitioner_role.location
         health_facility = cls.get_location_by_reference(location_references, errors)
 
-        if claim_admin:
+        if not cls.valid_condition(claim_admin is None, "Practitioner doesn't exists", errors):
             claim_admin.health_facility = health_facility
         cls.check_errors(errors)
         return claim_admin

@@ -35,4 +35,3 @@ class PractitionerConverterTestCase(PractitionerTestMixin):
         self.add_imis_db_id_to_fhir_resource(fhir_practitioner)
         actual_representation = fhir_practitioner.dumps(format_='json')
         self.assertEqual(self._test_practitioner_json_representation, actual_representation)
-
