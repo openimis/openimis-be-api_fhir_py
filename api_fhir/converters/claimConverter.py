@@ -236,7 +236,7 @@ class ClaimConverter(BaseFHIRConverter):
     @classmethod
     def build_fhir_information(cls, fhir_claim, imis_claim):
         claim_information = []
-        cls.build_fhir_guarantee_id_information(claim_information, imis_claim)
+        cls.build_fhir_guarantee_id_information(claim_information, imis_claim.guarantee_id)
         fhir_claim.information = claim_information
 
     @classmethod
@@ -249,13 +249,13 @@ class ClaimConverter(BaseFHIRConverter):
                     imis_claim.guarantee_id = information.valueString
 
     @classmethod
-    def build_fhir_guarantee_id_information(cls, claim_information, imis_claim):
-        if imis_claim.guarantee_id:
+    def build_fhir_guarantee_id_information(cls, claim_information, guarantee_id):
+        if guarantee_id:
             information_concept = ClaimInformation()
             information_concept.sequence = len(claim_information) + 1
             guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
             information_concept.category = cls.build_simple_codeable_concept(guarantee_id_code)
-            information_concept.valueString = imis_claim.guarantee_id
+            information_concept.valueString = guarantee_id
             claim_information.append(information_concept)
 
     @classmethod
