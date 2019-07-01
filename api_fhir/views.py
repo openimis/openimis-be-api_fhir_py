@@ -1,11 +1,12 @@
-from claim.models import ClaimAdmin
+from claim.models import ClaimAdmin, Claim
 from insuree.models import Insuree
 from location.models import HealthFacility
 
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
+from rest_framework.viewsets import GenericViewSet
 
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
-    PractitionerSerializer
+    PractitionerSerializer, ClaimSerializer
 
 
 class InsureeViewSet(viewsets.ModelViewSet):
@@ -30,3 +31,10 @@ class PractitionerRoleViewSet(viewsets.ModelViewSet):
 class PractitionerViewSet(viewsets.ModelViewSet):
     queryset = ClaimAdmin.objects.all()
     serializer_class = PractitionerSerializer
+
+
+class ClaimViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin,
+                   mixins.CreateModelMixin, GenericViewSet):
+    queryset = Claim.objects.all()
+    serializer_class = ClaimSerializer
+    lookup_field = 'code'

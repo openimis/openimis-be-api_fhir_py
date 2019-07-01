@@ -2,14 +2,15 @@ from django.utils.translation import gettext
 from insuree.models import Insuree, Gender
 
 from api_fhir.configurations import Stu3IdentifierConfig, GeneralConfiguration, Stu3MaritalConfig
-from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin
+from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
 from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus
 
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.utils import TimeUtils
 
 
-class PatientConverter(BaseFHIRConverter, PersonConverterMixin):
+class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
+
     @classmethod
     def to_fhir_obj(cls, imis_insuree):
         fhir_patient = Patient()
@@ -40,12 +41,23 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin):
         return imis_insuree
 
     @classmethod
-    def get_imis_object_id(cls, imis_insuree):
-        return imis_insuree.id
+    def get_reference_obj_id(cls, imis_insuree):
+        return imis_insuree.chf_id
 
     @classmethod
     def get_fhir_resource_type(cls):
         return Patient
+
+    @classmethod
+    def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
+        imis_insuree = None
+        if reference:
+            imis_insuree_chf_id = cls._get_resource_id_from_reference(reference)
+            if not cls.valid_condition(imis_insuree_chf_id is None,
+                                       gettext('Could not fetch Patient id from reference').format(reference),
+                                       errors):
+                imis_insuree = Insuree.objects.filter(chf_id=imis_insuree_chf_id).first()
+        return imis_insuree
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):

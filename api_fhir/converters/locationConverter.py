@@ -2,14 +2,14 @@ from django.utils.translation import gettext
 from location.models import HealthFacility
 
 from api_fhir.configurations import GeneralConfiguration, Stu3IdentifierConfig, Stu3LocationConfig
-from api_fhir.converters import BaseFHIRConverter
+from api_fhir.converters import BaseFHIRConverter, ReferenceConverterMixin
 from api_fhir.models import Location, ContactPointSystem, ContactPointUse
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.models.imisModelEnums import ImisHfLevel
 from api_fhir.utils import TimeUtils
 
 
-class LocationConverter(BaseFHIRConverter):
+class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_hf):
@@ -34,12 +34,23 @@ class LocationConverter(BaseFHIRConverter):
         return imis_hf
 
     @classmethod
-    def get_imis_object_id(cls, imis_hf):
-        return imis_hf.id
+    def get_reference_obj_id(cls, imis_hf):
+        return imis_hf.code
 
     @classmethod
     def get_fhir_resource_type(cls):
         return Location
+
+    @classmethod
+    def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
+        health_facility = None
+        if reference:
+            location_code = cls._get_resource_id_from_reference(reference)
+            if not cls.valid_condition(location_code is None,
+                                       gettext('Could not fetch Location id from reference').format(reference),
+                                       errors):
+                health_facility = HealthFacility.objects.filter(code=location_code).first()
+        return health_facility
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):

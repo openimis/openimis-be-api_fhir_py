@@ -26,6 +26,7 @@ class LocationSerializer(BaseFHIRSerializer):
         instance.phone = validated_data.get('phone', instance.phone)
         instance.fax = validated_data.get('fax', instance.fax)
         instance.email = validated_data.get('email', instance.email)
+        instance.audit_user_id = self.get_audit_user_id()
         instance.save()
         return instance
 

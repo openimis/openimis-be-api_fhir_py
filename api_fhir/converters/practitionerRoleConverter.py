@@ -1,7 +1,3 @@
-from claim.models import ClaimAdmin
-from django.utils.translation import gettext
-from location.models import HealthFacility
-
 from api_fhir.converters import BaseFHIRConverter, PractitionerConverter, LocationConverter
 from api_fhir.models import PractitionerRole
 
@@ -20,11 +16,11 @@ class PractitionerRoleConverter(BaseFHIRConverter):
     def to_imis_obj(cls, fhir_practitioner_role, audit_user_id):
         errors = []
         practitioner = fhir_practitioner_role.practitioner
-        claim_admin = cls.get_practitioner_by_reference(practitioner, errors)
+        claim_admin = PractitionerConverter.get_imis_obj_by_fhir_reference(practitioner, errors)
         location_references = fhir_practitioner_role.location
         health_facility = cls.get_location_by_reference(location_references, errors)
 
-        if claim_admin:
+        if not cls.valid_condition(claim_admin is None, "Practitioner doesn't exists", errors):
             claim_admin.health_facility = health_facility
         cls.check_errors(errors)
         return claim_admin
@@ -40,16 +36,6 @@ class PractitionerRoleConverter(BaseFHIRConverter):
         fhir_practitioner_role.practitioner = PractitionerConverter.build_fhir_resource_reference(imis_claim_admin)
 
     @classmethod
-    def get_practitioner_by_reference(cls, practitioner, errors):
-        claim_admin = None
-        imis_claim_admin_id = PractitionerConverter.get_resource_id_from_reference(practitioner)
-        if not cls.valid_condition(imis_claim_admin_id is None,
-                                   gettext('Could not fetch Practitioner id from reference').format(practitioner),
-                                   errors):
-            claim_admin = ClaimAdmin.objects.get(pk=imis_claim_admin_id)
-        return claim_admin
-
-    @classmethod
     def build_fhir_location_references(cls, fhir_practitioner_role, imis_claim_admin):
         if imis_claim_admin.health_facility:
             reference = LocationConverter.build_fhir_resource_reference(imis_claim_admin.health_facility)
@@ -60,11 +46,7 @@ class PractitionerRoleConverter(BaseFHIRConverter):
         health_facility = None
         if location_references:
             location = cls.get_first_location(location_references)
-            location_id = LocationConverter.get_resource_id_from_reference(location)
-            if not cls.valid_condition(location_id is None,
-                                       gettext('Could not fetch Location id from reference').format(location),
-                                       errors):
-                health_facility = HealthFacility.objects.get(pk=location_id)
+            health_facility = LocationConverter.get_imis_obj_by_fhir_reference(location, errors)
         return health_facility
 
     @classmethod

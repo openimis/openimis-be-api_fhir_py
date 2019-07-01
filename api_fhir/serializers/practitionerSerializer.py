@@ -22,6 +22,7 @@ class PractitionerSerializer(BaseFHIRSerializer):
         instance.dob = validated_data.get('dob', instance.dob)
         instance.phone = validated_data.get('phone', instance.phone)
         instance.email_id = validated_data.get('email_id', instance.email_id)
+        instance.audit_user_id = self.get_audit_user_id()
         instance.save()
         return instance
 

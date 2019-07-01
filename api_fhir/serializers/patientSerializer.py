@@ -32,7 +32,7 @@ class PatientSerializer(BaseFHIRSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.current_address = validated_data.get('current_address', instance.current_address)
         instance.geolocation = validated_data.get('geolocation', instance.geolocation)
-        instance.audit_user_id = self.getAuditUserId()
+        instance.audit_user_id = self.get_audit_user_id()
         instance.save()
         return instance
 

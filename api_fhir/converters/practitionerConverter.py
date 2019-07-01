@@ -1,12 +1,13 @@
 from claim.models import ClaimAdmin
+from django.utils.translation import gettext
 
 from api_fhir.configurations import Stu3IdentifierConfig
-from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin
+from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
 from api_fhir.models import Practitioner
 from api_fhir.utils import TimeUtils
 
 
-class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin):
+class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_claim_admin):
@@ -27,12 +28,23 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin):
         return imis_claim_admin
 
     @classmethod
-    def get_imis_object_id(cls, fhir_practitioner):
-        return fhir_practitioner.id
+    def get_reference_obj_id(cls, imis_claim_admin):
+        return imis_claim_admin.code
 
     @classmethod
     def get_fhir_resource_type(cls):
         return Practitioner
+
+    @classmethod
+    def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
+        claim_admin = None
+        if reference:
+            imis_claim_admin_code = cls._get_resource_id_from_reference(reference)
+            if not cls.valid_condition(imis_claim_admin_code is None,
+                                       gettext('Could not fetch Practitioner id from reference').format(reference),
+                                       errors):
+                claim_admin = ClaimAdmin.objects.filter(code=imis_claim_admin_code).first()
+        return claim_admin
 
     @classmethod
     def create_default_claim_admin(cls, audit_user_id):

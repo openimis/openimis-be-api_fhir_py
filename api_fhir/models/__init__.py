@@ -88,10 +88,10 @@ class Property(PropertyMixin):
                 for item in value:
                     instance._values[self.definition.name].append(item)
             else:
-                raise PropertyError(gettext("The value of property {} need to be a list").format(self.definition.name))
+                raise PropertyError(gettext("The value of property `{}` need to be a list").format(self.definition.name))
         else:
             if isinstance(value, list):
-                raise PropertyError(gettext("The value of property {} shouldn't be a list").format(self.definition.name))
+                raise PropertyError(gettext("The value of property `{}` shouldn't be a list").format(self.definition.name))
             else:
                 self.validate_type(value)
                 instance._values[self.definition.name] = value
@@ -191,13 +191,13 @@ class FHIRBaseObject(object):
                         value.append(i)
             elif prop_type is FHIRDate:
                 value = obj
-            elif obj:
+            elif obj is not None:
                 try:
                     value = prop_type(obj)
                 except TypeError:
                     raise PropertyTypeError(type(obj).__name__, prop.definition)
 
-            if value:
+            if value is not None:
                 setattr(self, prop.definition.name, value)
         return self
 
@@ -234,7 +234,7 @@ class FHIRBaseObject(object):
                 if results:
                     retval[attr] = results
             else:
-                if value:
+                if value is not None:
                     retval[attr] = value
         return retval
 
@@ -259,7 +259,7 @@ from api_fhir.models.extension import Extension
 from api_fhir.models.fhirdate import FHIRDate
 from api_fhir.models.humanName import HumanName, NameUse
 from api_fhir.models.identifier import Identifier, IdentifierUse
-from api_fhir.models.imisModelEnums import ImisMaritalStatus
+from api_fhir.models.imisModelEnums import ImisMaritalStatus, ImisClaimIcdTypes
 from api_fhir.models.location import LocationPosition, LocationMode, Location, LocationStatus
 from api_fhir.models.meta import Meta
 from api_fhir.models.money import Money
@@ -277,3 +277,5 @@ from api_fhir.models.daysOfWeek import DaysOfWeek
 from api_fhir.models.endpoint import Endpoint
 from api_fhir.models.practitionerRole import PractitionerRole, PractitionerAvailableTime, PractitionerNotAvailable
 from api_fhir.models.practitioner import Practitioner, PractitionerQualification
+from api_fhir.models.claim import Claim, ClaimAccident, ClaimCareTeam, ClaimDiagnosis, ClaimInformation, \
+    ClaimInsurance, ClaimItem, ClaimItemDetail, ClaimItemDetailSubDetail, ClaimPayee, ClaimProcedure, ClaimRelated

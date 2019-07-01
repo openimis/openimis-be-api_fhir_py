@@ -27,7 +27,8 @@ DEFAULT_CFG = {
         "fhir_code_for_imis_chfid_type": "SB",
         "fhir_code_for_imis_passport_type": "PPN",
         "fhir_code_for_imis_facility_id_type": "FI",
-        "fhir_code_for_imis_claim_admin_code_type": "PLAC"
+        "fhir_code_for_imis_claim_admin_code_type": "FILL",
+        "fhir_code_for_imis_claim_code_type": "MR",
     },
     "stu3_fhir_marital_status_config": {
         "system": "https://www.hl7.org/fhir/STU3/valueset-marital-status.html",
@@ -45,7 +46,13 @@ DEFAULT_CFG = {
     },
     "stu3_fhir_issue_type_config": {
         "fhir_code_for_exception": "exception",
-        "fhir_code_for_not_found": "not-found"
+        "fhir_code_for_not_found": "not-found",
+        "fhir_code_for_informational": "informational"
+    },
+    "stu3_fhir_claim_config": {
+        "fhir_claim_information_guarantee_id_code": "guarantee_id",
+        "fhir_claim_item_code": "item",
+        "fhir_claim_service_code": "service"
     }
 }
 
