@@ -1,2 +1,0 @@
-class FhirRequestProcessException(Exception):
-    pass

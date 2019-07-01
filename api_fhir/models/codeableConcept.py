@@ -1,16 +1,10 @@
-from api_fhir.models.element import Element
+from api_fhir.models import Element, Property
 
 
 class CodeableConcept(Element):
 
-    resource_type = "CodeableConcept"
-
-    def __init__(self):
-        self.coding = None  # List of `Coding` items (represented as `dict` in JSON)
-
-        self.text = None  # Type `str`
-
-        super(CodeableConcept, self).__init__()
+    coding = Property('coding', 'Coding', count_max='*')
+    text = Property('text', str)
 
     class Meta:
         app_label = 'api_fhir'

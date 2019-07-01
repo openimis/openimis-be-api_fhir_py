@@ -1,12 +1,10 @@
-class Element(object):
+from api_fhir.models import FHIRBaseObject, Property
 
-    resource_type = "Element"
 
-    def __init__(self):
-        self.id = None  # Type `str` (id)
+class Element(FHIRBaseObject):
 
-        self.extension = None  # Type `Extension`
+    id = Property('id', str)
+    extension = Property('extension', 'Extension', count_max='*')
 
     class Meta:
-        abstract = True
         app_label = 'api_fhir'

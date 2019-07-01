@@ -1,16 +1,10 @@
-from api_fhir.models import Element
+from api_fhir.models import Element, Property
 
 
 class Narrative(Element):
 
-    resource_type = "Narrative"
-
-    def __init__(self):
-        self.div = None  # Type `str`.
-
-        self.status = None  # Type `str`. (generated | extensions | additional | empty)
-
-        super(Narrative, self).__init__()
+    div = Property('div', str)
+    status = Property('status', str)  # generated | extensions | additional | empty
 
     class Meta:
         app_label = 'api_fhir'

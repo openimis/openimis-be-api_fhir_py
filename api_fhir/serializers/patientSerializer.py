@@ -18,6 +18,8 @@ class PatientSerializer(BaseFHIRSerializer):
         # TODO the familyid isn't covered because that value is missing in the model
         # TODO the photoId isn't covered because that value is missing in the model
         # TODO the typeofid isn't covered because that value is missing in the model
+        # TODO the head isn't covered in the current version of API
+        # TODO the card_issued isn't covered in the current version of API
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.other_names = validated_data.get('other_names', instance.other_names)
         instance.chf_id = validated_data.get('chf_id', instance.chf_id)
@@ -30,7 +32,7 @@ class PatientSerializer(BaseFHIRSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.current_address = validated_data.get('current_address', instance.current_address)
         instance.geolocation = validated_data.get('geolocation', instance.geolocation)
-        instance.audit_user_id = self.getAuditUserId()
+        instance.audit_user_id = self.get_audit_user_id()
         instance.save()
         return instance
 

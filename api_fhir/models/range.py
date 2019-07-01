@@ -1,16 +1,10 @@
-from api_fhir.models import Element
+from api_fhir.models import Element, Property
 
 
 class Range(Element):
 
-    resource_type = "Range"
-
-    def __init__(self):
-        self.high = None  # Type `Quantity` (represented as `dict` in JSON).
-
-        self.low = None  # Type `Quantity` (represented as `dict` in JSON).
-
-        super(Range, self).__init__()
+    high = Property('high', 'Quantity')
+    low = Property('low', 'Quantity')
 
     class Meta:
         app_label = 'api_fhir'
