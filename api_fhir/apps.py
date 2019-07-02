@@ -21,6 +21,7 @@ DEFAULT_CFG = {
     "default_value_of_patient_card_issued_attribute": False,
     "default_value_of_location_offline_attribute": False,
     "default_value_of_location_care_type": "B",
+    "default_response_page_size": 10,
     "stu3_fhir_identifier_type_config": {
         "system": "https://hl7.org/fhir/valueset-identifier-type.html",
         "fhir_code_for_imis_db_id_type": "ACSN",
