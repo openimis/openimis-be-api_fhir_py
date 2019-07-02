@@ -1,3 +1,5 @@
+from enum import Enum
+
 from api_fhir.models import Resource, Property, BackboneElement
 
 
@@ -50,3 +52,22 @@ class Bundle(Resource):
     link = Property('link', 'BundleLink', count_max='*')
     entry = Property('entry', 'BundleEntry', count_max='*')
     signature = Property('signature', 'Signature')
+
+
+class BundleType(Enum):
+    DOCUMENT = "document"
+    MESSAGE = "message"
+    TRANSACTION = "transaction"
+    TRANSACTION_RESPONSE = "transaction-response"
+    BATCH = "batch"
+    BATCH_RESPONSE = "batch-response"
+    HISTORY = "history"
+    SEARCHSET = "searchset"
+    COLLECTION = "collection"
+
+class BundleLinkRelation(Enum):
+    SELF = "self"
+    NEXT = "next"
+    PREVIOUS = "previous"
+    LAST = "last"
+    FIRST = "first"
