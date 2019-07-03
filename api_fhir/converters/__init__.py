@@ -79,6 +79,7 @@ class BaseFHIRConverter(ABC):
             if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system() \
                     and first_coding.code == lookup_code:
                     value = identifier.value
+                    break
         return value
 
     @classmethod

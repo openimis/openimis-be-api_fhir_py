@@ -27,7 +27,7 @@ class ReferenceConverterMixin(object):
         return reference
 
     @classmethod
-    def _get_resource_id_from_reference(cls, reference, errors=None):
+    def _get_resource_id_from_reference(cls, reference):
         resource_id = None
         if reference:
             reference = reference.reference
