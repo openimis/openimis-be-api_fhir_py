@@ -71,6 +71,22 @@ class BaseFHIRConverter(ABC):
         return identifier
 
     @classmethod
+    def get_fhir_identifier_by_code(cls, identifiers, lookup_code):
+        value = None
+        if identifiers is not None:
+            for identifier in identifiers:
+                identifier_type = identifier.type
+                if identifier_type:
+                    coding_list = identifier_type.coding
+                    if coding_list:
+                        first_coding = cls.get_first_coding_from_codeable_concept(identifier_type)
+                        if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system():
+                            code = first_coding.code
+                            if code == lookup_code:
+                                value = identifier.value
+        return value
+
+    @classmethod
     def build_fhir_contact_point(cls, value, contact_point_system, contact_point_use):
         contact_point = ContactPoint()
         contact_point.system = contact_point_system

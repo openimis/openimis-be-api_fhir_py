@@ -1,5 +1,6 @@
 import inspect
 
+from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.models import Reference
 
 
@@ -26,12 +27,14 @@ class ReferenceConverterMixin(object):
         return reference
 
     @classmethod
-    def _get_resource_id_from_reference(cls, reference):
+    def _get_resource_id_from_reference(cls, reference, errors=None):
         resource_id = None
         if reference:
             reference = reference.reference
             if isinstance(reference, str) and '/' in reference:
                 path, resource_id = reference.rsplit('/', 1)
+        if resource_id is None:
+            raise FHIRRequestProcessException(['Could not fetch id from reference: {}'])
         return resource_id
 
     @classmethod
