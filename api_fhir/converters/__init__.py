@@ -6,13 +6,14 @@ from api_fhir.models import CodeableConcept, ContactPoint, Address, Coding, Iden
 
 
 class BaseFHIRConverter(ABC):
+
     @classmethod
     def to_fhir_obj(cls, obj):
-        raise NotImplementedError('`toFhirObj()` must be implemented.')
+        raise NotImplementedError('`toFhirObj()` must be implemented.')  # pragma: no cover
 
     @classmethod
     def to_imis_obj(cls, data, audit_user_id):
-        raise NotImplementedError('`toImisObj()` must be implemented.')
+        raise NotImplementedError('`toImisObj()` must be implemented.')  # pragma: no cover
 
     @classmethod
     def valid_condition(cls, condition, error_message, errors=None):
@@ -23,7 +24,7 @@ class BaseFHIRConverter(ABC):
         return condition
 
     @classmethod
-    def check_errors(cls, errors=None):
+    def check_errors(cls, errors=None):  # pragma: no cover
         if errors is None:
             errors = []
         if len(errors) > 0:

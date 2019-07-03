@@ -7,15 +7,15 @@ class ReferenceConverterMixin(object):
 
     @classmethod
     def get_reference_obj_id(cls, obj):
-        raise NotImplementedError('`get_imis_object_id()` must be implemented.')
+        raise NotImplementedError('`get_imis_object_id()` must be implemented.')  # pragma: no cover
 
     @classmethod
     def get_fhir_resource_type(cls):
-        raise NotImplementedError('`get_fhir_resource_type()` must be implemented.')
+        raise NotImplementedError('`get_fhir_resource_type()` must be implemented.')  # pragma: no cover
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        raise NotImplementedError('`get_imis_object_by_fhir_reference()` must be implemented.')
+        raise NotImplementedError('`get_imis_object_by_fhir_reference()` must be implemented.')  # pragma: no cover
 
     @classmethod
     def build_fhir_resource_reference(cls, obj):

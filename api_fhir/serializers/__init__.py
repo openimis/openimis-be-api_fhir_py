@@ -21,10 +21,10 @@ class BaseFHIRSerializer(serializers.Serializer):
         return self.fhirConverter.to_imis_obj(data, audit_user_id).__dict__
 
     def create(self, validated_data):
-        raise NotImplementedError('`create()` must be implemented.')
+        raise NotImplementedError('`create()` must be implemented.')  # pragma: no cover
 
     def update(self, instance, validated_data):
-        raise NotImplementedError('`update()` must be implemented.')
+        raise NotImplementedError('`update()` must be implemented.')  # pragma: no cover
 
     def get_audit_user_id(self):
         request = self.context.get("request")
