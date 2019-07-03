@@ -1,6 +1,7 @@
 import sys
 
-class BaseConfiguration(object):
+
+class BaseConfiguration(object):  # pragma: no cover
 
     @classmethod
     def build_configuration(cls, cfg):
@@ -12,7 +13,7 @@ class BaseConfiguration(object):
         return sys.modules[module_name]
 
 
-class IdentifierConfiguration(BaseConfiguration):
+class IdentifierConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
     def build_configuration(cls, cfg):
@@ -47,7 +48,7 @@ class IdentifierConfiguration(BaseConfiguration):
         raise NotImplementedError('`get_fhir_claim_code_type()` must be implemented.')
 
 
-class LocationConfiguration(BaseConfiguration):
+class LocationConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
     def build_configuration(cls, cfg):
@@ -70,7 +71,7 @@ class LocationConfiguration(BaseConfiguration):
         raise NotImplementedError('`get_fhir_code_for_health_center()` must be implemented.')
 
 
-class MaritalConfiguration(BaseConfiguration):
+class MaritalConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
     def build_configuration(cls, cfg):
@@ -101,7 +102,7 @@ class MaritalConfiguration(BaseConfiguration):
         raise NotImplementedError('`get_fhir_unknown_marital_status_code()` must be implemented.')
 
 
-class IssueTypeConfiguration(BaseConfiguration):
+class IssueTypeConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
     def build_configuration(cls, cfg):
@@ -120,7 +121,7 @@ class IssueTypeConfiguration(BaseConfiguration):
         raise NotImplementedError('`get_fhir_code_for_informational()` must be implemented.')
 
 
-class ClaimConfiguration(BaseConfiguration):
+class ClaimConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
     def build_configuration(cls, cfg):
@@ -139,7 +140,7 @@ class ClaimConfiguration(BaseConfiguration):
         raise NotImplementedError('`get_fhir_claim_service_code()` must be implemented.')
 
 
-class BaseApiFhirConfiguration(BaseConfiguration):
+class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
     def build_configuration(cls, cfg):

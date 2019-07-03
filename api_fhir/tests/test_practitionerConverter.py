@@ -3,7 +3,7 @@ import os
 from api_fhir.converters import PractitionerConverter
 
 from api_fhir.models import FHIRBaseObject
-from mixin.practitionerTestMixin import PractitionerTestMixin
+from api_fhir.tests import PractitionerTestMixin
 
 
 class PractitionerConverterTestCase(PractitionerTestMixin):

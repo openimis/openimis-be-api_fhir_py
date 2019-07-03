@@ -1,10 +1,7 @@
 from api_fhir.configurations import GeneralConfiguration
 from api_fhir.models import PractitionerRole, Reference
+from api_fhir.tests import GenericTestMixin, DbIdTestMixin, PractitionerTestMixin, LocationTestMixin
 from api_fhir.utils import TimeUtils
-from mixin.dbIdTestMixin import DbIdTestMixin
-from mixin.genericTestMixin import GenericTestMixin
-from mixin.locationTestMixin import LocationTestMixin
-from mixin.practitionerTestMixin import PractitionerTestMixin
 
 
 class PractitionerRoleTestMixin(GenericTestMixin, DbIdTestMixin):

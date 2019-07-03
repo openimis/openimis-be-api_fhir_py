@@ -4,11 +4,8 @@ from api_fhir.configurations import Stu3IdentifierConfig
 from api_fhir.converters import PatientConverter, LocationConverter, PractitionerConverter
 from api_fhir.converters.claimConverter import ClaimConverter
 from api_fhir.models import Claim as FHIRClaim, ImisClaimIcdTypes, Period, Money
+from api_fhir.tests import GenericTestMixin, PatientTestMixin, LocationTestMixin, PractitionerTestMixin
 from api_fhir.utils import TimeUtils
-from mixin.genericTestMixin import GenericTestMixin
-from mixin.locationTestMixin import LocationTestMixin
-from mixin.patientTestMixin import PatientTestMixin
-from mixin.practitionerTestMixin import PractitionerTestMixin
 
 
 class ClaimTestMixin(GenericTestMixin):

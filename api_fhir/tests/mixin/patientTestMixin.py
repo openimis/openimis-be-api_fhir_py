@@ -4,9 +4,8 @@ from api_fhir.configurations import Stu3IdentifierConfig, Stu3MaritalConfig
 from api_fhir.converters import PatientConverter
 from api_fhir.models import HumanName, NameUse, Identifier, AdministrativeGender, ContactPoint, ContactPointSystem, \
     Address, AddressType, ImisMaritalStatus, Patient, ContactPointUse, AddressUse
+from api_fhir.tests import GenericTestMixin, DbIdTestMixin
 from api_fhir.utils import TimeUtils
-from mixin.dbIdTestMixin import DbIdTestMixin
-from mixin.genericTestMixin import GenericTestMixin
 
 
 class PatientTestMixin(GenericTestMixin, DbIdTestMixin):

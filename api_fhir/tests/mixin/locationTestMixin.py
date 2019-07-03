@@ -3,8 +3,7 @@ from location.models import HealthFacility
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3LocationConfig
 from api_fhir.converters import LocationConverter
 from api_fhir.models import ContactPointSystem, AddressType, AddressUse, ContactPointUse, Location
-from mixin.dbIdTestMixin import DbIdTestMixin
-from mixin.genericTestMixin import GenericTestMixin
+from api_fhir.tests import GenericTestMixin, DbIdTestMixin
 
 
 class LocationTestMixin(GenericTestMixin, DbIdTestMixin):

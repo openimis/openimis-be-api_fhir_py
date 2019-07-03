@@ -64,19 +64,9 @@ class ClaimConverter(BaseFHIRConverter):
 
     @classmethod
     def build_imis_identifier(cls, imis_claim, fhir_claim, errors):
-        identifiers = fhir_claim.identifier
-        if identifiers:
-            for identifier in identifiers:
-                identifier_type = identifier.type
-                if identifier_type:
-                    coding_list = identifier_type.coding
-                    if coding_list:
-                        first_coding = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system():
-                            code = first_coding.code
-                            value = identifier.value
-                            if value and code == Stu3IdentifierConfig.get_fhir_claim_code_type():
-                                imis_claim.code = value
+        value = cls.get_fhir_identifier_by_code(fhir_claim.identifier, Stu3IdentifierConfig.get_fhir_claim_code_type())
+        if value:
+            imis_claim.code = value
         cls.valid_condition(imis_claim.code is None, gettext('Missing the claim code'), errors)
 
     @classmethod
@@ -324,26 +314,35 @@ class ClaimConverter(BaseFHIRConverter):
 
     @classmethod
     def build_imis_submit_item(cls, imis_items, fhir_item):
-        price_asked = None
-        qty_provided = None
-        item_code = None
-        if fhir_item.unitPrice:
-            price_asked = fhir_item.unitPrice.value
-        if fhir_item.quantity:
-            qty_provided = fhir_item.quantity.value
-        if fhir_item.service:
-            item_code = fhir_item.service.text
+        price_asked = cls.get_fhir_item_price_asked(fhir_item)
+        qty_provided = cls.get_fhir_item_qty_provided(fhir_item)
+        item_code = cls.get_fhir_item_code(fhir_item)
         imis_items.append(ClaimItemSubmit(item_code, qty_provided, price_asked))
 
     @classmethod
     def build_imis_submit_service(cls, imis_services, fhir_item):
-        price_asked = None
+        price_asked = cls.get_fhir_item_price_asked(fhir_item)
+        qty_provided = cls.get_fhir_item_qty_provided(fhir_item)
+        service_code = cls.get_fhir_item_code(fhir_item)
+        imis_services.append(ClaimServiceSubmit(service_code, qty_provided, price_asked))
+
+    @classmethod
+    def get_fhir_item_code(cls, fhir_item):
+        item_code = None
+        if fhir_item.service:
+            item_code = fhir_item.service.text
+        return item_code
+
+    @classmethod
+    def get_fhir_item_qty_provided(cls, fhir_item):
         qty_provided = None
-        service_code = None
-        if fhir_item.unitPrice:
-            price_asked = fhir_item.unitPrice.value
         if fhir_item.quantity:
             qty_provided = fhir_item.quantity.value
-        if fhir_item.service:
-            service_code = fhir_item.service.text
-        imis_services.append(ClaimServiceSubmit(service_code, qty_provided, price_asked))
+        return qty_provided
+
+    @classmethod
+    def get_fhir_item_price_asked(cls, fhir_item):
+        price_asked = None
+        if fhir_item.unitPrice:
+            price_asked = fhir_item.unitPrice.value
+        return price_asked

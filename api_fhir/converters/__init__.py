@@ -6,13 +6,14 @@ from api_fhir.models import CodeableConcept, ContactPoint, Address, Coding, Iden
 
 
 class BaseFHIRConverter(ABC):
+
     @classmethod
     def to_fhir_obj(cls, obj):
-        raise NotImplementedError('`toFhirObj()` must be implemented.')
+        raise NotImplementedError('`toFhirObj()` must be implemented.')  # pragma: no cover
 
     @classmethod
     def to_imis_obj(cls, data, audit_user_id):
-        raise NotImplementedError('`toImisObj()` must be implemented.')
+        raise NotImplementedError('`toImisObj()` must be implemented.')  # pragma: no cover
 
     @classmethod
     def build_fhir_pk(cls, fhir_obj, resource_id):
@@ -27,7 +28,7 @@ class BaseFHIRConverter(ABC):
         return condition
 
     @classmethod
-    def check_errors(cls, errors=None):
+    def check_errors(cls, errors=None):  # pragma: no cover
         if errors is None:
             errors = []
         if len(errors) > 0:
@@ -51,9 +52,10 @@ class BaseFHIRConverter(ABC):
     @classmethod
     def get_first_coding_from_codeable_concept(cls, codeable_concept):
         result = Coding()
-        coding = codeable_concept.coding
-        if coding and isinstance(coding, list) and len(coding) > 0:
-            result = codeable_concept.coding[0]
+        if codeable_concept:
+            coding = codeable_concept.coding
+            if coding and isinstance(coding, list) and len(coding) > 0:
+                result = codeable_concept.coding[0]
         return result
 
     @classmethod
@@ -72,6 +74,17 @@ class BaseFHIRConverter(ABC):
         identifier.type = type
         identifier.value = value
         return identifier
+
+    @classmethod
+    def get_fhir_identifier_by_code(cls, identifiers, lookup_code):
+        value = None
+        for identifier in identifiers or []:
+            first_coding = cls.get_first_coding_from_codeable_concept(identifier.type)
+            if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system() \
+                    and first_coding.code == lookup_code:
+                    value = identifier.value
+                    break
+        return value
 
     @classmethod
     def build_fhir_contact_point(cls, value, contact_point_system, contact_point_use):

@@ -44,14 +44,8 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        health_facility = None
-        if reference:
-            location_code = cls._get_resource_id_from_reference(reference)
-            if not cls.valid_condition(location_code is None,
-                                       gettext('Could not fetch Location id from reference').format(reference),
-                                       errors):
-                health_facility = HealthFacility.objects.filter(code=location_code).first()
-        return health_facility
+        location_code = cls._get_resource_id_from_reference(reference)
+        return HealthFacility.objects.filter(code=location_code).first()
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):
@@ -81,18 +75,10 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_imis_hf_identiftier(cls, imis_hf, fhir_location, errors):
-        identifiers = fhir_location.identifier
-        if identifiers is not None:
-            for identifier in identifiers:
-                identifier_type = identifier.type
-                if identifier_type:
-                    coding_list = identifier_type.coding
-                    if coding_list:
-                        first_code = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_code.system == Stu3IdentifierConfig.get_fhir_identifier_type_system() \
-                                and first_code.code == Stu3IdentifierConfig.get_fhir_facility_id_type() \
-                                and identifier.value:
-                            imis_hf.code = identifier.value
+        value = cls.get_fhir_identifier_by_code(fhir_location.identifier,
+                                                Stu3IdentifierConfig.get_fhir_facility_id_type())
+        if value:
+            imis_hf.code = value
         cls.valid_condition(imis_hf.code is None, gettext('Missing hf code'), errors)
 
     @classmethod

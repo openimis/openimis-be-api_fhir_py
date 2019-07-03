@@ -21,11 +21,13 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
 
     @classmethod
     def to_imis_obj(cls, fhir_practitioner, audit_user_id):
+        errors = []
         imis_claim_admin = PractitionerConverter.create_default_claim_admin(audit_user_id)
-        cls.build_imis_identifiers(imis_claim_admin, fhir_practitioner)
+        cls.build_imis_identifiers(imis_claim_admin, fhir_practitioner, errors)
         cls.build_imis_names(imis_claim_admin, fhir_practitioner)
         cls.build_imis_birth_date(imis_claim_admin, fhir_practitioner)
         cls.build_imis_contacts(imis_claim_admin, fhir_practitioner)
+        cls.check_errors(errors)
         return imis_claim_admin
 
     @classmethod
@@ -38,14 +40,8 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        claim_admin = None
-        if reference:
-            imis_claim_admin_code = cls._get_resource_id_from_reference(reference)
-            if not cls.valid_condition(imis_claim_admin_code is None,
-                                       gettext('Could not fetch Practitioner id from reference').format(reference),
-                                       errors):
-                claim_admin = ClaimAdmin.objects.filter(code=imis_claim_admin_code).first()
-        return claim_admin
+        imis_claim_admin_code = cls._get_resource_id_from_reference(reference)
+        return ClaimAdmin.objects.filter(code=imis_claim_admin_code).first()
 
     @classmethod
     def create_default_claim_admin(cls, audit_user_id):
@@ -70,20 +66,12 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
             identifiers.append(identifier)
 
     @classmethod
-    def build_imis_identifiers(cls, imis_claim_admin, fhir_practitioner):
-        identifiers = fhir_practitioner.identifier
-        if identifiers is not None:
-            for identifier in identifiers:
-                identifier_type = identifier.type
-                if identifier_type:
-                    coding_list = identifier_type.coding
-                    if coding_list:
-                        first_coding = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system():
-                            code = first_coding.code
-                            value = identifier.value
-                            if value and code == Stu3IdentifierConfig.get_fhir_claim_admin_code_type():
-                                imis_claim_admin.code = value
+    def build_imis_identifiers(cls, imis_claim_admin, fhir_practitioner, errors):
+        value = cls.get_fhir_identifier_by_code(fhir_practitioner.identifier,
+                                                Stu3IdentifierConfig.get_fhir_claim_admin_code_type())
+        if value:
+            imis_claim_admin.code = value
+        cls.valid_condition(imis_claim_admin.code is None, gettext('Missing the claim admin code'), errors)
 
     @classmethod
     def build_human_names(cls, fhir_practitioner, imis_claim_admin):

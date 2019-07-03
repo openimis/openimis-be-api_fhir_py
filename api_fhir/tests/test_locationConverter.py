@@ -2,7 +2,7 @@ import os
 
 from api_fhir.converters.locationConverter import LocationConverter
 from api_fhir.models import FHIRBaseObject
-from mixin.locationTestMixin import LocationTestMixin
+from api_fhir.tests import LocationTestMixin
 
 
 class LocationConverterTestCase(LocationTestMixin):

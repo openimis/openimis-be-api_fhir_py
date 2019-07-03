@@ -4,9 +4,8 @@ from api_fhir.configurations import Stu3IdentifierConfig
 from api_fhir.converters import PractitionerConverter
 from api_fhir.models import HumanName, NameUse, Identifier, ContactPoint, ContactPointSystem, Practitioner, \
     ContactPointUse
+from api_fhir.tests import GenericTestMixin, DbIdTestMixin
 from api_fhir.utils import TimeUtils
-from mixin.dbIdTestMixin import DbIdTestMixin
-from mixin.genericTestMixin import GenericTestMixin
 
 
 class PractitionerTestMixin(GenericTestMixin, DbIdTestMixin):
