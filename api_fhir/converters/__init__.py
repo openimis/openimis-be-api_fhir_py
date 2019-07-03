@@ -15,6 +15,10 @@ class BaseFHIRConverter(ABC):
         raise NotImplementedError('`toImisObj()` must be implemented.')
 
     @classmethod
+    def build_fhir_pk(cls, fhir_obj, resource_id):
+        fhir_obj.id = resource_id
+
+    @classmethod
     def valid_condition(cls, condition, error_message, errors=None):
         if errors is None:
             errors = []
