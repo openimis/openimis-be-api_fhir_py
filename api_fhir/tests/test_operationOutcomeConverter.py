@@ -1,7 +1,7 @@
 import os
 
 from api_fhir.converters import OperationOutcomeConverter
-from mixin.operationOutcomeTestMixin import OperationOutcomeTestMixin
+from api_fhir.tests import OperationOutcomeTestMixin
 
 
 class OperationOutcomeConverterTestCase(OperationOutcomeTestMixin):

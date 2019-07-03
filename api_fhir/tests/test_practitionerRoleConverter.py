@@ -1,5 +1,5 @@
 from api_fhir.converters import PractitionerRoleConverter
-from mixin.practitionerRoleTestMixin import PractitionerRoleTestMixin
+from api_fhir.tests import PractitionerRoleTestMixin
 
 
 class PractitionerRoleConverterTestCase(PractitionerRoleTestMixin):

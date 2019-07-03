@@ -3,7 +3,7 @@ import os
 from api_fhir.converters import PatientConverter
 
 from api_fhir.models import FHIRBaseObject
-from mixin.patientTestMixin import PatientTestMixin
+from api_fhir.tests import PatientTestMixin
 
 
 class PatientConverterTestCase(PatientTestMixin):

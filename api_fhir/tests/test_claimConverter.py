@@ -1,5 +1,5 @@
 from api_fhir.converters.claimConverter import ClaimConverter
-from mixin.claimTestMixin import ClaimTestMixin
+from api_fhir.tests import ClaimTestMixin
 
 
 class ClaimConverterTestCase(ClaimTestMixin):
