@@ -48,9 +48,10 @@ class BaseFHIRConverter(ABC):
     @classmethod
     def get_first_coding_from_codeable_concept(cls, codeable_concept):
         result = Coding()
-        coding = codeable_concept.coding
-        if coding and isinstance(coding, list) and len(coding) > 0:
-            result = codeable_concept.coding[0]
+        if codeable_concept:
+            coding = codeable_concept.coding
+            if coding and isinstance(coding, list) and len(coding) > 0:
+                result = codeable_concept.coding[0]
         return result
 
     @classmethod
@@ -73,17 +74,11 @@ class BaseFHIRConverter(ABC):
     @classmethod
     def get_fhir_identifier_by_code(cls, identifiers, lookup_code):
         value = None
-        if identifiers is not None:
-            for identifier in identifiers:
-                identifier_type = identifier.type
-                if identifier_type:
-                    coding_list = identifier_type.coding
-                    if coding_list:
-                        first_coding = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system():
-                            code = first_coding.code
-                            if code == lookup_code:
-                                value = identifier.value
+        for identifier in identifiers or []:
+            first_coding = cls.get_first_coding_from_codeable_concept(identifier.type)
+            if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system() \
+                    and first_coding.code == lookup_code:
+                    value = identifier.value
         return value
 
     @classmethod
