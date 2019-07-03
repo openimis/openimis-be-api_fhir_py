@@ -9,16 +9,16 @@
 [![Maintainability](https://img.shields.io/codeclimate/maintainability/openimis/openimis-be-api_fhir_py.svg)](https://codeclimate.com/github/openimis/openimis-be-api_fhir_py/maintainability)
 [![Test Coverage](https://img.shields.io/codeclimate/coverage/openimis/openimis-be-api_fhir_py.svg)](https://codeclimate.com/github/openimis/openimis-be-api_fhir_py)
 
-#Description
+# Description
 This repository holds the files of the openIMIS Backend FHIR API reference module. 
 It is dedicated to be deployed as a module of [openimis-be_py](https://github.com/openimis/openimis-be_py).
 
 The module can be used to mapping objects between OpenIMIS and FHIR representation.
 
-##Documentation:
+## Documentation:
 The documentation od this module can be found one the [OpenIMIS WIKI page](https://openimis.atlassian.net/wiki/spaces/OP/pages/868417563/The+OpenIMIS+API+FHIR+module).
 
-#Example of usage:
+# Example of usage:
 The FHIR API will be available after the module will be deployed on the [openimis-be_py](https://github.com/openimis/openimis-be_py).
 
 To fetch information about all OpenIMIS Insueree (FHIR Patient) available on server can be sent **GET** request on:
