@@ -51,11 +51,11 @@ class FhirBundleResultsSetPagination(PageNumberPagination):
     def build_bundle_entry(self, bundle, data):
         for obj in data:
             entry = BundleEntry()
-            entry.fullUrl = self.build_resource_full_resource(obj)
+            entry.fullUrl = self.build_full_url_for_resource(obj)
             entry.resource = obj
             bundle.entry.append(entry)
 
-    def build_resource_full_resource(self, fhir_object):
+    def build_full_url_for_resource(self, fhir_object):
         url = None
         resource_pk = self.get_object_pk(fhir_object)
         if resource_pk:
