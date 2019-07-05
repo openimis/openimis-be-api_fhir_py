@@ -12,6 +12,10 @@ class Stu3ClaimConfig(ClaimConfiguration):
         return cls.get_config().stu3_fhir_claim_config.get('fhir_claim_information_guarantee_id_code', "guarantee_id")
 
     @classmethod
+    def get_fhir_claim_information_explanation_code(cls):
+        return cls.get_config().stu3_fhir_claim_config.get('fhir_claim_information_explanation_code', "explanation")
+
+    @classmethod
     def get_fhir_claim_item_code(cls):
         return cls.get_config().stu3_fhir_claim_config.get('fhir_claim_item_code', "item")
 

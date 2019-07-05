@@ -27,7 +27,8 @@ class ClaimSerializer(BaseFHIRSerializer):
                                    visit_type=validated_data.get('visit_type'),
                                    guarantee_no=validated_data.get('guarantee_id'),
                                    item_submits=validated_data.get('submit_items'),
-                                   service_submits=validated_data.get('submit_services')
+                                   service_submits=validated_data.get('submit_services'),
+                                   comment=validated_data.get('explanation')
                                    )
         request = self.context.get("request")
         ClaimSubmitService(request.user).submit(claim_submit)

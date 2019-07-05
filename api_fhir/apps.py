@@ -51,6 +51,7 @@ DEFAULT_CFG = {
     },
     "stu3_fhir_claim_config": {
         "fhir_claim_information_guarantee_id_code": "guarantee_id",
+        "fhir_claim_information_explanation_code": "explanation",
         "fhir_claim_item_code": "item",
         "fhir_claim_service_code": "service"
     }
