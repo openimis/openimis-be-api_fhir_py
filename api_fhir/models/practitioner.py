@@ -7,9 +7,6 @@ class PractitionerQualification(BackboneElement):
     period = Property('period', 'Period')
     issuer = Property('issuer', 'Reference')  # referencing `Organization`
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class Practitioner(DomainResource):
 
@@ -23,6 +20,3 @@ class Practitioner(DomainResource):
     photo = Property('photo', 'Attachment', count_max='*')
     qualification = Property('qualification', 'PractitionerQualification', count_max='*')
     communication = Property('communication', 'CodeableConcept', count_max='*')
-
-    class Meta:
-        app_label = 'api_fhir'

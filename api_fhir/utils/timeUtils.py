@@ -17,6 +17,3 @@ class TimeUtils(object):
         except ValueError:
             date = core.datetime.datetime.strptime(str_value, GeneralConfiguration.get_iso_datetime_format())
         return date
-
-    class Meta:
-        app_label = 'api_fhir'

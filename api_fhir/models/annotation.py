@@ -7,6 +7,3 @@ class Annotation(Element):
     authorString = Property('authorString', str)
     text = Property('text', str)
     time = Property('time', 'FHIRDate')
-
-    class Meta:
-        app_label = 'api_fhir'

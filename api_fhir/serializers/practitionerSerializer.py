@@ -25,6 +25,3 @@ class PractitionerSerializer(BaseFHIRSerializer):
         instance.audit_user_id = self.get_audit_user_id()
         instance.save()
         return instance
-
-    class Meta:
-        app_label = 'api_fhir'

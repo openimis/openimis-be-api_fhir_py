@@ -7,6 +7,3 @@ class DomainResource(Resource):
     extension = Property('extension', 'Extension', count_max='*')
     modifierExtension = Property('modifierExtension', 'Extension', count_max='*')
     text = Property('text', 'Narrative')
-
-    class Meta:
-        app_label = 'api_fhir'

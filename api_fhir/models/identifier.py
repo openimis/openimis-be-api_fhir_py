@@ -12,9 +12,6 @@ class Identifier(Element):
     period = Property('period', 'Period')
     assigner = Property('assigner', 'Reference')  # referencing `Organization`
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class IdentifierUse(Enum):
     USUAL = "usual"

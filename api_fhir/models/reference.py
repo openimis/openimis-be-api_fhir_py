@@ -7,6 +7,3 @@ class Reference(Element):
     identifier = Property('identifier', 'Identifier')
     reference = Property('reference', str)
     type = Property('type', str)  # e.g. "Patient"
-
-    class Meta:
-        app_label = 'api_fhir'

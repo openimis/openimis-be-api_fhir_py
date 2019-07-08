@@ -54,6 +54,3 @@ class GeneralConfiguration(BaseConfiguration):
     @classmethod
     def get_default_value_of_location_care_type(cls):
         return cls.get_config().default_value_of_location_care_type
-
-    class Meta:
-        app_label = 'api_fhir'

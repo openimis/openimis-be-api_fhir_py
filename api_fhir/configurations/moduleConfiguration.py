@@ -28,7 +28,3 @@ class ModuleConfiguration(BaseConfiguration):
     @classmethod
     def get_default_api_error_handler(cls):
         return cls.get_config().default_api_error_handler
-
-
-class Meta:
-        app_label = 'api_fhir'

@@ -33,6 +33,3 @@ class ClaimSerializer(BaseFHIRSerializer):
         request = self.context.get("request")
         ClaimSubmitService(request.user).submit(claim_submit)
         return HttpResponse(gettext('Claim submit created'))
-
-    class Meta:
-        app_label = 'api_fhir'

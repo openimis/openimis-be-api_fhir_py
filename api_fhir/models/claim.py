@@ -7,18 +7,12 @@ class ClaimRelated(BackboneElement):
     relationship = Property('relationship', 'CodeableConcept')
     reference = Property('reference', 'Identifier')
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class ClaimPayee(BackboneElement):
 
     type = Property('type', 'CodeableConcept')
     resourceType = Property('resourceType', 'Coding')
     party = Property('party', 'Reference')  # referencing `Practitioner` | `Organization` | `Patient` | `RelatedPerson`
-
-    class Meta:
-        app_label = 'api_fhir'
 
 
 class ClaimCareTeam(BackboneElement):
@@ -28,9 +22,6 @@ class ClaimCareTeam(BackboneElement):
     responsible = Property('responsible', bool)
     role = Property('role', 'CodeableConcept')
     qualification = Property('qualification', 'CodeableConcept')
-
-    class Meta:
-        app_label = 'api_fhir'
 
 
 class ClaimInformation(BackboneElement):
@@ -46,9 +37,6 @@ class ClaimInformation(BackboneElement):
     valueReference = Property('valueReference', 'Reference')  # referencing `Any`
     reason = Property('reason', 'CodeableConcept')
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class ClaimDiagnosis(BackboneElement):
 
@@ -58,8 +46,6 @@ class ClaimDiagnosis(BackboneElement):
     type = Property('type', 'CodeableConcept', count_max='*')
     packageCode = Property('packageCode', 'CodeableConcept')
 
-    class Meta:
-        app_label = 'api_fhir'
 
 class ClaimProcedure(BackboneElement):
 
@@ -68,8 +54,6 @@ class ClaimProcedure(BackboneElement):
     procedureCodeableConcept = Property('procedureCodeableConcept', 'CodeableConcept')
     procedureReference = Property('procedureReference', 'Reference')  # referencing `Procedure`
 
-    class Meta:
-        app_label = 'api_fhir'
 
 class ClaimInsurance(BackboneElement):
 
@@ -80,8 +64,6 @@ class ClaimInsurance(BackboneElement):
     preAuthRef = Property('preAuthRef', str, count_max='*')
     claimResponse = Property('claimResponse', 'Reference')  # referencing `ClaimResponse`
 
-    class Meta:
-        app_label = 'api_fhir'
 
 class ClaimAccident(BackboneElement):
 
@@ -90,8 +72,6 @@ class ClaimAccident(BackboneElement):
     locationAddress = Property('locationAddress', 'Address')
     locationReference = Property('locationReference', 'Reference')  # referencing `Location`
 
-    class Meta:
-        app_label = 'api_fhir'
 
 class ClaimItemDetailSubDetail(BackboneElement):
 
@@ -107,8 +87,6 @@ class ClaimItemDetailSubDetail(BackboneElement):
     net = Property('net', 'Money')
     udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`
 
-    class Meta:
-        app_label = 'api_fhir'
 
 class ClaimItemDetail(BackboneElement):
 
@@ -125,8 +103,6 @@ class ClaimItemDetail(BackboneElement):
     udi = Property('udi', 'Reference', count_max='*')  # referencing `Device`
     subDetail = Property('subDetail', 'ClaimItemDetailSubDetail', count_max='*')
 
-    class Meta:
-        app_label = 'api_fhir'
 
 class ClaimItem(BackboneElement):
 
@@ -155,8 +131,6 @@ class ClaimItem(BackboneElement):
     encounter = Property('encounter', 'Reference', count_max='*')  # referencing `Encounter`
     detail = Property('detail', 'ClaimItemDetail', count_max='*')
 
-    class Meta:
-        app_label = 'api_fhir'
 
 class Claim(DomainResource):
 
@@ -190,6 +164,3 @@ class Claim(DomainResource):
     hospitalization = Property('hospitalization', 'Period')
     item = Property('item', 'ClaimItem', count_max='*')
     total = Property('total', 'Money')
-
-    class Meta:
-        app_label = 'api_fhir'

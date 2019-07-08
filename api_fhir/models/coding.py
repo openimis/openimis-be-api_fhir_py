@@ -8,6 +8,3 @@ class Coding(Element):
     system = Property('system', str)
     userSelected = Property('userSelected', bool)
     version = Property('version', str)
-
-    class Meta:
-        app_label = 'api_fhir'

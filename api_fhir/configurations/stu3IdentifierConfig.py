@@ -35,6 +35,3 @@ class Stu3IdentifierConfig(IdentifierConfiguration):
     @classmethod
     def get_fhir_claim_code_type(cls):
         return cls.get_config().stu3_fhir_identifier_type_config.get('fhir_code_for_imis_claim_code_type', "MR")
-
-    class Meta:
-        app_label = 'api_fhir'
