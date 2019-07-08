@@ -12,6 +12,7 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
     @classmethod
     def to_fhir_obj(cls, imis_claim_admin):
         fhir_practitioner = Practitioner()
+        cls.build_fhir_pk(fhir_practitioner, imis_claim_admin.id)
         cls.build_fhir_identifiers(fhir_practitioner, imis_claim_admin)
         cls.build_human_names(fhir_practitioner, imis_claim_admin)
         cls.build_fhir_birth_date(fhir_practitioner, imis_claim_admin)

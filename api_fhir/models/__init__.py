@@ -277,5 +277,7 @@ from api_fhir.models.daysOfWeek import DaysOfWeek
 from api_fhir.models.endpoint import Endpoint
 from api_fhir.models.practitionerRole import PractitionerRole, PractitionerAvailableTime, PractitionerNotAvailable
 from api_fhir.models.practitioner import Practitioner, PractitionerQualification
+from api_fhir.models.bundle import Bundle, BundleEntry, BundleEntryRequest, BundleEntryResponse, BundleEntrySearch, \
+    BundleLink, BundleType
 from api_fhir.models.claim import Claim, ClaimAccident, ClaimCareTeam, ClaimDiagnosis, ClaimInformation, \
     ClaimInsurance, ClaimItem, ClaimItemDetail, ClaimItemDetailSubDetail, ClaimPayee, ClaimProcedure, ClaimRelated

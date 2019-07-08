@@ -7,6 +7,7 @@ class PractitionerRoleConverter(BaseFHIRConverter):
     @classmethod
     def to_fhir_obj(cls, imis_claim_admin):
         fhir_practitioner_role = PractitionerRole()
+        cls.build_fhir_pk(fhir_practitioner_role, imis_claim_admin.id)
         cls.build_fhir_identifiers(fhir_practitioner_role, imis_claim_admin)
         cls.build_fhir_practitioner_reference(fhir_practitioner_role, imis_claim_admin)
         cls.build_fhir_location_references(fhir_practitioner_role, imis_claim_admin)

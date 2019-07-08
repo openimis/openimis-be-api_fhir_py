@@ -14,6 +14,7 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def to_fhir_obj(cls, imis_hf):
         fhir_location = Location()
+        cls.build_fhir_pk(fhir_location, imis_hf.id)
         cls.build_fhir_location_identifier(fhir_location, imis_hf)
         cls.build_fhir_location_name(fhir_location, imis_hf)
         cls.build_fhir_location_type(fhir_location, imis_hf)

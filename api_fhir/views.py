@@ -5,21 +5,28 @@ from location.models import HealthFacility
 from rest_framework import viewsets, mixins
 from rest_framework.viewsets import GenericViewSet
 
+from api_fhir.paginations import FhirBundleResultsSetPagination
+from api_fhir.permissions import FHIRApiPermissions
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
     PractitionerSerializer, ClaimSerializer
 
 
-class InsureeViewSet(viewsets.ModelViewSet):
+class BaseFHIRView(object):
+    pagination_class = FhirBundleResultsSetPagination
+    permission_classes = (FHIRApiPermissions,)
+
+
+class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
     queryset = Insuree.objects.all()
     serializer_class = PatientSerializer
 
 
-class HFViewSet(viewsets.ModelViewSet):
+class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
     queryset = HealthFacility.objects.all()
     serializer_class = LocationSerializer
 
 
-class PractitionerRoleViewSet(viewsets.ModelViewSet):
+class PractitionerRoleViewSet(BaseFHIRView, viewsets.ModelViewSet):
     queryset = ClaimAdmin.objects.all()
     serializer_class = PractitionerRoleSerializer
 
@@ -28,12 +35,12 @@ class PractitionerRoleViewSet(viewsets.ModelViewSet):
         instance.save()
 
 
-class PractitionerViewSet(viewsets.ModelViewSet):
+class PractitionerViewSet(BaseFHIRView, viewsets.ModelViewSet):
     queryset = ClaimAdmin.objects.all()
     serializer_class = PractitionerSerializer
 
 
-class ClaimViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin,
+class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin,
                    mixins.CreateModelMixin, GenericViewSet):
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer

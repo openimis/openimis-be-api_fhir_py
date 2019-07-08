@@ -14,6 +14,7 @@ class ClaimConverter(BaseFHIRConverter):
     @classmethod
     def to_fhir_obj(cls, imis_claim):
         fhir_claim = FHIRClaim()
+        cls.build_fhir_pk(fhir_claim, imis_claim.code)
         fhir_claim.created = imis_claim.date_claimed.isoformat()
         fhir_claim.facility = LocationConverter.build_fhir_resource_reference(imis_claim.health_facility)
         cls.build_fhir_identifiers(fhir_claim, imis_claim)
