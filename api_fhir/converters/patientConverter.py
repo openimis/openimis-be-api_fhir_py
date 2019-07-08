@@ -222,6 +222,3 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                     imis_insuree.current_address = address.text
                 elif address.type == AddressType.BOTH.value:
                     imis_insuree.geolocation = address.text
-
-    class Meta:
-        app_label = 'api_fhir'

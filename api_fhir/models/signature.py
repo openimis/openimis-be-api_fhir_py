@@ -11,6 +11,3 @@ class Signature(Element):
     when = Property('when', 'FHIRDate')
     whoReference = Property('whoReference', 'Reference')  # referencing `Practitioner, RelatedPerson, Patient, Device, Organization`
     whoUri = Property('whoUri', str)
-
-    class Meta:
-        app_label = 'api_fhir'

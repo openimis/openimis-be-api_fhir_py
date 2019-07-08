@@ -53,6 +53,3 @@ class PractitionerRoleConverter(BaseFHIRConverter):
     @classmethod
     def get_first_location(cls, location_references):
         return location_references[0]
-
-    class Meta:
-        app_label = 'api_fhir'

@@ -11,6 +11,3 @@ class Attachment(Element):
     size = Property('size', int)
     title = Property('title', str)
     url = Property('url', str)
-
-    class Meta:
-        app_label = 'api_fhir'

@@ -5,6 +5,3 @@ class Ratio(Element):
 
     denominator = Property('denominator', 'Quantity')
     numerator = Property('numerator', 'Quantity')
-
-    class Meta:
-        app_label = 'api_fhir'

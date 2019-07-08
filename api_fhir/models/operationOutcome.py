@@ -19,13 +19,7 @@ class OperationOutcomeIssue(BackboneElement):
     location = Property('location', str, count_max='*')
     expression = Property('expression', str, count_max='*')
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class OperationOutcome(DomainResource):
 
     issue = Property('issue', 'OperationOutcomeIssue', count_max='*')
-
-    class Meta:
-        app_label = 'api_fhir'

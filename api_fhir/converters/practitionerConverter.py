@@ -101,6 +101,3 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
     @classmethod
     def build_imis_contacts(cls, imis_claim_admin, fhir_practitioner):
         imis_claim_admin.phone, imis_claim_admin.email_id = cls.build_imis_phone_num_and_email(fhir_practitioner.telecom)
-
-    class Meta:
-        app_label = 'api_fhir'

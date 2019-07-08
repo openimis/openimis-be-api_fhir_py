@@ -8,9 +8,6 @@ class LocationPosition(BackboneElement):
     latitude = Property('latitude', float)
     longitude = Property('longitude', float)
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class Location(DomainResource):
 
@@ -29,9 +26,6 @@ class Location(DomainResource):
     managingOrganization = Property('managingOrganization', 'Reference')  # referencing `Organization`
     partOf = Property('partOf', 'Reference')  # referencing `Location`
     endpoint = Property('endpoint', 'Reference', count_max='*')  # referencing `Endpoint`
-
-    class Meta:
-        app_label = 'api_fhir'
 
 
 class LocationMode(Enum):

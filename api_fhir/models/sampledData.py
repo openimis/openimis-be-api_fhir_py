@@ -10,6 +10,3 @@ class SampledData(Element):
     origin = Property('origin', 'Quantity')
     period = Property('period', float)
     upperLimit = Property('upperLimit', float)
-
-    class Meta:
-        app_label = 'api_fhir'

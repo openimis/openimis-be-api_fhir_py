@@ -23,6 +23,3 @@ class Stu3ApiFhirConfig(BaseApiFhirConfiguration):
     @classmethod
     def get_claim_configuration(cls):
         return Stu3ClaimConfig
-
-    class Meta:
-        app_label = 'api_fhir'

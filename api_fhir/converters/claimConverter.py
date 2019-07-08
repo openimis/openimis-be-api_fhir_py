@@ -227,26 +227,29 @@ class ClaimConverter(BaseFHIRConverter):
     @classmethod
     def build_fhir_information(cls, fhir_claim, imis_claim):
         claim_information = []
-        cls.build_fhir_guarantee_id_information(claim_information, imis_claim.guarantee_id)
+        guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
+        cls.build_fhir_string_information(claim_information, guarantee_id_code, imis_claim.guarantee_id)
+        explanation_code = Stu3ClaimConfig.get_fhir_claim_information_explanation_code()
+        cls.build_fhir_string_information(claim_information, explanation_code, imis_claim.explanation)
         fhir_claim.information = claim_information
 
     @classmethod
     def build_imis_information(cls, imis_claim, fhir_claim):
         if fhir_claim.information:
             for information in fhir_claim.information:
-                guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
                 category = information.category
-                if category and category.text == guarantee_id_code:
+                if category and category.text == Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code():
                     imis_claim.guarantee_id = information.valueString
+                elif category and category.text == Stu3ClaimConfig.get_fhir_claim_information_explanation_code():
+                    imis_claim.explanation = information.valueString
 
     @classmethod
-    def build_fhir_guarantee_id_information(cls, claim_information, guarantee_id):
-        if guarantee_id:
+    def build_fhir_string_information(cls, claim_information, code, value_string):
+        if value_string:
             information_concept = ClaimInformation()
             information_concept.sequence = len(claim_information) + 1
-            guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
-            information_concept.category = cls.build_simple_codeable_concept(guarantee_id_code)
-            information_concept.valueString = guarantee_id
+            information_concept.category = cls.build_simple_codeable_concept(code)
+            information_concept.valueString = value_string
             claim_information.append(information_concept)
 
     @classmethod

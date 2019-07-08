@@ -8,6 +8,3 @@ class Quantity(Element):
     system = Property('system', str)
     unit = Property('unit', str)
     value = Property('value', float)
-
-    class Meta:
-        app_label = 'api_fhir'

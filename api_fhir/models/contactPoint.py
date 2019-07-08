@@ -11,9 +11,6 @@ class ContactPoint(Element):
     use = Property('use', str)  # ContactPointUse (home | work | temp | old | mobile)
     value = Property('value', str)
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class ContactPointSystem(Enum):
     PHONE = "phone"

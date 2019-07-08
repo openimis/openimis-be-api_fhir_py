@@ -31,6 +31,3 @@ class Stu3MaritalConfig(MaritalConfiguration):
     @classmethod
     def get_fhir_unknown_marital_status_code(cls):
         return cls.get_config().stu3_fhir_marital_status_config.get('fhir_code_for_unknown', "U")
-
-    class Meta:
-        app_label = 'api_fhir'

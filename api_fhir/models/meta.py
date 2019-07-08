@@ -8,6 +8,3 @@ class Meta(Element):
     security = Property('security', 'Coding', count_max='*')
     tag = Property('tag', 'Coding', count_max='*')
     versionId = Property('versionId', str)
-
-    class Meta:
-        app_label = 'api_fhir'

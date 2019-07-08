@@ -11,9 +11,6 @@ class PatientContact(BackboneElement):
     relationship = Property('relationship', 'CodeableConcept', count_max='*')
     telecom = Property('telecom', 'ContactPoint', count_max='*')
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class PatientAnimal(BackboneElement):
 
@@ -21,26 +18,17 @@ class PatientAnimal(BackboneElement):
     genderStatus = Property('genderStatus', 'CodeableConcept')
     species = Property('species', 'CodeableConcept')
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class PatientCommunication(BackboneElement):
 
     language = Property('language', 'CodeableConcept')
     preferred = Property('preferred', bool)
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class PatientLink(BackboneElement):
 
     other = Property('other', 'Reference')
     type = Property('type', str)  # replaced-by | replaces | refer | seealso
-
-    class Meta:
-        app_label = 'api_fhir'
 
 
 class Patient(DomainResource):
@@ -64,6 +52,3 @@ class Patient(DomainResource):
     generalPractitioner = Property('generalPractitioner', 'Reference', count_max='*')  # referencing `Organization, Practitioner`
     managingOrganization = Property('managingOrganization', 'Reference')  # referencing `Organization`
     link = Property('link', 'PatientLink')
-
-    class Meta:
-        app_label = 'api_fhir'

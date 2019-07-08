@@ -59,6 +59,3 @@ class GeneralConfiguration(BaseConfiguration):
     @classmethod
     def get_default_response_page_size(cls):
         return cls.get_config().default_response_page_size
-
-    class Meta:
-        app_label = 'api_fhir'

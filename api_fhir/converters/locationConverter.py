@@ -162,6 +162,3 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
                     imis_hf.fax = contact_point.value
                 elif contact_point.system == ContactPointSystem.EMAIL.value:
                     imis_hf.email = contact_point.value
-
-    class Meta:
-        app_label = 'api_fhir'

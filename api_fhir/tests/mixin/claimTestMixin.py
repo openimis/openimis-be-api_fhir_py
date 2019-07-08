@@ -1,6 +1,6 @@
 from claim.models import Claim, ClaimDiagnosisCode
 
-from api_fhir.configurations import Stu3IdentifierConfig
+from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
 from api_fhir.converters import PatientConverter, LocationConverter, PractitionerConverter
 from api_fhir.converters.claimConverter import ClaimConverter
 from api_fhir.models import Claim as FHIRClaim, ImisClaimIcdTypes, Period, Money
@@ -17,6 +17,7 @@ class ClaimTestMixin(GenericTestMixin):
     _TEST_CLAIMED = 42
     _TEST_DATE_CLAIMED = '2019-06-12T00:00:00'
     _TEST_GUARANTEE_ID = "guarantee_id"
+    _TEST_EXPLANATION = "explanation"
     _TEST_ICD_1 = "icd_1"
     _TEST_ICD_2 = "icd_2"
     _TEST_ICD_3 = "icd_3"
@@ -55,6 +56,7 @@ class ClaimTestMixin(GenericTestMixin):
         self.assertEqual(self._TEST_DATE_CLAIMED, imis_obj.date_claimed.isoformat())
         self.assertIsNotNone(imis_obj.health_facility)
         self.assertEqual(self._TEST_GUARANTEE_ID, imis_obj.guarantee_id)
+        self.assertEqual(self._TEST_EXPLANATION, imis_obj.explanation)
         self.assertIsNotNone(imis_obj.admin)
         self.assertEqual(self._TEST_VISIT_TYPE, imis_obj.visit_type)
 
@@ -81,7 +83,10 @@ class ClaimTestMixin(GenericTestMixin):
         imis_hf = self._create_and_save_hf()
         fhir_claim.facility = LocationConverter.build_fhir_resource_reference(imis_hf)
         information = []
-        ClaimConverter.build_fhir_guarantee_id_information(information, self._TEST_GUARANTEE_ID)
+        guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
+        ClaimConverter.build_fhir_string_information(information, guarantee_id_code, self._TEST_GUARANTEE_ID)
+        explanation_code = Stu3ClaimConfig.get_fhir_claim_information_explanation_code()
+        ClaimConverter.build_fhir_string_information(information, explanation_code, self._TEST_EXPLANATION)
         fhir_claim.information = information
         claim_admin = self._create_and_save_claim_admin()
         fhir_claim.enterer = PractitionerConverter.build_fhir_resource_reference(claim_admin)
@@ -132,6 +137,10 @@ class ClaimTestMixin(GenericTestMixin):
         self.assertEqual(self._TEST_CLAIMED, fhir_obj.total.value)
         self.assertEqual(self._TEST_DATE_CLAIMED, fhir_obj.created)
         self.assertIsNotNone(fhir_obj.facility.reference)
-        self.assertEqual(self._TEST_GUARANTEE_ID, fhir_obj.information[0].valueString)
+        for information in fhir_obj.information:
+            if information.category.text == Stu3ClaimConfig.get_fhir_claim_information_explanation_code():
+                self.assertEqual(self._TEST_EXPLANATION, information.valueString)
+            elif information.category.text == Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code():
+                self.assertEqual(self._TEST_GUARANTEE_ID, information.valueString)
         self.assertIsNotNone(fhir_obj.enterer.reference)
         self.assertEqual(self._TEST_VISIT_TYPE, fhir_obj.type.text)
