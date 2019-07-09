@@ -1,0 +1,83 @@
+from api_fhir.configurations import EligibilityConfiguration
+
+
+class Stu3EligibilityConfiguration(EligibilityConfiguration):
+
+    @classmethod
+    def build_configuration(cls, cfg):
+        cls.get_config().stu3_fhir_eligibility_config = cfg['stu3_fhir_eligibility_config']
+
+    @classmethod
+    def get_fhir_financial_code(cls):
+        pass
+
+    @classmethod
+    def get_fhir_item_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_item_code', 'item')
+
+    @classmethod
+    def get_fhir_service_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_service_code', 'service')
+
+    @classmethod
+    def get_fhir_total_admissions_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_total_admissions_code', 'total_admissions')
+
+    @classmethod
+    def get_fhir_total_visits_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_total_visits_code', 'total_visits')
+
+    @classmethod
+    def get_fhir_total_consultations_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_total_consultations_code', 'total_consultations')
+
+    @classmethod
+    def get_fhir_total_surgeries_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_total_surgeries_code', 'total_surgeries')
+
+    @classmethod
+    def get_fhir_total_deliveries_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_total_deliveries_code', 'total_deliveries')
+
+    @classmethod
+    def get_fhir_total_antenatal_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_total_antenatal_code', 'total_antenatal')
+
+    @classmethod
+    def get_fhir_consultation_amount_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_consultation_amount_code',
+                                                                 'consultation_amount')
+
+    @classmethod
+    def get_fhir_surgery_amount_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_surgery_amount_code', 'surgery_amount')
+
+    @classmethod
+    def get_fhir_delivery_amount_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_delivery_amount_code', 'delivery_amount')
+
+    @classmethod
+    def get_fhir_hospitalization_amount_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_hospitalization_amount_code',
+                                                                 'hospitalization_amount')
+
+    @classmethod
+    def get_fhir_antenatal_amount_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_antenatal_amount_code', 'antenatal_amount')
+
+    @classmethod
+    def get_fhir_service_left_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_service_left_code', 'service_left')
+
+    @classmethod
+    def get_fhir_item_left_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_item_left_code', 'item_left')
+
+    @classmethod
+    def get_fhir_is_item_ok_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_is_item_ok_code', 'is_item_ok')
+
+    @classmethod
+    def get_fhir_is_service_ok_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_is_service_ok_code', 'is_service_ok')
+

@@ -55,6 +55,25 @@ DEFAULT_CFG = {
         "fhir_claim_information_explanation_code": "explanation",
         "fhir_claim_item_code": "item",
         "fhir_claim_service_code": "service"
+    },
+    "stu3_fhir_eligibility_config": {
+        "fhir_item_code": "item",
+        "fhir_service_code": "service",
+        "fhir_total_admissions_code": "total_admissions",
+        "fhir_total_visits_code": "total_visits",
+        "fhir_total_consultations_code": "total_consultations",
+        "fhir_total_surgeries_code": "total_surgeries",
+        "fhir_total_deliveries_code": "total_deliveries",
+        "fhir_total_antenatal_code": "total_antenatal",
+        "fhir_consultation_amount_code": "consultation_amount",
+        "fhir_surgery_amount_code": "surgery_amount",
+        "fhir_delivery_amount_code": "delivery_amount",
+        "fhir_hospitalization_amount_code": "hospitalization_amount",
+        "fhir_antenatal_amount_code": "antenatal_amount",
+        "fhir_service_left_code": "service_left",
+        "fhir_item_left_code": "item_left",
+        "fhir_is_item_ok_code": "is_item_ok",
+        "fhir_is_service_ok_code": "is_service_ok"
     }
 }
 

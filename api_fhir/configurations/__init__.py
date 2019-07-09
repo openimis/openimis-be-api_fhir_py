@@ -144,6 +144,84 @@ class ClaimConfiguration(BaseConfiguration):  # pragma: no cover
         raise NotImplementedError('`get_fhir_claim_service_code()` must be implemented.')
 
 
+class EligibilityConfiguration(BaseConfiguration):  # pragma: no cover
+
+    @classmethod
+    def build_configuration(cls, cfg):
+        raise NotImplementedError('`build_configuration()` must be implemented.')
+
+    @classmethod
+    def get_fhir_financial_code(cls):
+        raise NotImplementedError('`get_fhir_financial_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_item_code(cls):
+        raise NotImplementedError('`get_fhir_item_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_service_code(cls):
+        raise NotImplementedError('`get_fhir_service_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_total_admissions_code(cls):
+        raise NotImplementedError('`get_fhir_total_admissions_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_total_visits_code(cls):
+        raise NotImplementedError('`get_fhir_total_visits_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_total_consultations_code(cls):
+        raise NotImplementedError('`get_fhir_total_consultations_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_total_surgeries_code(cls):
+        raise NotImplementedError('`get_fhir_total_surgeries_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_total_deliveries_code(cls):
+        raise NotImplementedError('`get_fhir_total_delivieries_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_total_antenatal_code(cls):
+        raise NotImplementedError('`get_fhir_total_antenatal_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_consultation_amount_code(cls):
+        raise NotImplementedError('`get_fhir_consultation_amount_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_surgery_amount_code(cls):
+        raise NotImplementedError('`get_fhir_surgery_amount_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_delivery_amount_code(cls):
+        raise NotImplementedError('`get_fhir_delivery_amount_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_hospitalization_amount_code(cls):
+        raise NotImplementedError('`get_fhir_hospitalization_amount_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_antenatal_amount_code(cls):
+        raise NotImplementedError('`get_fhir_antenatal_amount_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_service_left_code(cls):
+        raise NotImplementedError('`get_fhir_service_left_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_item_left_code(cls):
+        raise NotImplementedError('`get_fhir_item_left_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_is_item_ok_code(cls):
+        raise NotImplementedError('`get_fhir_is_item_ok_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_is_service_ok_code(cls):
+        raise NotImplementedError('`get_fhir_is_service_ok_code()` must be implemented.')
+
 class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
@@ -153,6 +231,7 @@ class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
         cls.get_marital_type_configuration().build_configuration(cfg)
         cls.get_issue_type_configuration().build_configuration(cfg)
         cls.get_claim_configuration().build_configuration(cfg)
+        cls.get_eligibility_configuration().build_configuration(cfg)
 
     @classmethod
     def get_identifier_configuration(cls):
@@ -174,6 +253,10 @@ class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
     def get_claim_configuration(cls):
         raise NotImplementedError('`get_claim_configuration()` must be implemented.')
 
+    @classmethod
+    def get_eligibility_configuration(cls):
+        raise NotImplementedError('`get_eligibility_configuration()` must be implemented.')
+
 
 from api_fhir.configurations.generalConfiguration import GeneralConfiguration
 from api_fhir.configurations.stu3IdentifierConfig import Stu3IdentifierConfig
@@ -181,5 +264,6 @@ from api_fhir.configurations.stu3LocationConfig import Stu3LocationConfig
 from api_fhir.configurations.stu3MaritalConfig import Stu3MaritalConfig
 from api_fhir.configurations.stu3IssueTypeConfig import Stu3IssueTypeConfig
 from api_fhir.configurations.stu3ClaimConfig import Stu3ClaimConfig
+from api_fhir.configurations.stu3EligibilityConfiguration import Stu3EligibilityConfiguration
 from api_fhir.configurations.stu3ApiFhirConfig import Stu3ApiFhirConfig
 from api_fhir.configurations.moduleConfiguration import ModuleConfiguration
