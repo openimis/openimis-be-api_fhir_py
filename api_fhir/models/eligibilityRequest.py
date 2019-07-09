@@ -4,7 +4,7 @@ from api_fhir.models import DomainResource, Property
 class EligibilityRequest(DomainResource):
 
     identifier = Property('identifier', 'Identifier', count_max='*')
-    status = Property('status', str)
+    status = Property('status', str)  # active | cancelled | draft | entered-in-error
     priority = Property('priority', 'CodeableConcept')
     patient = Property('patient', 'Reference')  # referencing `Patient`
     servicedDate = Property('servicedDate', 'FHIRDate')

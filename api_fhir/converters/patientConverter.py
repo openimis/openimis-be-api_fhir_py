@@ -51,7 +51,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        imis_insuree_chf_id = cls._get_resource_id_from_reference(reference)
+        imis_insuree_chf_id = cls.get_resource_id_from_reference(reference)
         return Insuree.objects.filter(chf_id=imis_insuree_chf_id).first()
 
     @classmethod
