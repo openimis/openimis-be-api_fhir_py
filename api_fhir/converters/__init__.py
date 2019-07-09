@@ -110,3 +110,4 @@ from api_fhir.converters.locationConverter import LocationConverter
 from api_fhir.converters.operationOutcomeConverter import OperationOutcomeConverter
 from api_fhir.converters.practitionerConverter import PractitionerConverter
 from api_fhir.converters.practitionerRoleConverter import PractitionerRoleConverter
+from api_fhir.converters.eligibilityRequestConverter import EligibilityRequestConverter

@@ -281,3 +281,7 @@ from api_fhir.models.bundle import Bundle, BundleEntry, BundleEntryRequest, Bund
     BundleLink, BundleType
 from api_fhir.models.claim import Claim, ClaimAccident, ClaimCareTeam, ClaimDiagnosis, ClaimInformation, \
     ClaimInsurance, ClaimItem, ClaimItemDetail, ClaimItemDetailSubDetail, ClaimPayee, ClaimProcedure, ClaimRelated
+from api_fhir.models.eligibilityRequest import EligibilityRequest
+from api_fhir.models.eligibilityResponse import EligibilityResponse, EligibilityResponseError, \
+    EligibilityResponseInsurance, InsuranceBenefitBalance, InsuranceBenefitBalanceFinancial
+

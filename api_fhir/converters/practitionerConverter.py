@@ -40,7 +40,7 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        imis_claim_admin_code = cls._get_resource_id_from_reference(reference)
+        imis_claim_admin_code = cls.get_resource_id_from_reference(reference)
         return ClaimAdmin.objects.filter(code=imis_claim_admin_code).first()
 
     @classmethod
