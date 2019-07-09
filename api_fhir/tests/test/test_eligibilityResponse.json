@@ -1,0 +1,161 @@
+{
+  "resourceType": "EligibilityResponse",
+  "insurance": [
+    {
+      "benefitBalance": [
+        {
+          "category": {
+            "text": "total_admissions"
+          },
+          "financial": [
+            {
+              "allowedUnsignedInt": 1
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "total_visits"
+          },
+          "financial": [
+            {
+              "allowedUnsignedInt": 3
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "total_consultations"
+          },
+          "financial": [
+            {
+              "allowedUnsignedInt": 23
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "total_surgeries"
+          },
+          "financial": [
+            {
+              "allowedUnsignedInt": 5
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "total_deliveries"
+          },
+          "financial": [
+            {
+              "allowedUnsignedInt": 2
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "total_antenatal"
+          },
+          "financial": [
+            {
+              "allowedUnsignedInt": 11
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "consultation_amount"
+          },
+          "financial": [
+            {
+              "allowedMoney": {
+                "value": 123.21
+              }
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "surgery_amount"
+          },
+          "financial": [
+            {
+              "allowedMoney": {
+                "value": 12.11
+              }
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "delivery_amount"
+          },
+          "financial": [
+            {
+              "allowedMoney": {
+                "value": 26.0
+              }
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "hospitalization_amount"
+          },
+          "financial": [
+            {
+              "allowedMoney": {
+                "value": 42.0
+              }
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "antenatal_amount"
+          },
+          "financial": [
+            {
+              "allowedMoney": {
+                "value": 59.14
+              }
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "service_left"
+          },
+          "financial": [
+            {
+              "allowedUnsignedInt": 12
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "item_left"
+          },
+          "financial": [
+            {
+              "allowedUnsignedInt": 1
+            }
+          ]
+        },
+        {
+          "category": {
+            "text": "is_service_ok"
+          },
+          "excluded": false
+        },
+        {
+          "category": {
+            "text": "is_item_ok"
+          },
+          "excluded": true
+        }
+      ]
+    }
+  ]
+}
