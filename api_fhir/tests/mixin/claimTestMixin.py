@@ -23,7 +23,13 @@ class ClaimTestMixin(GenericTestMixin):
     _TEST_ICD_3 = "icd_3"
     _TEST_ICD_4 = "icd_4"
     _TEST_VISIT_TYPE = "E"
-    _TEST_ADMIN_USER_ID = 1
+
+    def set_up(self):
+        self._TEST_DIAGNOSIS_CODE = ClaimDiagnosisCode()
+        self._TEST_DIAGNOSIS_CODE.code = self._TEST_MAIN_ICD_CODE
+        self._TEST_CLAIM_ADMIN = PractitionerTestMixin().create_test_imis_instance()
+        self._TEST_HF = LocationTestMixin().create_test_imis_instance()
+        self._TEST_INSUREE = PatientTestMixin().create_test_imis_instance()
 
     def create_test_imis_instance(self):
         imis_claim = Claim()
@@ -61,9 +67,9 @@ class ClaimTestMixin(GenericTestMixin):
         self.assertEqual(self._TEST_VISIT_TYPE, imis_obj.visit_type)
 
     def create_test_fhir_instance(self):
+        self.set_up()
         fhir_claim = FHIRClaim()
-        imis_insuree = self._create_and_save_insuree()
-        fhir_claim.patient = PatientConverter.build_fhir_resource_reference(imis_insuree)
+        fhir_claim.patient = PatientConverter.build_fhir_resource_reference(self._TEST_INSUREE)
         claim_code = ClaimConverter.build_fhir_identifier(self._TEST_CODE,
                                                Stu3IdentifierConfig.get_fhir_identifier_type_system(),
                                                Stu3IdentifierConfig.get_fhir_claim_code_type())
@@ -73,55 +79,22 @@ class ClaimTestMixin(GenericTestMixin):
         billable_period.end = self._TEST_DATE_TO
         fhir_claim.billablePeriod = billable_period
         diagnoses = []
-        diagnosis_code = self._create_and_save_diagnosis_code()
-        ClaimConverter.build_fhir_diagnosis(diagnoses, diagnosis_code.code, ImisClaimIcdTypes.ICD_0.value)
+        ClaimConverter.build_fhir_diagnosis(diagnoses, self._TEST_DIAGNOSIS_CODE.code, ImisClaimIcdTypes.ICD_0.value)
         fhir_claim.diagnosis = diagnoses
         total = Money()
         total.value = self._TEST_CLAIMED
         fhir_claim.total = total
         fhir_claim.created = self._TEST_DATE_CLAIMED
-        imis_hf = self._create_and_save_hf()
-        fhir_claim.facility = LocationConverter.build_fhir_resource_reference(imis_hf)
+        fhir_claim.facility = LocationConverter.build_fhir_resource_reference(self._TEST_HF)
         information = []
         guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
         ClaimConverter.build_fhir_string_information(information, guarantee_id_code, self._TEST_GUARANTEE_ID)
         explanation_code = Stu3ClaimConfig.get_fhir_claim_information_explanation_code()
         ClaimConverter.build_fhir_string_information(information, explanation_code, self._TEST_EXPLANATION)
         fhir_claim.information = information
-        claim_admin = self._create_and_save_claim_admin()
-        fhir_claim.enterer = PractitionerConverter.build_fhir_resource_reference(claim_admin)
+        fhir_claim.enterer = PractitionerConverter.build_fhir_resource_reference(self._TEST_CLAIM_ADMIN)
         fhir_claim.type = ClaimConverter.build_simple_codeable_concept(self._TEST_VISIT_TYPE)
         return fhir_claim
-
-    def _create_and_save_diagnosis_code(self):
-        diagnosis_code = ClaimDiagnosisCode()
-        diagnosis_code.code = self._TEST_MAIN_ICD_CODE
-        diagnosis_code.validity_from = TimeUtils.now()
-        diagnosis_code.audit_user_id = self._TEST_ADMIN_USER_ID
-        diagnosis_code.save()
-        return diagnosis_code
-
-    def _create_and_save_claim_admin(self):
-        claim_admin = PractitionerTestMixin().create_test_imis_instance()
-        claim_admin.save()
-        return claim_admin
-
-    def _create_and_save_hf(self):
-        imis_hf = LocationTestMixin().create_test_imis_instance()
-        imis_hf.validity_from = TimeUtils.now()
-        imis_hf.offline = False
-        imis_hf.audit_user_id = self._TEST_ADMIN_USER_ID
-        imis_hf.save()
-        return imis_hf
-
-    def _create_and_save_insuree(self):
-        imis_insuree = PatientTestMixin().create_test_imis_instance()
-        imis_insuree.head = False
-        imis_insuree.card_issued = False
-        imis_insuree.validity_from = TimeUtils.now()
-        imis_insuree.audit_user_id = self._TEST_ADMIN_USER_ID
-        imis_insuree.save()
-        return imis_insuree
 
     def verify_fhir_instance(self, fhir_obj):
         self.assertIsNotNone(fhir_obj.patient.reference)

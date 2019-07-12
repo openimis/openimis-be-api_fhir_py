@@ -19,7 +19,6 @@ class OperationOutcomeTestMixin(GenericTestMixin):
         exc = self.create_test_imis_instance()
         return OperationOutcomeConverter.to_fhir_obj(exc)
 
-
     def verify_fhir_instance(self, fhir_obj):
             issues = fhir_obj.issue
             self.assertEqual(1, len(issues))
