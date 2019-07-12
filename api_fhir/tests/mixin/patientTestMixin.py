@@ -23,12 +23,12 @@ class PatientTestMixin(GenericTestMixin):
     _TEST_ADDRESS = "TEST_ADDRESS"
     _TEST_GEOLOCATION = "TEST_GEOLOCATION"
 
-    def set_up(self):
+    def setUp(self):
         self._TEST_GENDER = Gender()
         self._TEST_GENDER.code = self._TEST_GENDER_CODE
 
     def create_test_imis_instance(self):
-        self.set_up()
+        self.setUp()
         imis_insuree = Insuree()
         imis_insuree.last_name = self._TEST_LAST_NAME
         imis_insuree.other_names = self._TEST_OTHER_NAME

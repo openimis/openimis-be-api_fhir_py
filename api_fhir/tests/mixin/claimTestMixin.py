@@ -24,7 +24,7 @@ class ClaimTestMixin(GenericTestMixin):
     _TEST_ICD_4 = "icd_4"
     _TEST_VISIT_TYPE = "E"
 
-    def set_up(self):
+    def setUp(self):
         self._TEST_DIAGNOSIS_CODE = ClaimDiagnosisCode()
         self._TEST_DIAGNOSIS_CODE.code = self._TEST_MAIN_ICD_CODE
         self._TEST_CLAIM_ADMIN = PractitionerTestMixin().create_test_imis_instance()
@@ -67,7 +67,7 @@ class ClaimTestMixin(GenericTestMixin):
         self.assertEqual(self._TEST_VISIT_TYPE, imis_obj.visit_type)
 
     def create_test_fhir_instance(self):
-        self.set_up()
+        self.setUp()
         fhir_claim = FHIRClaim()
         fhir_claim.patient = PatientConverter.build_fhir_resource_reference(self._TEST_INSUREE)
         claim_code = ClaimConverter.build_fhir_identifier(self._TEST_CODE,

@@ -9,7 +9,7 @@ class PractitionerRoleTestMixin(GenericTestMixin):
     _TEST_LOCATION_REFERENCE = None
     _TEST_PRACTITIONER_REFERENCE = None
 
-    def set_up(self):
+    def setUp(self):
         self._TEST_CLAIM_ADMIN = PractitionerTestMixin().create_test_imis_instance()
         self._TEST_PRACTITIONER_REFERENCE = "Practitioner/" + self._TEST_CLAIM_ADMIN.code
 
@@ -17,7 +17,7 @@ class PractitionerRoleTestMixin(GenericTestMixin):
         self._TEST_LOCATION_REFERENCE = "Location/" + self._TEST_HF.code
 
     def create_test_imis_instance(self):
-        self.set_up()
+        self.setUp()
         self._TEST_CLAIM_ADMIN.health_facility = self._TEST_HF
         return self._TEST_CLAIM_ADMIN
 

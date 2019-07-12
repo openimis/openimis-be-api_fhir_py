@@ -28,7 +28,7 @@ class EligibilityRequestTestMixin(GenericTestMixin):
     _TEST_IS_SERVICE_OK = True
     _TEST_IS_ITEM_OK = False
 
-    def set_up(self):
+    def setUp(self):
         self._TEST_INSUREE = PatientTestMixin().create_test_imis_instance()
         self._TEST_INSUREE.chf_id = self._TEST_CHFID
 
@@ -61,7 +61,7 @@ class EligibilityRequestTestMixin(GenericTestMixin):
         self.assertEqual(self._TEST_SERVICE_CODE, imis_obj.service_code)
 
     def create_test_fhir_instance(self):
-        self.set_up()
+        self.setUp()
         fhir_reqest = EligibilityRequest()
         fhir_reqest.patient = PatientConverter.build_fhir_resource_reference(self._TEST_INSUREE)
         fhir_reqest.benefitCategory = PatientConverter.build_codeable_concept(
