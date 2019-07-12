@@ -4,11 +4,11 @@ from api_fhir.configurations import Stu3IdentifierConfig, Stu3MaritalConfig
 from api_fhir.converters import PatientConverter
 from api_fhir.models import HumanName, NameUse, Identifier, AdministrativeGender, ContactPoint, ContactPointSystem, \
     Address, AddressType, ImisMaritalStatus, Patient, ContactPointUse, AddressUse
-from api_fhir.tests import GenericTestMixin, DbIdTestMixin
+from api_fhir.tests import GenericTestMixin
 from api_fhir.utils import TimeUtils
 
 
-class PatientTestMixin(GenericTestMixin, DbIdTestMixin):
+class PatientTestMixin(GenericTestMixin):
 
     __TEST_LAST_NAME = "TEST_LAST_NAME"
     __TEST_OTHER_NAME = "TEST_OTHER_NAME"
@@ -28,15 +28,12 @@ class PatientTestMixin(GenericTestMixin, DbIdTestMixin):
         self.__TEST_GENDER.code = self.__TEST_GENDER_CODE
         self.__TEST_GENDER.save()
 
-    def get_test_db_id(self):
-        return self.__TEST_ID
-
     def create_test_imis_instance(self):
         self.__set_up()
         imis_insuree = Insuree()
         imis_insuree.last_name = self.__TEST_LAST_NAME
         imis_insuree.other_names = self.__TEST_OTHER_NAME
-        imis_insuree.id = self.get_test_db_id()
+        imis_insuree.id = self.__TEST_ID
         imis_insuree.chf_id = self.__TEST_CHF_ID
         imis_insuree.passport = self.__TEST_PASSPORT
         imis_insuree.dob = TimeUtils.str_to_date(self.__TEST_DOB)
@@ -110,14 +107,13 @@ class PatientTestMixin(GenericTestMixin, DbIdTestMixin):
         self.assertEqual(self.__TEST_OTHER_NAME, human_name.given[0])
         self.assertEqual(self.__TEST_LAST_NAME, human_name.family)
         self.assertEqual(NameUse.USUAL.value, human_name.use)
-        self.assertEqual(3, len(fhir_obj.identifier))
         for identifier in fhir_obj.identifier:
             self.assertTrue(isinstance(identifier, Identifier))
             code = PatientConverter.get_first_coding_from_codeable_concept(identifier.type).code
             if code == Stu3IdentifierConfig.get_fhir_chfid_type_code():
                 self.assertEqual(self.__TEST_CHF_ID, identifier.value)
             elif code == Stu3IdentifierConfig.get_fhir_id_type_code():
-                self.assertEqual(str(self.get_test_db_id()), identifier.value)
+                self.assertEqual(str(self.__TEST_ID), identifier.value)
             elif code == Stu3IdentifierConfig.get_fhir_passport_type_code():
                 self.assertEqual(self.__TEST_PASSPORT, identifier.value)
         self.assertEqual(self.__TEST_DOB, fhir_obj.birthDate)

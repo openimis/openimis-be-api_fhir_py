@@ -3,10 +3,10 @@ from location.models import HealthFacility
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3LocationConfig
 from api_fhir.converters import LocationConverter
 from api_fhir.models import ContactPointSystem, AddressType, AddressUse, ContactPointUse, Location
-from api_fhir.tests import GenericTestMixin, DbIdTestMixin
+from api_fhir.tests import GenericTestMixin
 
 
-class LocationTestMixin(GenericTestMixin, DbIdTestMixin):
+class LocationTestMixin(GenericTestMixin):
 
     __TEST_ID = 1
     __TEST_HF_CODE = "12345678"
@@ -17,12 +17,9 @@ class LocationTestMixin(GenericTestMixin, DbIdTestMixin):
     __TEST_FAX = "1-408-999 8888"
     __TEST_EMAIL = "TEST@TEST.com"
 
-    def get_test_db_id(self):
-        return self.__TEST_ID
-
     def create_test_imis_instance(self):
         hf = HealthFacility()
-        hf.id = self.get_test_db_id()
+        hf.id = self.__TEST_ID
         hf.code = self.__TEST_HF_CODE
         hf.name = self.__TEST_HF_NAME
         hf.level = self.__TEST_HF_LEVEL
@@ -68,11 +65,10 @@ class LocationTestMixin(GenericTestMixin, DbIdTestMixin):
         return location
 
     def verify_fhir_instance(self, fhir_obj):
-        self.assertEqual(2, len(fhir_obj.identifier))
         for identifier in fhir_obj.identifier:
             code = LocationConverter.get_first_coding_from_codeable_concept(identifier.type).code
             if code == Stu3IdentifierConfig.get_fhir_id_type_code():
-                self.assertEqual(str(self.get_test_db_id()), identifier.value)
+                self.assertEqual(str(self.__TEST_ID), identifier.value)
             elif code == Stu3IdentifierConfig.get_fhir_facility_id_type():
                 self.assertEqual(self.__TEST_HF_CODE, identifier.value)
         self.assertEqual(self.__TEST_HF_NAME, fhir_obj.name)

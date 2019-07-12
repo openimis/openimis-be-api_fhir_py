@@ -1,5 +1,4 @@
 from api_fhir.tests.mixin.genericTestMixin import GenericTestMixin
-from api_fhir.tests.mixin.dbIdTestMixin import DbIdTestMixin
 from api_fhir.tests.mixin.locationTestMixin import LocationTestMixin
 from api_fhir.tests.mixin.operationOutcomeTestMixin import OperationOutcomeTestMixin
 from api_fhir.tests.mixin.patientTestMixin import PatientTestMixin

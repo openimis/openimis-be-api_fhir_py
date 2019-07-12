@@ -34,6 +34,5 @@ class PatientConverterTestCase(PatientTestMixin):
     def test_fhir_object_to_json(self):
         self.__set_up()
         fhir_patient = self.create_test_fhir_instance()
-        self.add_imis_db_id_to_fhir_resource(fhir_patient)
         actual_representation = fhir_patient.dumps(format_='json')
         self.assertEqual(self._test_patient_json_representation, actual_representation)

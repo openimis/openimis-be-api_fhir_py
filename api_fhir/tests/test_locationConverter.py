@@ -31,6 +31,5 @@ class LocationConverterTestCase(LocationTestMixin):
     def test_fhir_object_to_json(self):
         self.__set_up()
         fhir_location = self.create_test_fhir_instance()
-        self.add_imis_db_id_to_fhir_resource(fhir_location)
         actual_representation = fhir_location.dumps(format_='json')
         self.assertEqual(self._test_location_json_representation, actual_representation)

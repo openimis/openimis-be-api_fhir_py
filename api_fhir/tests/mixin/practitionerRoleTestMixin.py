@@ -1,10 +1,10 @@
 from api_fhir.configurations import GeneralConfiguration
 from api_fhir.models import PractitionerRole, Reference
-from api_fhir.tests import GenericTestMixin, DbIdTestMixin, PractitionerTestMixin, LocationTestMixin
+from api_fhir.tests import GenericTestMixin, PractitionerTestMixin, LocationTestMixin
 from api_fhir.utils import TimeUtils
 
 
-class PractitionerRoleTestMixin(GenericTestMixin, DbIdTestMixin):
+class PractitionerRoleTestMixin(GenericTestMixin):
 
     _TEST_CLAIM_ADMIN = None
     _TEST_HF = None

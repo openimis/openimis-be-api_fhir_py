@@ -38,18 +38,6 @@
       },
       "use": "usual",
       "value": "TEST_PASSPORT"
-    },
-    {
-      "type": {
-        "coding": [
-          {
-            "code": "ACSN",
-            "system": "https://hl7.org/fhir/valueset-identifier-type.html"
-          }
-        ]
-      },
-      "use": "usual",
-      "value": 1
     }
   ],
   "maritalStatus": {
