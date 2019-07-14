@@ -25,6 +25,9 @@ class FhirApiUpdateTestMixin(object):
     def verify_updated_obj(self, obj):
         raise NotImplementedError()
 
+    def login(self):
+        raise NotImplementedError()
+
     def test_put_should_update_correctly(self):
         self.login()
         # create

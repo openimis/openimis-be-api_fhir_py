@@ -7,6 +7,9 @@ class FhirApiReadTestMixin(object):
     def base_url(self):
         raise NotImplementedError()
 
+    def login(self):
+        raise NotImplementedError()
+
     def test_get_should_return_empty_list(self):
         self.login()
         response = self.client.get(self.base_url, data=None, format='json')

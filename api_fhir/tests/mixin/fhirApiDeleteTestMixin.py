@@ -20,6 +20,9 @@ class FhirApiDeleteTestMixin(object):
     def get_fhir_obj_from_json_response(self, response):
         raise NotImplementedError()
 
+    def login(self):
+        raise NotImplementedError()
+
     def test_delete_should_remove_correctly(self):
         self.login()
         # create

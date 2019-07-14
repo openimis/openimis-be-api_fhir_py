@@ -11,6 +11,9 @@ class FhirApiCreateTestMixin(object):
     def _test_request_data(self):
         raise NotImplementedError()
 
+    def login(self):
+        raise NotImplementedError()
+
     def test_post_should_create_correctly(self):
         self.login()
         self.create_dependencies()
