@@ -143,6 +143,25 @@ class ClaimConfiguration(BaseConfiguration):  # pragma: no cover
     def get_fhir_claim_service_code(cls):
         raise NotImplementedError('`get_fhir_claim_service_code()` must be implemented.')
 
+    @classmethod
+    def get_fhir_claim_status_rejected_code(cls):
+        raise NotImplementedError('`get_fhir_claim_status_rejected_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_claim_status_entered_code(cls):
+        raise NotImplementedError('`get_fhir_claim_status_entered_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_claim_status_checked_code(cls):
+        raise NotImplementedError('`get_fhir_claim_status_checked_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_claim_status_processed_code(cls):
+        raise NotImplementedError('`get_fhir_claim_status_processed_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_claim_status_valuated_code(cls):
+        raise NotImplementedError('`get_fhir_claim_status_valuated_code()` must be implemented.')
 
 class EligibilityConfiguration(BaseConfiguration):  # pragma: no cover
 
@@ -221,6 +240,7 @@ class EligibilityConfiguration(BaseConfiguration):  # pragma: no cover
     @classmethod
     def get_fhir_is_service_ok_code(cls):
         raise NotImplementedError('`get_fhir_is_service_ok_code()` must be implemented.')
+
 
 class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
 

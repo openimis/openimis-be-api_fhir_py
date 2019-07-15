@@ -54,7 +54,12 @@ DEFAULT_CFG = {
         "fhir_claim_information_guarantee_id_code": "guarantee_id",
         "fhir_claim_information_explanation_code": "explanation",
         "fhir_claim_item_code": "item",
-        "fhir_claim_service_code": "service"
+        "fhir_claim_service_code": "service",
+        "fhir_claim_status_rejected_code": "rejected",
+        "fhir_claim_status_entered_code": "entered",
+        "fhir_claim_status_checked_code": "checked",
+        "fhir_claim_status_processed_code": "processed",
+        "fhir_claim_status_valuated_code": "valuated"
     },
     "stu3_fhir_eligibility_config": {
         "fhir_item_code": "item",
