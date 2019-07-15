@@ -111,3 +111,4 @@ from api_fhir.converters.operationOutcomeConverter import OperationOutcomeConver
 from api_fhir.converters.practitionerConverter import PractitionerConverter
 from api_fhir.converters.practitionerRoleConverter import PractitionerRoleConverter
 from api_fhir.converters.eligibilityRequestConverter import EligibilityRequestConverter
+from api_fhir.converters.claimResponseConverter import ClaimResponseConverter
