@@ -17,18 +17,6 @@
       },
       "use": "usual",
       "value": "12345678"
-    },
-    {
-      "type": {
-        "coding": [
-          {
-            "code": "ACSN",
-            "system": "https://hl7.org/fhir/valueset-identifier-type.html"
-          }
-        ]
-      },
-      "use": "usual",
-      "value": 1
     }
   ],
   "name": "TEST_NAME",

@@ -1,0 +1,70 @@
+{
+  "resourceType": "Claim",
+  "billablePeriod": {
+    "end": "2019-06-12T00:00:00",
+    "start": "2019-06-01T00:00:00"
+  },
+  "created": "2019-06-12T00:00:00",
+  "diagnosis": [
+    {
+      "diagnosisCodeableConcept": {
+        "coding": [
+          {
+            "code": "ICD_CD"
+          }
+        ]
+      },
+      "sequence": 1,
+      "type": [
+        {
+          "text": "icd_0"
+        }
+      ]
+    }
+  ],
+  "enterer": {
+    "reference": "Practitioner/1234abcd"
+  },
+  "facility": {
+    "reference": "Location/12345678"
+  },
+  "identifier": [
+    {
+      "type": {
+        "coding": [
+          {
+            "code": "MR",
+            "system": "https://hl7.org/fhir/valueset-identifier-type.html"
+          }
+        ]
+      },
+      "use": "usual",
+      "value": "code"
+    }
+  ],
+  "information": [
+    {
+      "category": {
+        "text": "guarantee_id"
+      },
+      "sequence": 1,
+      "valueString": "guarantee_id"
+    },
+    {
+      "category": {
+        "text": "explanation"
+      },
+      "sequence": 2,
+      "valueString": "explanation"
+    }
+  ],
+  "patient": {
+    "reference": "Patient/TEST_CHF_ID"
+  },
+  "total": {
+    "value": 42
+  },
+  "type": {
+    "text": "E"
+  }
+}

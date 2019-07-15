@@ -4,7 +4,6 @@ from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.converters import PatientConverter
 from api_fhir.models import EligibilityRequest
 from api_fhir.tests import GenericTestMixin, PatientTestMixin
-from api_fhir.utils import TimeUtils
 
 
 class EligibilityRequestTestMixin(GenericTestMixin):
@@ -28,6 +27,10 @@ class EligibilityRequestTestMixin(GenericTestMixin):
     _TEST_ITEM_LEFT = 1
     _TEST_IS_SERVICE_OK = True
     _TEST_IS_ITEM_OK = False
+
+    def setUp(self):
+        self._TEST_INSUREE = PatientTestMixin().create_test_imis_instance()
+        self._TEST_INSUREE.chf_id = self._TEST_CHFID
 
     def create_test_imis_instance(self):
         return EligibilityResponse(
@@ -58,9 +61,9 @@ class EligibilityRequestTestMixin(GenericTestMixin):
         self.assertEqual(self._TEST_SERVICE_CODE, imis_obj.service_code)
 
     def create_test_fhir_instance(self):
+        self.setUp()
         fhir_reqest = EligibilityRequest()
-        imis_insuree = self._create_and_save_insuree()
-        fhir_reqest.patient = PatientConverter.build_fhir_resource_reference(imis_insuree)
+        fhir_reqest.patient = PatientConverter.build_fhir_resource_reference(self._TEST_INSUREE)
         fhir_reqest.benefitCategory = PatientConverter.build_codeable_concept(
             Config.get_fhir_service_code(), system=None, text=self._TEST_SERVICE_CODE)
         fhir_reqest.benefitSubCategory = PatientConverter.build_codeable_concept(
@@ -100,13 +103,3 @@ class EligibilityRequestTestMixin(GenericTestMixin):
                 self.assertEqual(self._TEST_IS_SERVICE_OK, not benefit.excluded)
             elif benefit.category.text == Config.get_fhir_is_item_ok_code():
                 self.assertEqual(self._TEST_IS_ITEM_OK, not benefit.excluded)
-
-    def _create_and_save_insuree(self):
-        imis_insuree = PatientTestMixin().create_test_imis_instance()
-        imis_insuree.head = False
-        imis_insuree.card_issued = False
-        imis_insuree.validity_from = TimeUtils.now()
-        imis_insuree.audit_user_id = self._TEST_ADMIN_USER_ID
-        imis_insuree.chf_id = self._TEST_CHFID
-        imis_insuree.save()
-        return imis_insuree
