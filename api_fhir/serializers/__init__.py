@@ -41,3 +41,4 @@ from api_fhir.serializers.practitionerSerializer import PractitionerSerializer
 from api_fhir.serializers.claimSerializer import ClaimSerializer
 from api_fhir.serializers.eligibilityRequestSerializer import EligibilityRequestSerializer
 from api_fhir.serializers.claimResponseSerializer import ClaimResponseSerializer
+from api_fhir.serializers.communicationRequestSerializer import CommunicationRequestSerializer

@@ -9,6 +9,7 @@ router.register(r'PractitionerRole', views.PractitionerRoleViewSet)
 router.register(r'Practitioner', views.PractitionerViewSet)
 router.register(r'Claim', views.ClaimViewSet)
 router.register(r'ClaimResponse', views.ClaimResponseViewSet)
+router.register(r'CommunicationRequest', views.CommunicationRequestViewSet)
 router.register(r'EligibilityRequest', views.EligibilityRequestViewSet, base_name='EligibilityRequest')
 
 urlpatterns = [

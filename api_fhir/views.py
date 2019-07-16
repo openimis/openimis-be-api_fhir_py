@@ -1,4 +1,4 @@
-from claim.models import ClaimAdmin, Claim
+from claim.models import ClaimAdmin, Claim, Feedback
 from insuree.models import Insuree
 from location.models import HealthFacility
 
@@ -8,7 +8,8 @@ from rest_framework.viewsets import GenericViewSet
 from api_fhir.paginations import FhirBundleResultsSetPagination
 from api_fhir.permissions import FHIRApiPermissions
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
-    PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, ClaimResponseSerializer
+    PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, ClaimResponseSerializer, \
+    CommunicationRequestSerializer
 
 
 class BaseFHIRView(object):
@@ -51,6 +52,11 @@ class ClaimResponseViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListM
     queryset = Claim.objects.all()
     serializer_class = ClaimResponseSerializer
     lookup_field = 'code'
+
+
+class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    queryset = Feedback.objects.all()
+    serializer_class = CommunicationRequestSerializer
 
 
 class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericViewSet):
