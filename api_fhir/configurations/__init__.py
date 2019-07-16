@@ -242,6 +242,33 @@ class EligibilityConfiguration(BaseConfiguration):  # pragma: no cover
         raise NotImplementedError('`get_fhir_is_service_ok_code()` must be implemented.')
 
 
+class CommunicationRequestConfiguration(BaseConfiguration):  # pragma: no cover
+
+    @classmethod
+    def build_configuration(cls, cfg):
+        raise NotImplementedError('`build_configuration()` must be implemented.')
+
+    @classmethod
+    def get_fhir_care_rendered_code(cls):
+        raise NotImplementedError('`get_fhir_care_rendered_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_payment_asked_code(cls):
+        raise NotImplementedError('`get_fhir_payment_asked_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_drug_prescribed_code(cls):
+        raise NotImplementedError('`get_fhir_drug_prescribed_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_drug_received_code(cls):
+        raise NotImplementedError('`get_fhir_care_rendered_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_asessment_code(cls):
+        raise NotImplementedError('`get_fhir_asessment_code()` must be implemented.')
+
+
 class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
@@ -277,6 +304,10 @@ class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
     def get_eligibility_configuration(cls):
         raise NotImplementedError('`get_eligibility_configuration()` must be implemented.')
 
+    @classmethod
+    def get_communication_request_configuration(cls):
+        raise NotImplementedError('`get_communication_request_configuration()` must be implemented.')
+
 
 from api_fhir.configurations.generalConfiguration import GeneralConfiguration
 from api_fhir.configurations.stu3IdentifierConfig import Stu3IdentifierConfig
@@ -285,5 +316,6 @@ from api_fhir.configurations.stu3MaritalConfig import Stu3MaritalConfig
 from api_fhir.configurations.stu3IssueTypeConfig import Stu3IssueTypeConfig
 from api_fhir.configurations.stu3ClaimConfig import Stu3ClaimConfig
 from api_fhir.configurations.stu3EligibilityConfiguration import Stu3EligibilityConfiguration
+from api_fhir.configurations.stu3CommunicationRequestConfig import Stu3CommunicationRequestConfig
 from api_fhir.configurations.stu3ApiFhirConfig import Stu3ApiFhirConfig
 from api_fhir.configurations.moduleConfiguration import ModuleConfiguration

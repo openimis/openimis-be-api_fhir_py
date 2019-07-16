@@ -79,6 +79,13 @@ DEFAULT_CFG = {
         "fhir_item_left_code": "item_left",
         "fhir_is_item_ok_code": "is_item_ok",
         "fhir_is_service_ok_code": "is_service_ok"
+    },
+    "stu3_fhir_communication_request_config": {
+        "fhir_care_rendered_code": "care_rendered",
+        "fhir_payment_asked_code": "payment_asked",
+        "fhir_drug_prescribed_code": "drug_prescribed",
+        "fhir_drug_received_code": "drug_received",
+        "fhir_asessment_code": "asessment"
     }
 }
 
