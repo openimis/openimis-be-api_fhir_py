@@ -1,5 +1,5 @@
 from api_fhir.configurations import Stu3ClaimConfig
-from api_fhir.converters import BaseFHIRConverter
+from api_fhir.converters import BaseFHIRConverter, CommunicationRequestConverter
 from api_fhir.converters.claimConverter import ClaimConverter
 from api_fhir.models import ClaimResponse, Money, ClaimResponsePayment, ClaimResponseError
 from api_fhir.utils import TimeUtils
@@ -13,17 +13,13 @@ class ClaimResponseConverter(BaseFHIRConverter):
         fhir_claim_response.created = TimeUtils.date().isoformat()
         fhir_claim_response.request = ClaimConverter.build_fhir_resource_reference(imis_claim)
         cls.build_fhir_pk(fhir_claim_response, imis_claim.code)
+        ClaimConverter.build_fhir_identifiers(fhir_claim_response, imis_claim)
         cls.build_fhir_outcome(fhir_claim_response, imis_claim)
         cls.build_fhir_payment(fhir_claim_response, imis_claim)
         cls.build_fhir_total_benefit(fhir_claim_response, imis_claim)
         cls.build_fhir_errors(fhir_claim_response, imis_claim)
+        cls.build_fhir_communication_request_reference(fhir_claim_response, imis_claim)
         return fhir_claim_response
-
-    @classmethod
-    def build_fhir_total_benefit(cls, fhir_claim_response, imis_claim):
-        total_approved = Money()
-        total_approved.value = imis_claim.approved
-        fhir_claim_response.totalBenefit = total_approved
 
     @classmethod
     def build_fhir_outcome(cls, fhir_claim_response, imis_claim):
@@ -50,9 +46,22 @@ class ClaimResponseConverter(BaseFHIRConverter):
         fhir_claim_response.payment = fhir_payment
 
     @classmethod
+    def build_fhir_total_benefit(cls, fhir_claim_response, imis_claim):
+        total_approved = Money()
+        total_approved.value = imis_claim.approved
+        fhir_claim_response.totalBenefit = total_approved
+
+    @classmethod
     def build_fhir_errors(cls, fhir_claim_response, imis_claim):
         rejection_reason = imis_claim.rejection_reason
         if rejection_reason:
             fhir_error = ClaimResponseError()
             fhir_error.code = cls.build_codeable_concept(rejection_reason)
             fhir_claim_response.error = [fhir_error]
+
+    @classmethod
+    def build_fhir_communication_request_reference(cls, fhir_claim_response, imis_claim):
+        feedback = imis_claim.feedback
+        if feedback:
+            reference = CommunicationRequestConverter.build_fhir_resource_reference(feedback)
+            fhir_claim_response.communicationRequest = [reference]

@@ -279,6 +279,7 @@ class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
         cls.get_issue_type_configuration().build_configuration(cfg)
         cls.get_claim_configuration().build_configuration(cfg)
         cls.get_eligibility_configuration().build_configuration(cfg)
+        cls.get_communication_request_configuration().build_configuration(cfg)
 
     @classmethod
     def get_identifier_configuration(cls):
