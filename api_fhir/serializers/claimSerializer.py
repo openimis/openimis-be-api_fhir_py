@@ -1,7 +1,7 @@
 from claim import ClaimSubmitService, ClaimSubmit
-from django.http import HttpResponse
-from django.utils.translation import gettext
+from claim.models import Claim
 
+from api_fhir.converters import ClaimResponseConverter
 from api_fhir.converters.claimConverter import ClaimConverter
 from api_fhir.serializers import BaseFHIRSerializer
 
@@ -32,4 +32,8 @@ class ClaimSerializer(BaseFHIRSerializer):
                                    )
         request = self.context.get("request")
         ClaimSubmitService(request.user).submit(claim_submit)
-        return HttpResponse(gettext('Claim submit created'))
+        return self.create_claim_response(validated_data.get('code'))
+
+    def create_claim_response(self, claim_code):
+        claim = Claim.objects.filter(code=claim_code).first()
+        return ClaimResponseConverter.to_fhir_obj(claim)

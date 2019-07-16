@@ -1,3 +1,5 @@
+from claim.models import Feedback
+
 from api_fhir.configurations import Stu3ClaimConfig
 from api_fhir.converters import BaseFHIRConverter, CommunicationRequestConverter
 from api_fhir.converters.claimConverter import ClaimConverter
@@ -42,7 +44,9 @@ class ClaimResponseConverter(BaseFHIRConverter):
     def build_fhir_payment(cls, fhir_claim_response, imis_claim):
         fhir_payment = ClaimResponsePayment()
         fhir_payment.adjustmentReason = cls.build_simple_codeable_concept(imis_claim.adjustment)
-        fhir_payment.date = imis_claim.date_processed.isoformat()
+        date_processed = imis_claim.date_processed
+        if date_processed:
+            fhir_payment.date = date_processed.isoformat()
         fhir_claim_response.payment = fhir_payment
 
     @classmethod
@@ -61,7 +65,16 @@ class ClaimResponseConverter(BaseFHIRConverter):
 
     @classmethod
     def build_fhir_communication_request_reference(cls, fhir_claim_response, imis_claim):
-        feedback = imis_claim.feedback
+        feedback = cls.get_imis_claim_feedback(imis_claim)
         if feedback:
             reference = CommunicationRequestConverter.build_fhir_resource_reference(feedback)
             fhir_claim_response.communicationRequest = [reference]
+
+    @classmethod
+    def get_imis_claim_feedback(cls, imis_claim):
+        feedback = None
+        try:
+            feedback = imis_claim.feedback
+        except Feedback.DoesNotExist:
+            feedback = None
+        return feedback

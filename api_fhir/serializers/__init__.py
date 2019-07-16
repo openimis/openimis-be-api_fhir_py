@@ -12,6 +12,8 @@ class BaseFHIRSerializer(serializers.Serializer):
     def to_representation(self, obj):
         if isinstance(obj, HttpResponseBase):
             return OperationOutcomeConverter.to_fhir_obj(obj).toDict()
+        elif isinstance(obj, FHIRBaseObject):
+            return obj.toDict()
         return self.fhirConverter.to_fhir_obj(obj).toDict()
 
     def to_internal_value(self, data):
