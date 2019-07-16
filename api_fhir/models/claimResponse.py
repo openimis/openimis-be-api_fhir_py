@@ -31,7 +31,7 @@ class ClaimResponsePayment(BackboneElement):
 
 class ClaimResponseError(BackboneElement):
 
-    sequenceLinkId = Property('sequence', int)
+    sequenceLinkId = Property('sequenceLinkId', int)
     detailSequenceLinkId = Property('detailSequenceLinkId', int)
     subdetailSequenceLinkId = Property('subdetailSequenceLinkId', int)
     code = Property('code', 'CodeableConcept', required=True)

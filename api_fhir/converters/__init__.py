@@ -39,7 +39,7 @@ class BaseFHIRConverter(ABC):
         return cls.build_codeable_concept(None, None, text)
 
     @classmethod
-    def build_codeable_concept(cls, code, system, text=None):
+    def build_codeable_concept(cls, code, system=None, text=None):
         codeable_concept = CodeableConcept()
         if code or system:
             coding = Coding()

@@ -3,13 +3,14 @@ from claim.models import Claim, ClaimDiagnosisCode, ClaimItem, ClaimService
 from django.utils.translation import gettext
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
-from api_fhir.converters import BaseFHIRConverter, LocationConverter, PatientConverter, PractitionerConverter
+from api_fhir.converters import BaseFHIRConverter, LocationConverter, PatientConverter, PractitionerConverter, \
+    ReferenceConverterMixin
 from api_fhir.models import Claim as FHIRClaim, ClaimItem as FHIRClaimItem, Period, ClaimDiagnosis, Money, \
     ImisClaimIcdTypes, ClaimInformation, Quantity
 from api_fhir.utils import TimeUtils
 
 
-class ClaimConverter(BaseFHIRConverter):
+class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_claim):
@@ -45,6 +46,19 @@ class ClaimConverter(BaseFHIRConverter):
         cls.build_imis_submit_items_and_services(imis_claim, fhir_claim)
         cls.check_errors(errors)
         return imis_claim
+
+    @classmethod
+    def get_reference_obj_id(cls, imis_claim):
+        return imis_claim.code
+
+    @classmethod
+    def get_fhir_resource_type(cls):
+        return FHIRClaim
+
+    @classmethod
+    def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
+        imis_claim_code = cls.get_resource_id_from_reference(reference)
+        return Claim.objects.filter(code=imis_claim_code).first()
 
     @classmethod
     def build_imis_date_claimed(cls, imis_claim, fhir_claim, errors):
