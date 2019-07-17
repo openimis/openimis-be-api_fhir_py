@@ -1,4 +1,5 @@
-from claim.models import Claim, ClaimDiagnosisCode
+from claim.models import Claim, ClaimDiagnosisCode, ClaimItem, ClaimService
+from medical.models import Item, Service
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
 from api_fhir.converters import PatientConverter, LocationConverter, PractitionerConverter
@@ -10,6 +11,7 @@ from api_fhir.utils import TimeUtils
 
 class ClaimTestMixin(GenericTestMixin):
 
+    _TEST_ID = 1
     _TEST_CODE = 'code'
     _TEST_DATE_FROM = '2019-06-01T00:00:00'
     _TEST_DATE_TO = '2019-06-12T00:00:00'
@@ -23,6 +25,14 @@ class ClaimTestMixin(GenericTestMixin):
     _TEST_ICD_3 = "icd_3"
     _TEST_ICD_4 = "icd_4"
     _TEST_VISIT_TYPE = "E"
+    _TEST_ITEM_CODE = "iCode"
+    _TEST_ITEM_QUANTITY_PROVIDED = 4
+    _TEST_ITEM_PRICE_ASKED = 21.1
+    _TEST_ITEM_EXPLANATION = "item_explanation"
+    _TEST_SERVICE_CODE = "sCode"
+    _TEST_SERVICE_QUANTITY_PROVIDED = 3
+    _TEST_SERVICE_PRICE_ASKED = 16.1
+    _TEST_SERVICE_EXPLANATION = "service_explanation"
 
     def setUp(self):
         self._TEST_DIAGNOSIS_CODE = ClaimDiagnosisCode()
@@ -30,9 +40,30 @@ class ClaimTestMixin(GenericTestMixin):
         self._TEST_CLAIM_ADMIN = PractitionerTestMixin().create_test_imis_instance()
         self._TEST_HF = LocationTestMixin().create_test_imis_instance()
         self._TEST_INSUREE = PatientTestMixin().create_test_imis_instance()
+        self._TEST_ITEM = self.create_test_claim_item()
+        self._TEST_SERVICE = self.create_test_claim_service()
+
+    def create_test_claim_item(self):
+        item = ClaimItem()
+        item.item = Item()
+        item.item.code = self._TEST_ITEM_CODE
+        item.price_asked = self._TEST_ITEM_PRICE_ASKED
+        item.qty_provided = self._TEST_ITEM_QUANTITY_PROVIDED
+        item.explanation = self._TEST_ITEM_EXPLANATION
+        return item
+
+    def create_test_claim_service(self):
+        service = ClaimService()
+        service.service = Service()
+        service.service.code = self._TEST_SERVICE_CODE
+        service.price_asked = self._TEST_SERVICE_PRICE_ASKED
+        service.qty_provided = self._TEST_SERVICE_QUANTITY_PROVIDED
+        service.explanation = self._TEST_SERVICE_EXPLANATION
+        return service
 
     def create_test_imis_instance(self):
         imis_claim = Claim()
+        imis_claim.id = self._TEST_ID
         imis_claim.insuree = PatientTestMixin().create_test_imis_instance()
         imis_claim.code = self._TEST_CODE
         imis_claim.date_from = TimeUtils.str_to_date(self._TEST_DATE_FROM)
@@ -65,10 +96,16 @@ class ClaimTestMixin(GenericTestMixin):
         self.assertEqual(self._TEST_EXPLANATION, imis_obj.explanation)
         self.assertIsNotNone(imis_obj.admin)
         self.assertEqual(self._TEST_VISIT_TYPE, imis_obj.visit_type)
+        self.assertEqual(self._TEST_ITEM_CODE, imis_obj.submit_items[0].code)
+        self.assertEqual(self._TEST_ITEM_QUANTITY_PROVIDED, imis_obj.submit_items[0].quantity)
+        self.assertEqual(self._TEST_ITEM_PRICE_ASKED, imis_obj.submit_items[0].price)
+        self.assertEqual(self._TEST_SERVICE_CODE, imis_obj.submit_services[0].code)
+        self.assertEqual(self._TEST_SERVICE_QUANTITY_PROVIDED, imis_obj.submit_services[0].quantity)
+        self.assertEqual(self._TEST_SERVICE_PRICE_ASKED, imis_obj.submit_services[0].price)
 
     def create_test_fhir_instance(self):
-        self.setUp()
         fhir_claim = FHIRClaim()
+        fhir_claim.id = self._TEST_CODE
         fhir_claim.patient = PatientConverter.build_fhir_resource_reference(self._TEST_INSUREE)
         claim_code = ClaimConverter.build_fhir_identifier(self._TEST_CODE,
                                                Stu3IdentifierConfig.get_fhir_identifier_type_system(),
@@ -94,11 +131,20 @@ class ClaimTestMixin(GenericTestMixin):
         fhir_claim.information = information
         fhir_claim.enterer = PractitionerConverter.build_fhir_resource_reference(self._TEST_CLAIM_ADMIN)
         fhir_claim.type = ClaimConverter.build_simple_codeable_concept(self._TEST_VISIT_TYPE)
+        type = Stu3ClaimConfig.get_fhir_claim_item_code()
+        ClaimConverter.build_fhir_item(fhir_claim, self._TEST_ITEM_CODE, type, self._TEST_ITEM)
+        type = Stu3ClaimConfig.get_fhir_claim_service_code()
+        ClaimConverter.build_fhir_item(fhir_claim, self._TEST_SERVICE_CODE, type, self._TEST_SERVICE)
         return fhir_claim
 
     def verify_fhir_instance(self, fhir_obj):
         self.assertIsNotNone(fhir_obj.patient.reference)
-        self.assertEqual(self._TEST_CODE, fhir_obj.identifier[0].value)
+        self.assertEqual(str(self._TEST_CODE), fhir_obj.id)
+        for identifier in fhir_obj.identifier:
+            if identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_id_type_code():
+                self.assertEqual(str(self._TEST_ID), identifier.value)
+            elif identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_claim_code_type():
+                self.assertEqual(self._TEST_CODE, identifier.value)
         self.assertEqual(self._TEST_DATE_FROM, fhir_obj.billablePeriod.start)
         self.assertEqual(self._TEST_DATE_TO, fhir_obj.billablePeriod.end)
         for diagnosis in fhir_obj.diagnosis:
@@ -117,3 +163,16 @@ class ClaimTestMixin(GenericTestMixin):
                 self.assertEqual(self._TEST_GUARANTEE_ID, information.valueString)
         self.assertIsNotNone(fhir_obj.enterer.reference)
         self.assertEqual(self._TEST_VISIT_TYPE, fhir_obj.type.text)
+        for item in fhir_obj.item:
+            if item.category.text == Stu3ClaimConfig.get_fhir_claim_item_code():
+                self.assertEqual(self._TEST_ITEM_CODE, item.service.text)
+                self.assertEqual(self._TEST_ITEM_QUANTITY_PROVIDED, item.quantity.value)
+                self.assertEqual(self._TEST_ITEM_PRICE_ASKED, item.unitPrice.value)
+                self.assertEqual(self._TEST_ITEM_EXPLANATION,
+                                 fhir_obj.information[item.informationLinkId[0] - 1].valueString)
+            elif item.category.text == Stu3ClaimConfig.get_fhir_claim_service_code():
+                self.assertEqual(self._TEST_SERVICE_CODE, item.service.text)
+                self.assertEqual(self._TEST_SERVICE_QUANTITY_PROVIDED, item.quantity.value)
+                self.assertEqual(self._TEST_SERVICE_PRICE_ASKED, item.unitPrice.value)
+                self.assertEqual(self._TEST_SERVICE_EXPLANATION,
+                                 fhir_obj.information[item.informationLinkId[0] - 1].valueString)
