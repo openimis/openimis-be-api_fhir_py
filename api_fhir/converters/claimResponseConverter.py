@@ -31,18 +31,23 @@ class ClaimResponseConverter(BaseFHIRConverter):
     def build_fhir_outcome(cls, fhir_claim_response, imis_claim):
         code = imis_claim.status
         if code is not None:
-            display = None
-            if code == 1:
-                display = Stu3ClaimConfig.get_fhir_claim_status_rejected_code()
-            elif code == 2:
-                display = Stu3ClaimConfig.get_fhir_claim_status_entered_code()
-            elif code == 4:
-                display = Stu3ClaimConfig.get_fhir_claim_status_checked_code()
-            elif code == 8:
-                display = Stu3ClaimConfig.get_fhir_claim_status_processed_code()
-            elif code == 16:
-                display = Stu3ClaimConfig.get_fhir_claim_status_valuated_code()
+            display = cls.get_status_desplay_by_code(code)
             fhir_claim_response.outcome = cls.build_codeable_concept(str(code), system=None, text=display)
+
+    @classmethod
+    def get_status_desplay_by_code(cls, code):
+        display = None
+        if code == 1:
+            display = Stu3ClaimConfig.get_fhir_claim_status_rejected_code()
+        elif code == 2:
+            display = Stu3ClaimConfig.get_fhir_claim_status_entered_code()
+        elif code == 4:
+            display = Stu3ClaimConfig.get_fhir_claim_status_checked_code()
+        elif code == 8:
+            display = Stu3ClaimConfig.get_fhir_claim_status_processed_code()
+        elif code == 16:
+            display = Stu3ClaimConfig.get_fhir_claim_status_valuated_code()
+        return display
 
     @classmethod
     def build_fhir_payment(cls, fhir_claim_response, imis_claim):
