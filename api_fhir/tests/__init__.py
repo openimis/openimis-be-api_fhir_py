@@ -5,6 +5,7 @@ from api_fhir.tests.mixin.patientTestMixin import PatientTestMixin
 from api_fhir.tests.mixin.practitionerTestMixin import PractitionerTestMixin
 from api_fhir.tests.mixin.practitionerRoleTestMixin import PractitionerRoleTestMixin
 from api_fhir.tests.mixin.claimTestMixin import ClaimTestMixin
+from api_fhir.tests.mixin.claimResponseTestMixin import ClaimResponseTestMixin
 from api_fhir.tests.mixin.eligibilityRequestTestMixin import EligibilityRequestTestMixin
 from api_fhir.tests.mixin.genericFhirAPITestMixin import GenericFhirAPITestMixin
 from api_fhir.tests.mixin.fhirApiReadTestMixin import FhirApiReadTestMixin

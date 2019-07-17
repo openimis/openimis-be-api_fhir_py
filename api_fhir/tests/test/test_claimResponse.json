@@ -1,0 +1,50 @@
+{
+  "resourceType": "ClaimResponse",
+  "communicationRequest": [
+    {
+      "reference": "CommunicationRequest/1"
+    }
+  ],
+  "error": [
+    {
+      "code": {
+        "coding": [
+          {
+            "code": "1"
+          }
+        ]
+      }
+    }
+  ],
+  "identifier": [
+    {
+      "type": {
+        "coding": [
+          {
+            "code": "MR",
+            "system": "https://hl7.org/fhir/valueset-identifier-type.html"
+          }
+        ]
+      },
+      "use": "usual",
+      "value": "code"
+    }
+  ],
+  "outcome": {
+    "coding": [
+      {
+        "code": "1"
+      }
+    ],
+    "text": "rejected"
+  },
+  "payment": {
+    "adjustmentReason": {
+      "text": "adjustment"
+    },
+    "date": "2010-11-16T00:00:00"
+  },
+  "totalBenefit": {
+    "value": 214.25
+  }
+}

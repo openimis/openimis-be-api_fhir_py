@@ -38,7 +38,7 @@ class ClaimResponseConverter(BaseFHIRConverter):
                 display = Stu3ClaimConfig.get_fhir_claim_status_processed_code()
             elif code == 16:
                 display = Stu3ClaimConfig.get_fhir_claim_status_valuated_code()
-            fhir_claim_response.outcome = cls.build_codeable_concept(imis_claim.status, system=None, text=display)
+            fhir_claim_response.outcome = cls.build_codeable_concept(str(code), system=None, text=display)
 
     @classmethod
     def build_fhir_payment(cls, fhir_claim_response, imis_claim):
@@ -60,7 +60,7 @@ class ClaimResponseConverter(BaseFHIRConverter):
         rejection_reason = imis_claim.rejection_reason
         if rejection_reason:
             fhir_error = ClaimResponseError()
-            fhir_error.code = cls.build_codeable_concept(rejection_reason)
+            fhir_error.code = cls.build_codeable_concept(str(rejection_reason))
             fhir_claim_response.error = [fhir_error]
 
     @classmethod
