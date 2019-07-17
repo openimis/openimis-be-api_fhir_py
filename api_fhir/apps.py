@@ -60,7 +60,12 @@ DEFAULT_CFG = {
         "fhir_claim_status_entered_code": "entered",
         "fhir_claim_status_checked_code": "checked",
         "fhir_claim_status_processed_code": "processed",
-        "fhir_claim_status_valuated_code": "valuated"
+        "fhir_claim_status_valuated_code": "valuated",
+        "fhir_claim_item_status_code": "claim_item_status",
+        "fhir_claim_item_status_passed_code": "passed",
+        "fhir_claim_item_status_rejected_code": "rejected",
+        "fhir_claim_item_general_adjudication_code": "general",
+        "fhir_claim_item_rejected_reason_adjudication_code": "rejected_reason",
     },
     "stu3_fhir_eligibility_config": {
         "fhir_item_code": "item",

@@ -300,7 +300,8 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         fhir_item.category = cls.build_simple_codeable_concept(item_type)
         item_explanation_code = Stu3ClaimConfig.get_fhir_claim_item_explanation_code()
         information = cls.build_fhir_string_information(fhir_claim.information, item_explanation_code, item.explanation)
-        fhir_item.informationLinkId = [information.sequence]
+        if information:
+            fhir_item.informationLinkId = [information.sequence]
         fhir_claim.item.append(fhir_item)
 
     @classmethod

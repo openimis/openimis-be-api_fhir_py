@@ -46,3 +46,20 @@ class Stu3ClaimConfig(ClaimConfiguration):
     @classmethod
     def get_fhir_claim_status_valuated_code(cls):
         return cls.get_config().stu3_fhir_claim_config.get('fhir_claim_status_valuated_code', "valuated")
+
+    @classmethod
+    def get_fhir_claim_item_status_passed_code(cls):
+        return cls.get_config().stu3_fhir_claim_config.get('fhir_claim_item_status_passed_code', "passed")
+
+    @classmethod
+    def get_fhir_claim_item_status_rejected_code(cls):
+        return cls.get_config().stu3_fhir_claim_config.get('fhir_claim_item_status_rejected_code', "rejected")
+
+    @classmethod
+    def get_fhir_claim_item_general_adjudication_code(cls):
+        return cls.get_config().stu3_fhir_claim_config.get('fhir_claim_item_general_adjudication_code', "general")
+
+    @classmethod
+    def get_fhir_claim_item_rejected_reason_adjudication_code(cls):
+        return cls.get_config().stu3_fhir_claim_config.get('fhir_claim_item_rejected_reason_adjudication_code',
+                                                           "rejected_reason")

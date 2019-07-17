@@ -1,9 +1,12 @@
-from claim.models import Feedback
+from claim.models import Feedback, ClaimItem, ClaimService
+from django.db.models import Subquery
+from medical.models import Item, Service
 
 from api_fhir.configurations import Stu3ClaimConfig
 from api_fhir.converters import BaseFHIRConverter, CommunicationRequestConverter
 from api_fhir.converters.claimConverter import ClaimConverter
-from api_fhir.models import ClaimResponse, Money, ClaimResponsePayment, ClaimResponseError
+from api_fhir.models import ClaimResponse, Money, ClaimResponsePayment, ClaimResponseError, ClaimResponseItem, Claim, \
+    ClaimResponseItemAdjudication, ClaimResponseProcessNote
 from api_fhir.utils import TimeUtils
 
 
@@ -21,6 +24,7 @@ class ClaimResponseConverter(BaseFHIRConverter):
         cls.build_fhir_total_benefit(fhir_claim_response, imis_claim)
         cls.build_fhir_errors(fhir_claim_response, imis_claim)
         cls.build_fhir_communication_request_reference(fhir_claim_response, imis_claim)
+        cls.build_fhir_items(fhir_claim_response, imis_claim)
         return fhir_claim_response
 
     @classmethod
@@ -72,9 +76,93 @@ class ClaimResponseConverter(BaseFHIRConverter):
 
     @classmethod
     def get_imis_claim_feedback(cls, imis_claim):
-        feedback = None
         try:
             feedback = imis_claim.feedback
         except Feedback.DoesNotExist:
             feedback = None
         return feedback
+
+    @classmethod
+    def build_fhir_items(cls, fhir_claim_response, imis_claim):
+        for claim_item in cls.generate_fhir_claim_items(imis_claim):
+            type = claim_item.category.text
+            code = claim_item.service.text
+            if type == Stu3ClaimConfig.get_fhir_claim_item_code():
+                imis_item = cls.get_imis_claim_item_by_code(code, imis_claim.id)
+                cls.build_fhir_item(fhir_claim_response, claim_item, imis_item,
+                                    rejected_reason=imis_item.rejection_reason)
+            elif type == Stu3ClaimConfig.get_fhir_claim_service_code():
+                imis_service = cls.get_service_claim_item_by_code(code, imis_claim.id)
+                cls.build_fhir_item(fhir_claim_response, claim_item, imis_service,
+                                    rejected_reason=imis_service.rejectionreason)
+
+    @classmethod
+    def generate_fhir_claim_items(cls, imis_claim):
+        claim = Claim()
+        ClaimConverter.build_fhir_items(claim, imis_claim)
+        return claim.item
+
+    @classmethod
+    def get_imis_claim_item_by_code(cls, code, claim_id):
+        item_code_qs = Item.objects.filter(code=code)
+        result = ClaimItem.objects.filter(item_id__in=Subquery(item_code_qs.values('id')), claim_id=claim_id)
+        return result[0] if len(result) > 0 else None
+
+    @classmethod
+    def get_service_claim_item_by_code(cls, code, claim_id):
+        service_code_qs = Service.objects.filter(code=code)
+        result = ClaimService.objects.filter(service_id__in=Subquery(service_code_qs.values('id')), claim_id=claim_id)
+        return result[0] if len(result) > 0 else None
+
+    @classmethod
+    def build_fhir_item(cls, fhir_claim_response, claim_item, item, rejected_reason=None):
+        claim_response_item = ClaimResponseItem()
+        claim_response_item.sequenceLinkId = claim_item.sequence
+        cls.build_fhir_item_general_adjudication(claim_response_item, item)
+        if rejected_reason:
+            cls.build_fhir_item_rejected_reason_adjudication(claim_response_item, rejected_reason)
+        note = cls.build_process_note(fhir_claim_response, item.justification)
+        if note:
+            claim_response_item.noteNumber = [note.number]
+        fhir_claim_response.item.append(claim_response_item)
+
+    @classmethod
+    def build_fhir_item_general_adjudication(cls, claim_response_item, item):
+        item_adjudication = ClaimResponseItemAdjudication()
+        item_adjudication.category = \
+            cls.build_simple_codeable_concept(Stu3ClaimConfig.get_fhir_claim_item_general_adjudication_code())
+        item_adjudication.reason = cls.build_fhir_adjudication_reason(item)
+        item_adjudication.value = item.qty_approved
+        limitation_value = Money()
+        limitation_value.value = item.limitation_value
+        item_adjudication.amount = limitation_value
+        claim_response_item.adjudication.append(item_adjudication)
+
+    @classmethod
+    def build_fhir_item_rejected_reason_adjudication(cls, claim_response_item, rejection_reason):
+        item_adjudication = ClaimResponseItemAdjudication()
+        item_adjudication.category = \
+            cls.build_simple_codeable_concept(Stu3ClaimConfig.get_fhir_claim_item_rejected_reason_adjudication_code())
+        item_adjudication.reason = cls.build_codeable_concept(rejection_reason)
+        claim_response_item.adjudication.append(item_adjudication)
+
+    @classmethod
+    def build_fhir_adjudication_reason(cls, item):
+        status = item.status
+        text_code = None
+        if status == 1:
+            text_code = Stu3ClaimConfig.get_fhir_claim_item_status_passed_code()
+        elif status == 2:
+            text_code = Stu3ClaimConfig.get_fhir_claim_item_status_rejected_code()
+        return cls.build_codeable_concept(status, text=text_code)
+
+    @classmethod
+    def build_process_note(cls, fhir_claim_response, string_value):
+        result = None
+        if string_value:
+            note = ClaimResponseProcessNote()
+            note.number = len(fhir_claim_response.processNote) + 1
+            note.text = string_value
+            fhir_claim_response.processNote.append(note)
+            result = note
+        return result

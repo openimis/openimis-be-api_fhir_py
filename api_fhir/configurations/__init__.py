@@ -120,6 +120,14 @@ class IssueTypeConfiguration(BaseConfiguration):  # pragma: no cover
     def get_fhir_code_for_informational(cls):
         raise NotImplementedError('`get_fhir_code_for_informational()` must be implemented.')
 
+    @classmethod
+    def get_fhir_claim_item_general_adjudication_code(cls):
+        raise NotImplementedError('`get_fhir_claim_item_general_adjudication_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_claim_item_rejected_reason_adjudication_code(cls):
+        raise NotImplementedError('`get_fhir_claim_item_rejected_reason_adjudication_code()` must be implemented.')
+
 
 class ClaimConfiguration(BaseConfiguration):  # pragma: no cover
 
@@ -166,6 +174,15 @@ class ClaimConfiguration(BaseConfiguration):  # pragma: no cover
     @classmethod
     def get_fhir_claim_status_valuated_code(cls):
         raise NotImplementedError('`get_fhir_claim_status_valuated_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_claim_item_status_passed_code(cls):
+        raise NotImplementedError('`get_fhir_claim_item_status_passed_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_claim_item_status_rejected_code(cls):
+        raise NotImplementedError('`get_fhir_claim_item_status_rejected_code()` must be implemented.')
+
 
 class EligibilityConfiguration(BaseConfiguration):  # pragma: no cover
 

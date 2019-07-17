@@ -44,6 +44,8 @@ class BaseFHIRConverter(ABC):
         if code or system:
             coding = Coding()
             coding.system = system
+            if not isinstance(code, str):
+                code = str(code)
             coding.code = code
             codeable_concept.coding = [coding]
         codeable_concept.text = text

@@ -86,7 +86,7 @@ class ClaimResponseItemAdjudication(BackboneElement):
 
 class ClaimResponseItem(BackboneElement):
 
-    sequenceLinkId = Property('sequence', int, required=True)
+    sequenceLinkId = Property('sequenceLinkId', int, required=True)
     noteNumber = Property('noteNumber', int, count_max="*")
     adjudication = Property('adjudication', 'ClaimResponseItemAdjudication', count_max="*")
     detail = Property('detail', 'ClaimResponseItemDetail', count_max="*")

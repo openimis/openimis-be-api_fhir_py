@@ -16,7 +16,20 @@
       }
     }
   ],
+  "id": "code",
   "identifier": [
+    {
+      "type": {
+        "coding": [
+          {
+            "code": "ACSN",
+            "system": "https://hl7.org/fhir/valueset-identifier-type.html"
+          }
+        ]
+      },
+      "use": "usual",
+      "value": 1
+    },
     {
       "type": {
         "coding": [
@@ -28,6 +41,82 @@
       },
       "use": "usual",
       "value": "code"
+    }
+  ],
+  "item": [
+    {
+      "adjudication": [
+        {
+          "amount": {
+            "value": 2
+          },
+          "category": {
+            "text": "general"
+          },
+          "reason": {
+            "coding": [
+              {
+                "code": "1",
+                "system": "passed"
+              }
+            ]
+          },
+          "value": 4
+        },
+        {
+          "category": {
+            "text": "rejected_reason"
+          },
+          "reason": {
+            "coding": [
+              {
+                "code": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "noteNumber": [
+        1
+      ],
+      "sequenceLinkId": 1
+    },
+    {
+      "adjudication": [
+        {
+          "amount": {
+            "value": 4
+          },
+          "category": {
+            "text": "general"
+          },
+          "reason": {
+            "coding": [
+              {
+                "code": "2",
+                "system": "rejected"
+              }
+            ]
+          },
+          "value": 3
+        },
+        {
+          "category": {
+            "text": "rejected_reason"
+          },
+          "reason": {
+            "coding": [
+              {
+                "code": "3"
+              }
+            ]
+          }
+        }
+      ],
+      "noteNumber": [
+        2
+      ],
+      "sequenceLinkId": 2
     }
   ],
   "outcome": {
@@ -44,6 +133,16 @@
     },
     "date": "2010-11-16T00:00:00"
   },
+  "processNote": [
+    {
+      "number": 1,
+      "text": "item justification"
+    },
+    {
+      "number": 2,
+      "text": "service justification"
+    }
+  ],
   "totalBenefit": {
     "value": 214.25
   }
