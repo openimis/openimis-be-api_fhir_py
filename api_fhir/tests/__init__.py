@@ -7,6 +7,7 @@ from api_fhir.tests.mixin.practitionerRoleTestMixin import PractitionerRoleTestM
 from api_fhir.tests.mixin.claimTestMixin import ClaimTestMixin
 from api_fhir.tests.mixin.claimResponseTestMixin import ClaimResponseTestMixin
 from api_fhir.tests.mixin.eligibilityRequestTestMixin import EligibilityRequestTestMixin
+from api_fhir.tests.mixin.communicationRequestTestMixin import CommunicationRequestTestMixin
 from api_fhir.tests.mixin.genericFhirAPITestMixin import GenericFhirAPITestMixin
 from api_fhir.tests.mixin.fhirApiReadTestMixin import FhirApiReadTestMixin
 from api_fhir.tests.mixin.fhirApiCreateTestMixin import FhirApiCreateTestMixin
