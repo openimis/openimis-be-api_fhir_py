@@ -1,8 +1,11 @@
 from claim.models import ClaimAdmin, Claim, Feedback
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from insuree.models import Insuree
 from location.models import HealthFacility
 
 from rest_framework import viewsets, mixins
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from api_fhir.paginations import FhirBundleResultsSetPagination
@@ -12,7 +15,8 @@ from api_fhir.serializers import PatientSerializer, LocationSerializer, Practiti
     CommunicationRequestSerializer
 
 
-class BaseFHIRView(object):
+@method_decorator(csrf_exempt, name='dispatch')
+class BaseFHIRView(APIView):
     pagination_class = FhirBundleResultsSetPagination
     permission_classes = (FHIRApiPermissions,)
 
