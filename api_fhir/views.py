@@ -1,10 +1,9 @@
 from claim.models import ClaimAdmin, Claim, Feedback
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 from insuree.models import Insuree
 from location.models import HealthFacility
 
 from rest_framework import viewsets, mixins
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
@@ -15,10 +14,16 @@ from api_fhir.serializers import PatientSerializer, LocationSerializer, Practiti
     CommunicationRequestSerializer
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+
+    def enforce_csrf(self, request):
+        return
+
+
 class BaseFHIRView(APIView):
     pagination_class = FhirBundleResultsSetPagination
     permission_classes = (FHIRApiPermissions,)
+    authentication_classes = [CsrfExemptSessionAuthentication] + APIView.settings.DEFAULT_AUTHENTICATION_CLASSES
 
 
 class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
