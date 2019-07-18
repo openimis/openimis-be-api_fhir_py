@@ -7,6 +7,7 @@ from rest_framework import status
 from api_fhir.configurations import Stu3IdentifierConfig
 from api_fhir.converters import BaseFHIRConverter
 from api_fhir.models import FHIRBaseObject, Bundle
+from api_fhir.utils import DbManagerUtils
 
 
 class GenericFhirAPITestMixin(object):
@@ -29,14 +30,14 @@ class GenericFhirAPITestMixin(object):
         self._test_request_data = json.loads(json_representation)
 
     def login(self):
-        user = User.objects.filter(username=self._TEST_SUPERUSER_NAME).first()
+        user = DbManagerUtils.get_object_or_none(User, username=self._TEST_SUPERUSER_NAME)
         if user is None:
             user = self.__create_superuser()
         self.client.force_authenticate(user=user)
 
     def __create_superuser(self):
         User.objects.create_superuser(username=self._TEST_SUPERUSER_NAME, password=self._TEST_SUPERUSER_PASS)
-        return User.objects.filter(username=self._TEST_SUPERUSER_NAME).first()
+        return DbManagerUtils.get_object_or_none(User, username=self._TEST_SUPERUSER_NAME)
 
     def get_bundle_from_json_response(self, response):
         bundle = FHIRBaseObject.loads(response.content, 'json')

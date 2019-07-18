@@ -6,7 +6,7 @@ from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, Referen
 from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus
 
 from api_fhir.models.address import AddressUse, AddressType
-from api_fhir.utils import TimeUtils
+from api_fhir.utils import TimeUtils, DbManagerUtils
 
 
 class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
@@ -52,7 +52,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
         imis_insuree_chf_id = cls.get_resource_id_from_reference(reference)
-        return Insuree.objects.filter(chf_id=imis_insuree_chf_id).first()
+        return DbManagerUtils.get_object_or_none(Insuree, chf_id=imis_insuree_chf_id)
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):

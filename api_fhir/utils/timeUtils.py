@@ -10,6 +10,10 @@ class TimeUtils(object):
         return core.datetime.datetime.now()
 
     @classmethod
+    def date(cls):
+        return core.datetime.datetime.date(cls.now())
+
+    @classmethod
     def str_to_date(cls, str_value):
         date = None
         try:

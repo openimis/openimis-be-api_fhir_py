@@ -1,0 +1,61 @@
+{
+  "resourceType": "CommunicationRequest",
+  "id": "1",
+  "identifier": [
+    {
+      "type": {
+        "coding": [
+          {
+            "code": "ACSN",
+            "system": "https://hl7.org/fhir/valueset-identifier-type.html"
+          }
+        ]
+      },
+      "use": "usual",
+      "value": "1"
+    }
+  ],
+  "occurrenceDateTime": "2010-11-16T00:00:00",
+  "reasonCode": [
+    {
+      "coding": [
+        {
+          "code": "care_rendered"
+        }
+      ],
+      "text": "True"
+    },
+    {
+      "coding": [
+        {
+          "code": "payment_asked"
+        }
+      ],
+      "text": "False"
+    },
+    {
+      "coding": [
+        {
+          "code": "drug_prescribed"
+        }
+      ],
+      "text": "True"
+    },
+    {
+      "coding": [
+        {
+          "code": "drug_received"
+        }
+      ],
+      "text": "False"
+    },
+    {
+      "coding": [
+        {
+          "code": "asessment"
+        }
+      ],
+      "text": "2"
+    }
+  ]
+}

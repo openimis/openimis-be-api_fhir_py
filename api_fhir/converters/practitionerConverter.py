@@ -4,7 +4,7 @@ from django.utils.translation import gettext
 from api_fhir.configurations import Stu3IdentifierConfig
 from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
 from api_fhir.models import Practitioner
-from api_fhir.utils import TimeUtils
+from api_fhir.utils import TimeUtils, DbManagerUtils
 
 
 class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
@@ -41,7 +41,7 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
         imis_claim_admin_code = cls.get_resource_id_from_reference(reference)
-        return ClaimAdmin.objects.filter(code=imis_claim_admin_code).first()
+        return DbManagerUtils.get_object_or_none(ClaimAdmin, code=imis_claim_admin_code)
 
     @classmethod
     def create_default_claim_admin(cls, audit_user_id):

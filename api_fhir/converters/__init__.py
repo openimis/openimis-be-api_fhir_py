@@ -39,11 +39,13 @@ class BaseFHIRConverter(ABC):
         return cls.build_codeable_concept(None, None, text)
 
     @classmethod
-    def build_codeable_concept(cls, code, system, text=None):
+    def build_codeable_concept(cls, code, system=None, text=None):
         codeable_concept = CodeableConcept()
         if code or system:
             coding = Coding()
             coding.system = system
+            if not isinstance(code, str):
+                code = str(code)
             coding.code = code
             codeable_concept.coding = [coding]
         codeable_concept.text = text
@@ -111,3 +113,5 @@ from api_fhir.converters.operationOutcomeConverter import OperationOutcomeConver
 from api_fhir.converters.practitionerConverter import PractitionerConverter
 from api_fhir.converters.practitionerRoleConverter import PractitionerRoleConverter
 from api_fhir.converters.eligibilityRequestConverter import EligibilityRequestConverter
+from api_fhir.converters.communicationRequestConverter import CommunicationRequestConverter
+from api_fhir.converters.claimResponseConverter import ClaimResponseConverter

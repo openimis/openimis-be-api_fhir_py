@@ -284,4 +284,9 @@ from api_fhir.models.claim import Claim, ClaimAccident, ClaimCareTeam, ClaimDiag
 from api_fhir.models.eligibilityRequest import EligibilityRequest
 from api_fhir.models.eligibilityResponse import EligibilityResponse, EligibilityResponseError, \
     EligibilityResponseInsurance, InsuranceBenefitBalance, InsuranceBenefitBalanceFinancial
-
+from api_fhir.models.claimResponse import ClaimResponse, ClaimResponseAddItem, ClaimResponseAddItemDetail, \
+    ClaimResponseError, ClaimResponseInsurance, ClaimResponseItem, ClaimResponseItemAdjudication, \
+    ClaimResponseItemDetail, ClaimResponseItemSubDetail, ClaimResponsePayment, ClaimResponseProcessNote
+from api_fhir.models.communicationRequest import CommunicationRequest, CommunicationRequestPayload, \
+    CommunicationRequestRequester
+from api_fhir.models.requestStatus import RequestStatus

@@ -28,6 +28,7 @@
   "facility": {
     "reference": "Location/12345678"
   },
+  "id": "code",
   "identifier": [
     {
       "type": {
@@ -56,6 +57,58 @@
       },
       "sequence": 2,
       "valueString": "explanation"
+    },
+    {
+      "category": {
+        "text": "item_explanation"
+      },
+      "sequence": 3,
+      "valueString": "item_explanation"
+    },
+    {
+      "category": {
+        "text": "item_explanation"
+      },
+      "sequence": 4,
+      "valueString": "service_explanation"
+    }
+  ],
+  "item": [
+    {
+      "category": {
+        "text": "item"
+      },
+      "informationLinkId": [
+        3
+      ],
+      "quantity": {
+        "value": 4
+      },
+      "sequence": 1,
+      "service": {
+        "text": "iCode"
+      },
+      "unitPrice": {
+        "value": 21.1
+      }
+    },
+    {
+      "category": {
+        "text": "service"
+      },
+      "informationLinkId": [
+        4
+      ],
+      "quantity": {
+        "value": 3
+      },
+      "sequence": 2,
+      "service": {
+        "text": "sCode"
+      },
+      "unitPrice": {
+        "value": 16.1
+      }
     }
   ],
   "patient": {

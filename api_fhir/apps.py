@@ -53,8 +53,19 @@ DEFAULT_CFG = {
     "stu3_fhir_claim_config": {
         "fhir_claim_information_guarantee_id_code": "guarantee_id",
         "fhir_claim_information_explanation_code": "explanation",
+        "fhir_claim_item_explanation_code": "item_explanation",
         "fhir_claim_item_code": "item",
-        "fhir_claim_service_code": "service"
+        "fhir_claim_service_code": "service",
+        "fhir_claim_status_rejected_code": "rejected",
+        "fhir_claim_status_entered_code": "entered",
+        "fhir_claim_status_checked_code": "checked",
+        "fhir_claim_status_processed_code": "processed",
+        "fhir_claim_status_valuated_code": "valuated",
+        "fhir_claim_item_status_code": "claim_item_status",
+        "fhir_claim_item_status_passed_code": "passed",
+        "fhir_claim_item_status_rejected_code": "rejected",
+        "fhir_claim_item_general_adjudication_code": "general",
+        "fhir_claim_item_rejected_reason_adjudication_code": "rejected_reason",
     },
     "stu3_fhir_eligibility_config": {
         "fhir_item_code": "item",
@@ -74,8 +85,16 @@ DEFAULT_CFG = {
         "fhir_item_left_code": "item_left",
         "fhir_is_item_ok_code": "is_item_ok",
         "fhir_is_service_ok_code": "is_service_ok"
+    },
+    "stu3_fhir_communication_request_config": {
+        "fhir_care_rendered_code": "care_rendered",
+        "fhir_payment_asked_code": "payment_asked",
+        "fhir_drug_prescribed_code": "drug_prescribed",
+        "fhir_drug_received_code": "drug_received",
+        "fhir_asessment_code": "asessment"
     }
 }
+
 
 class ApiFhirConfig(AppConfig):
     name = MODULE_NAME
