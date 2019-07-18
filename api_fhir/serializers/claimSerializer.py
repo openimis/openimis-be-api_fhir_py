@@ -1,5 +1,6 @@
 from claim import ClaimSubmitService, ClaimSubmit
 from claim.models import Claim
+from django.shortcuts import get_object_or_404
 
 from api_fhir.converters import ClaimResponseConverter
 from api_fhir.converters.claimConverter import ClaimConverter
@@ -35,5 +36,5 @@ class ClaimSerializer(BaseFHIRSerializer):
         return self.create_claim_response(validated_data.get('code'))
 
     def create_claim_response(self, claim_code):
-        claim = Claim.objects.filter(code=claim_code).first()
+        claim = get_object_or_404(Claim, code=claim_code)
         return ClaimResponseConverter.to_fhir_obj(claim)

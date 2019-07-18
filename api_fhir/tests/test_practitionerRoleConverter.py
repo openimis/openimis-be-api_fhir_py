@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 
-from api_fhir.converters import PractitionerRoleConverter
+from api_fhir.converters import PractitionerRoleConverter, PractitionerConverter, LocationConverter
 from api_fhir.models import FHIRBaseObject
 from api_fhir.tests import PractitionerRoleTestMixin
 
@@ -21,12 +21,12 @@ class PractitionerRoleConverterTestCase(PractitionerRoleTestMixin):
         fhir_practitioner_role = PractitionerRoleConverter.to_fhir_obj(imis_claim_admin)
         self.verify_fhir_instance(fhir_practitioner_role)
 
-    @mock.patch('location.models.HealthFacility.objects')
-    @mock.patch('claim.models.ClaimAdmin.objects')
-    def test_to_imis_obj(self, mock_claim_admin, mock_hf):
+    @mock.patch.object(LocationConverter, 'get_imis_obj_by_fhir_reference')
+    @mock.patch.object(PractitionerConverter, 'get_imis_obj_by_fhir_reference')
+    def test_to_imis_obj(self, mock_pc, mock_hf):
         self.setUp()
-        mock_hf.filter().first.return_value = self._TEST_HF
-        mock_claim_admin.filter().first.return_value = self._TEST_CLAIM_ADMIN
+        mock_hf.return_value = self._TEST_HF
+        mock_pc.return_value = self._TEST_CLAIM_ADMIN
 
         fhir_practitioner_role = self.create_test_fhir_instance()
         imis_claim_admin = PractitionerRoleConverter.to_imis_obj(fhir_practitioner_role, None)

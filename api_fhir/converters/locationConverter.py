@@ -6,7 +6,7 @@ from api_fhir.converters import BaseFHIRConverter, ReferenceConverterMixin
 from api_fhir.models import Location, ContactPointSystem, ContactPointUse
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.models.imisModelEnums import ImisHfLevel
-from api_fhir.utils import TimeUtils
+from api_fhir.utils import TimeUtils, DbManagerUtils
 
 
 class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -45,7 +45,7 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
         location_code = cls.get_resource_id_from_reference(reference)
-        return HealthFacility.objects.filter(code=location_code).first()
+        return DbManagerUtils.get_object_or_none(HealthFacility, code=location_code)
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):

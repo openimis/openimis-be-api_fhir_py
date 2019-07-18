@@ -7,7 +7,7 @@ from api_fhir.converters import BaseFHIRConverter, LocationConverter, PatientCon
     ReferenceConverterMixin
 from api_fhir.models import Claim as FHIRClaim, ClaimItem as FHIRClaimItem, Period, ClaimDiagnosis, Money, \
     ImisClaimIcdTypes, ClaimInformation, Quantity
-from api_fhir.utils import TimeUtils
+from api_fhir.utils import TimeUtils, FhirUtils, DbManagerUtils
 
 
 class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -58,7 +58,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
         imis_claim_code = cls.get_resource_id_from_reference(reference)
-        return Claim.objects.filter(code=imis_claim_code).first()
+        return DbManagerUtils.get_object_or_none(Claim, code=imis_claim_code)
 
     @classmethod
     def build_imis_date_claimed(cls, imis_claim, fhir_claim, errors):
@@ -137,7 +137,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_fhir_diagnosis(cls, diagnoses, icd_code, icd_type):
         claim_diagnosis = ClaimDiagnosis()
-        claim_diagnosis.sequence = len(diagnoses) + 1
+        claim_diagnosis.sequence = FhirUtils.get_next_array_sequential_id(diagnoses)
         claim_diagnosis.diagnosisCodeableConcept = cls.build_codeable_concept(icd_code, None)
         claim_diagnosis.type = [cls.build_simple_codeable_concept(icd_type)]
         diagnoses.append(claim_diagnosis)
@@ -186,7 +186,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
     def get_claim_diagnosis_code_by_id(cls, diagnosis_id):
         code = None
         if diagnosis_id is not None:
-            diagnosis = ClaimDiagnosisCode.objects.filter(pk=diagnosis_id).first()
+            diagnosis = DbManagerUtils.get_object_or_none(ClaimDiagnosisCode, pk=diagnosis_id)
             if diagnosis:
                 code = diagnosis.code
         return code
@@ -260,7 +260,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         result = None
         if value_string:
             information_concept = ClaimInformation()
-            information_concept.sequence = len(claim_information) + 1
+            information_concept.sequence = FhirUtils.get_next_array_sequential_id(claim_information)
             information_concept.category = cls.build_simple_codeable_concept(code)
             information_concept.valueString = value_string
             claim_information.append(information_concept)
@@ -289,7 +289,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_fhir_item(cls, fhir_claim, code, item_type, item):
         fhir_item = FHIRClaimItem()
-        fhir_item.sequence = len(fhir_claim.item) + 1
+        fhir_item.sequence = FhirUtils.get_next_array_sequential_id(fhir_claim.item)
         unit_price = Money()
         unit_price.value = item.price_asked
         fhir_item.unitPrice = unit_price

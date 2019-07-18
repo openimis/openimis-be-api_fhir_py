@@ -3,6 +3,7 @@ from claim.models import Feedback
 from api_fhir.configurations import Stu3CommunicationRequestConfig as Config
 from api_fhir.converters import BaseFHIRConverter, ReferenceConverterMixin
 from api_fhir.models import CommunicationRequest, RequestStatus
+from api_fhir.utils import DbManagerUtils
 
 
 class CommunicationRequestConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -28,7 +29,7 @@ class CommunicationRequestConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
         imis_feedback_id = cls.get_resource_id_from_reference(reference)
-        return Feedback.objects.filter(pk=imis_feedback_id).first()
+        return DbManagerUtils.get_object_or_none(Feedback, pk=imis_feedback_id)
 
     @classmethod
     def build_fhir_occurrence_datetime(cls, fhir_communication_request, imis_feedback):

@@ -7,7 +7,7 @@ from api_fhir.converters import BaseFHIRConverter, CommunicationRequestConverter
 from api_fhir.converters.claimConverter import ClaimConverter
 from api_fhir.models import ClaimResponse, Money, ClaimResponsePayment, ClaimResponseError, ClaimResponseItem, Claim, \
     ClaimResponseItemAdjudication, ClaimResponseProcessNote
-from api_fhir.utils import TimeUtils
+from api_fhir.utils import TimeUtils, FhirUtils
 
 
 class ClaimResponseConverter(BaseFHIRConverter):
@@ -166,7 +166,7 @@ class ClaimResponseConverter(BaseFHIRConverter):
         result = None
         if string_value:
             note = ClaimResponseProcessNote()
-            note.number = len(fhir_claim_response.processNote) + 1
+            note.number = FhirUtils.get_next_array_sequential_id(fhir_claim_response.processNote)
             note.text = string_value
             fhir_claim_response.processNote.append(note)
             result = note
