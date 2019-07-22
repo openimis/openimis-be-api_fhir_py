@@ -14,6 +14,7 @@ class ImisHfLevel(Enum):
     HOSPITAL = "H"
     DISPENSARY = "D"
 
+
 class ImisClaimIcdTypes(Enum):
     ICD_0 = "icd_0"
     ICD_1 = "icd_1"

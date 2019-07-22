@@ -3,6 +3,7 @@ import copy
 from insuree.models import Insuree, Gender
 
 from api_fhir.converters import PatientConverter
+from api_fhir.exceptions import FHIRException
 from api_fhir.serializers import BaseFHIRSerializer
 
 
@@ -10,6 +11,9 @@ class PatientSerializer(BaseFHIRSerializer):
     fhirConverter = PatientConverter()
 
     def create(self, validated_data):
+        chf_id = validated_data.get('chf_id')
+        if Insuree.objects.filter(chf_id=chf_id).count() > 0:
+            raise FHIRException('Exists patient with following chfid `{}`'.format(chf_id))
         copied_data = copy.deepcopy(validated_data)
         del copied_data['_state']
         return Insuree.objects.create(**copied_data)
@@ -35,6 +39,3 @@ class PatientSerializer(BaseFHIRSerializer):
         instance.audit_user_id = self.get_audit_user_id()
         instance.save()
         return instance
-
-    class Meta:
-        app_label = 'api_fhir'

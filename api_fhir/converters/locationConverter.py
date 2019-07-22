@@ -6,7 +6,7 @@ from api_fhir.converters import BaseFHIRConverter, ReferenceConverterMixin
 from api_fhir.models import Location, ContactPointSystem, ContactPointUse
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.models.imisModelEnums import ImisHfLevel
-from api_fhir.utils import TimeUtils
+from api_fhir.utils import TimeUtils, DbManagerUtils
 
 
 class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -14,6 +14,7 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def to_fhir_obj(cls, imis_hf):
         fhir_location = Location()
+        cls.build_fhir_pk(fhir_location, imis_hf.id)
         cls.build_fhir_location_identifier(fhir_location, imis_hf)
         cls.build_fhir_location_name(fhir_location, imis_hf)
         cls.build_fhir_location_type(fhir_location, imis_hf)
@@ -43,14 +44,8 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        health_facility = None
-        if reference:
-            location_code = cls._get_resource_id_from_reference(reference)
-            if not cls.valid_condition(location_code is None,
-                                       gettext('Could not fetch Location id from reference').format(reference),
-                                       errors):
-                health_facility = HealthFacility.objects.filter(code=location_code).first()
-        return health_facility
+        location_code = cls.get_resource_id_from_reference(reference)
+        return DbManagerUtils.get_object_or_none(HealthFacility, code=location_code)
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):
@@ -80,18 +75,10 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_imis_hf_identiftier(cls, imis_hf, fhir_location, errors):
-        identifiers = fhir_location.identifier
-        if identifiers is not None:
-            for identifier in identifiers:
-                identifier_type = identifier.type
-                if identifier_type:
-                    coding_list = identifier_type.coding
-                    if coding_list:
-                        first_code = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_code.system == Stu3IdentifierConfig.get_fhir_identifier_type_system() \
-                                and first_code.code == Stu3IdentifierConfig.get_fhir_facility_id_type() \
-                                and identifier.value:
-                            imis_hf.code = identifier.value
+        value = cls.get_fhir_identifier_by_code(fhir_location.identifier,
+                                                Stu3IdentifierConfig.get_fhir_facility_id_type())
+        if value:
+            imis_hf.code = value
         cls.valid_condition(imis_hf.code is None, gettext('Missing hf code'), errors)
 
     @classmethod
@@ -175,6 +162,3 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
                     imis_hf.fax = contact_point.value
                 elif contact_point.system == ContactPointSystem.EMAIL.value:
                     imis_hf.email = contact_point.value
-
-    class Meta:
-        app_label = 'api_fhir'

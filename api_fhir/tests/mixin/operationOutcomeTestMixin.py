@@ -2,7 +2,7 @@ from api_fhir.configurations import Stu3IssueTypeConfig
 from api_fhir.converters import BaseFHIRConverter, OperationOutcomeConverter
 from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.models import IssueSeverity, CodeableConcept
-from mixin.genericTestMixin import GenericTestMixin
+from api_fhir.tests import GenericTestMixin
 
 
 class OperationOutcomeTestMixin(GenericTestMixin):
@@ -18,7 +18,6 @@ class OperationOutcomeTestMixin(GenericTestMixin):
     def create_test_fhir_instance(self):
         exc = self.create_test_imis_instance()
         return OperationOutcomeConverter.to_fhir_obj(exc)
-
 
     def verify_fhir_instance(self, fhir_obj):
             issues = fhir_obj.issue

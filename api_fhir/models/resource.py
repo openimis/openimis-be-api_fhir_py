@@ -7,6 +7,3 @@ class Resource(FHIRBaseObject):
     meta = Property('meta', 'Meta')
     implicitRules = Property('implicitRules', str)
     language = Property('language', str)  # code
-
-    class Meta:
-        app_label = 'api_fhir'

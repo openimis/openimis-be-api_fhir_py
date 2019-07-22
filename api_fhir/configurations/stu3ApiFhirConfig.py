@@ -1,5 +1,6 @@
 from api_fhir.configurations import BaseApiFhirConfiguration, Stu3IdentifierConfig, \
-    Stu3LocationConfig, Stu3MaritalConfig, Stu3IssueTypeConfig, Stu3ClaimConfig
+    Stu3LocationConfig, Stu3MaritalConfig, Stu3IssueTypeConfig, Stu3ClaimConfig, Stu3EligibilityConfiguration, \
+    Stu3CommunicationRequestConfig
 
 
 class Stu3ApiFhirConfig(BaseApiFhirConfiguration):
@@ -24,5 +25,10 @@ class Stu3ApiFhirConfig(BaseApiFhirConfiguration):
     def get_claim_configuration(cls):
         return Stu3ClaimConfig
 
-    class Meta:
-        app_label = 'api_fhir'
+    @classmethod
+    def get_eligibility_configuration(cls):
+        return Stu3EligibilityConfiguration
+
+    @classmethod
+    def get_communication_request_configuration(cls):
+        return Stu3CommunicationRequestConfig

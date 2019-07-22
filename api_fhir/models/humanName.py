@@ -13,9 +13,6 @@ class HumanName(Element):
     text = Property('text', str)
     use = Property('use', str)  # NameUse
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class NameUse(Enum):
     USUAL = "usual"

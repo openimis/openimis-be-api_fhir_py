@@ -6,7 +6,7 @@ from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, Referen
 from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus
 
 from api_fhir.models.address import AddressUse, AddressType
-from api_fhir.utils import TimeUtils
+from api_fhir.utils import TimeUtils, DbManagerUtils
 
 
 class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
@@ -14,6 +14,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     @classmethod
     def to_fhir_obj(cls, imis_insuree):
         fhir_patient = Patient()
+        cls.build_fhir_pk(fhir_patient, imis_insuree.id)
         cls.build_human_names(fhir_patient, imis_insuree)
         cls.build_fhir_identifiers(fhir_patient, imis_insuree)
         cls.build_fhir_birth_date(fhir_patient, imis_insuree)
@@ -50,14 +51,8 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        imis_insuree = None
-        if reference:
-            imis_insuree_chf_id = cls._get_resource_id_from_reference(reference)
-            if not cls.valid_condition(imis_insuree_chf_id is None,
-                                       gettext('Could not fetch Patient id from reference').format(reference),
-                                       errors):
-                imis_insuree = Insuree.objects.filter(chf_id=imis_insuree_chf_id).first()
-        return imis_insuree
+        imis_insuree_chf_id = cls.get_resource_id_from_reference(reference)
+        return DbManagerUtils.get_object_or_none(Insuree, chf_id=imis_insuree_chf_id)
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):
@@ -91,21 +86,14 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
     @classmethod
     def build_imis_identifiers(cls, imis_insuree, fhir_patient):
-        identifiers = fhir_patient.identifier
-        if identifiers is not None:
-            for identifier in identifiers:
-                identifier_type = identifier.type
-                if identifier_type:
-                    coding_list = identifier_type.coding
-                    if coding_list:
-                        first_coding = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system():
-                            code = first_coding.code
-                            value = identifier.value
-                            if value and code == Stu3IdentifierConfig.get_fhir_chfid_type_code():
-                                imis_insuree.chf_id = value
-                            if value and code == Stu3IdentifierConfig.get_fhir_passport_type_code():
-                                imis_insuree.passport = value
+        value = cls.get_fhir_identifier_by_code(fhir_patient.identifier,
+                                                Stu3IdentifierConfig.get_fhir_chfid_type_code())
+        if value:
+            imis_insuree.chf_id = value
+        value = cls.get_fhir_identifier_by_code(fhir_patient.identifier,
+                                                Stu3IdentifierConfig.get_fhir_passport_type_code())
+        if value:
+            imis_insuree.passport = value
 
     @classmethod
     def build_fhir_chfid_identifier(cls, identifiers, imis_insuree):
@@ -234,6 +222,3 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                     imis_insuree.current_address = address.text
                 elif address.type == AddressType.BOTH.value:
                     imis_insuree.geolocation = address.text
-
-    class Meta:
-        app_label = 'api_fhir'

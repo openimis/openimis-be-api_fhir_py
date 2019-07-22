@@ -1,0 +1,22 @@
+{
+  "resourceType": "EligibilityRequest",
+  "benefitCategory": {
+    "coding": [
+      {
+        "code": "service"
+      }
+    ],
+    "text": "serviceCode"
+  },
+  "benefitSubCategory": {
+    "coding": [
+      {
+        "code": "item"
+      }
+    ],
+    "text": "itemCode"
+  },
+  "patient": {
+    "reference": "Patient/chfid"
+  }
+}

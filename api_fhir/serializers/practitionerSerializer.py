@@ -3,6 +3,7 @@ import copy
 from claim.models import ClaimAdmin
 
 from api_fhir.converters import PractitionerConverter
+from api_fhir.exceptions import FHIRException
 from api_fhir.serializers import BaseFHIRSerializer
 
 
@@ -11,6 +12,9 @@ class PractitionerSerializer(BaseFHIRSerializer):
     fhirConverter = PractitionerConverter()
 
     def create(self, validated_data):
+        code = validated_data.get('code')
+        if ClaimAdmin.objects.filter(code=code).count() > 0:
+            raise FHIRException('Exists practitioner with following code `{}`'.format(code))
         copied_data = copy.deepcopy(validated_data)
         del copied_data['_state']
         return ClaimAdmin.objects.create(**copied_data)
@@ -25,6 +29,3 @@ class PractitionerSerializer(BaseFHIRSerializer):
         instance.audit_user_id = self.get_audit_user_id()
         instance.save()
         return instance
-
-    class Meta:
-        app_label = 'api_fhir'

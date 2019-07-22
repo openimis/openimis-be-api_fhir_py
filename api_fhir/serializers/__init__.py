@@ -12,6 +12,8 @@ class BaseFHIRSerializer(serializers.Serializer):
     def to_representation(self, obj):
         if isinstance(obj, HttpResponseBase):
             return OperationOutcomeConverter.to_fhir_obj(obj).toDict()
+        elif isinstance(obj, FHIRBaseObject):
+            return obj.toDict()
         return self.fhirConverter.to_fhir_obj(obj).toDict()
 
     def to_internal_value(self, data):
@@ -21,10 +23,10 @@ class BaseFHIRSerializer(serializers.Serializer):
         return self.fhirConverter.to_imis_obj(data, audit_user_id).__dict__
 
     def create(self, validated_data):
-        raise NotImplementedError('`create()` must be implemented.')
+        raise NotImplementedError('`create()` must be implemented.')  # pragma: no cover
 
     def update(self, instance, validated_data):
-        raise NotImplementedError('`update()` must be implemented.')
+        raise NotImplementedError('`update()` must be implemented.')  # pragma: no cover
 
     def get_audit_user_id(self):
         request = self.context.get("request")
@@ -39,3 +41,6 @@ from api_fhir.serializers.locationSerializer import LocationSerializer
 from api_fhir.serializers.practitionerRoleSerializer import PractitionerRoleSerializer
 from api_fhir.serializers.practitionerSerializer import PractitionerSerializer
 from api_fhir.serializers.claimSerializer import ClaimSerializer
+from api_fhir.serializers.eligibilityRequestSerializer import EligibilityRequestSerializer
+from api_fhir.serializers.claimResponseSerializer import ClaimResponseSerializer
+from api_fhir.serializers.communicationRequestSerializer import CommunicationRequestSerializer

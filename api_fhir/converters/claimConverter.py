@@ -3,17 +3,19 @@ from claim.models import Claim, ClaimDiagnosisCode, ClaimItem, ClaimService
 from django.utils.translation import gettext
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
-from api_fhir.converters import BaseFHIRConverter, LocationConverter, PatientConverter, PractitionerConverter
+from api_fhir.converters import BaseFHIRConverter, LocationConverter, PatientConverter, PractitionerConverter, \
+    ReferenceConverterMixin
 from api_fhir.models import Claim as FHIRClaim, ClaimItem as FHIRClaimItem, Period, ClaimDiagnosis, Money, \
     ImisClaimIcdTypes, ClaimInformation, Quantity
-from api_fhir.utils import TimeUtils
+from api_fhir.utils import TimeUtils, FhirUtils, DbManagerUtils
 
 
-class ClaimConverter(BaseFHIRConverter):
+class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_claim):
         fhir_claim = FHIRClaim()
+        cls.build_fhir_pk(fhir_claim, imis_claim.code)
         fhir_claim.created = imis_claim.date_claimed.isoformat()
         fhir_claim.facility = LocationConverter.build_fhir_resource_reference(imis_claim.health_facility)
         cls.build_fhir_identifiers(fhir_claim, imis_claim)
@@ -46,6 +48,19 @@ class ClaimConverter(BaseFHIRConverter):
         return imis_claim
 
     @classmethod
+    def get_reference_obj_id(cls, imis_claim):
+        return imis_claim.code
+
+    @classmethod
+    def get_fhir_resource_type(cls):
+        return FHIRClaim
+
+    @classmethod
+    def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
+        imis_claim_code = cls.get_resource_id_from_reference(reference)
+        return DbManagerUtils.get_object_or_none(Claim, code=imis_claim_code)
+
+    @classmethod
     def build_imis_date_claimed(cls, imis_claim, fhir_claim, errors):
         if fhir_claim.created:
             imis_claim.date_claimed = TimeUtils.str_to_date(fhir_claim.created)
@@ -63,19 +78,9 @@ class ClaimConverter(BaseFHIRConverter):
 
     @classmethod
     def build_imis_identifier(cls, imis_claim, fhir_claim, errors):
-        identifiers = fhir_claim.identifier
-        if identifiers:
-            for identifier in identifiers:
-                identifier_type = identifier.type
-                if identifier_type:
-                    coding_list = identifier_type.coding
-                    if coding_list:
-                        first_coding = cls.get_first_coding_from_codeable_concept(identifier_type)
-                        if first_coding.system == Stu3IdentifierConfig.get_fhir_identifier_type_system():
-                            code = first_coding.code
-                            value = identifier.value
-                            if value and code == Stu3IdentifierConfig.get_fhir_claim_code_type():
-                                imis_claim.code = value
+        value = cls.get_fhir_identifier_by_code(fhir_claim.identifier, Stu3IdentifierConfig.get_fhir_claim_code_type())
+        if value:
+            imis_claim.code = value
         cls.valid_condition(imis_claim.code is None, gettext('Missing the claim code'), errors)
 
     @classmethod
@@ -132,7 +137,7 @@ class ClaimConverter(BaseFHIRConverter):
     @classmethod
     def build_fhir_diagnosis(cls, diagnoses, icd_code, icd_type):
         claim_diagnosis = ClaimDiagnosis()
-        claim_diagnosis.sequence = len(diagnoses) + 1
+        claim_diagnosis.sequence = FhirUtils.get_next_array_sequential_id(diagnoses)
         claim_diagnosis.diagnosisCodeableConcept = cls.build_codeable_concept(icd_code, None)
         claim_diagnosis.type = [cls.build_simple_codeable_concept(icd_type)]
         diagnoses.append(claim_diagnosis)
@@ -181,7 +186,7 @@ class ClaimConverter(BaseFHIRConverter):
     def get_claim_diagnosis_code_by_id(cls, diagnosis_id):
         code = None
         if diagnosis_id is not None:
-            diagnosis = ClaimDiagnosisCode.objects.filter(pk=diagnosis_id).first()
+            diagnosis = DbManagerUtils.get_object_or_none(ClaimDiagnosisCode, pk=diagnosis_id)
             if diagnosis:
                 code = diagnosis.code
         return code
@@ -235,63 +240,69 @@ class ClaimConverter(BaseFHIRConverter):
 
     @classmethod
     def build_fhir_information(cls, fhir_claim, imis_claim):
-        claim_information = []
-        cls.build_fhir_guarantee_id_information(claim_information, imis_claim.guarantee_id)
-        fhir_claim.information = claim_information
+        guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
+        cls.build_fhir_string_information(fhir_claim.information, guarantee_id_code, imis_claim.guarantee_id)
+        explanation_code = Stu3ClaimConfig.get_fhir_claim_information_explanation_code()
+        cls.build_fhir_string_information(fhir_claim.information, explanation_code, imis_claim.explanation)
 
     @classmethod
     def build_imis_information(cls, imis_claim, fhir_claim):
         if fhir_claim.information:
             for information in fhir_claim.information:
-                guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
                 category = information.category
-                if category and category.text == guarantee_id_code:
+                if category and category.text == Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code():
                     imis_claim.guarantee_id = information.valueString
+                elif category and category.text == Stu3ClaimConfig.get_fhir_claim_information_explanation_code():
+                    imis_claim.explanation = information.valueString
 
     @classmethod
-    def build_fhir_guarantee_id_information(cls, claim_information, guarantee_id):
-        if guarantee_id:
+    def build_fhir_string_information(cls, claim_information, code, value_string):
+        result = None
+        if value_string:
             information_concept = ClaimInformation()
-            information_concept.sequence = len(claim_information) + 1
-            guarantee_id_code = Stu3ClaimConfig.get_fhir_claim_information_guarantee_id_code()
-            information_concept.category = cls.build_simple_codeable_concept(guarantee_id_code)
-            information_concept.valueString = guarantee_id
+            information_concept.sequence = FhirUtils.get_next_array_sequential_id(claim_information)
+            information_concept.category = cls.build_simple_codeable_concept(code)
+            information_concept.valueString = value_string
             claim_information.append(information_concept)
+            result = information_concept
+        return result
 
     @classmethod
     def build_fhir_items(cls, fhir_claim, imis_claim):
-        fhir_items = []
-        cls.build_items_for_imis_item(fhir_items, imis_claim)
-        cls.build_items_for_imis_services(fhir_items, imis_claim)
-        fhir_claim.item = fhir_items
+        cls.build_items_for_imis_item(fhir_claim, imis_claim)
+        cls.build_items_for_imis_services(fhir_claim, imis_claim)
 
     @classmethod
-    def build_items_for_imis_item(cls, fhir_items, imis_claim):
+    def build_items_for_imis_item(cls, fhir_claim, imis_claim):
         for item in cls.get_imis_items_for_claim(imis_claim):
             if item.item:
                 type = Stu3ClaimConfig.get_fhir_claim_item_code()
-                cls.build_fhir_item(fhir_items, item.price_asked, item.qty_provided, item.item.code, type)
+                cls.build_fhir_item(fhir_claim, item.item.code, type, item)
 
     @classmethod
-    def build_items_for_imis_services(cls, fhir_items, imis_claim):
+    def build_items_for_imis_services(cls, fhir_claim, imis_claim):
         for service in cls.get_imis_services_for_claim(imis_claim):
             if service.service:
                 type = Stu3ClaimConfig.get_fhir_claim_service_code()
-                cls.build_fhir_item(fhir_items, service.price_asked, service.qty_provided, service.service.code, type)
+                cls.build_fhir_item(fhir_claim, service.service.code, type, service)
 
     @classmethod
-    def build_fhir_item(cls, fhir_items, price, quantity, code, item_type):
+    def build_fhir_item(cls, fhir_claim, code, item_type, item):
         fhir_item = FHIRClaimItem()
-        fhir_item.sequence = len(fhir_items) + 1
+        fhir_item.sequence = FhirUtils.get_next_array_sequential_id(fhir_claim.item)
         unit_price = Money()
-        unit_price.value = price
+        unit_price.value = item.price_asked
         fhir_item.unitPrice = unit_price
         fhir_quantity = Quantity()
-        fhir_quantity.value = quantity
+        fhir_quantity.value = item.qty_provided
         fhir_item.quantity = fhir_quantity
         fhir_item.service = cls.build_simple_codeable_concept(code)
         fhir_item.category = cls.build_simple_codeable_concept(item_type)
-        fhir_items.append(fhir_item)
+        item_explanation_code = Stu3ClaimConfig.get_fhir_claim_item_explanation_code()
+        information = cls.build_fhir_string_information(fhir_claim.information, item_explanation_code, item.explanation)
+        if information:
+            fhir_item.informationLinkId = [information.sequence]
+        fhir_claim.item.append(fhir_item)
 
     @classmethod
     def get_imis_items_for_claim(cls, imis_claim):
@@ -302,10 +313,10 @@ class ClaimConverter(BaseFHIRConverter):
 
     @classmethod
     def get_imis_services_for_claim(cls, imis_claim):
-        items = []
+        services = []
         if imis_claim and imis_claim.id:
-            items = ClaimService.objects.filter(claim_id=imis_claim.id)
-        return items
+            services = ClaimService.objects.filter(claim_id=imis_claim.id)
+        return services
 
     @classmethod
     def build_imis_submit_items_and_services(cls, imis_claim, fhir_claim):
@@ -318,31 +329,41 @@ class ClaimConverter(BaseFHIRConverter):
                         cls.build_imis_submit_item(imis_items, item)
                     elif item.category.text == Stu3ClaimConfig.get_fhir_claim_service_code():
                         cls.build_imis_submit_service(imis_services, item)
+        # added additional attributes which will be used to create ClaimRequest in serializer
         imis_claim.submit_items = imis_items
         imis_claim.submit_services = imis_services
 
     @classmethod
     def build_imis_submit_item(cls, imis_items, fhir_item):
-        price_asked = None
-        qty_provided = None
-        item_code = None
-        if fhir_item.unitPrice:
-            price_asked = fhir_item.unitPrice.value
-        if fhir_item.quantity:
-            qty_provided = fhir_item.quantity.value
-        if fhir_item.service:
-            item_code = fhir_item.service.text
+        price_asked = cls.get_fhir_item_price_asked(fhir_item)
+        qty_provided = cls.get_fhir_item_qty_provided(fhir_item)
+        item_code = cls.get_fhir_item_code(fhir_item)
         imis_items.append(ClaimItemSubmit(item_code, qty_provided, price_asked))
 
     @classmethod
     def build_imis_submit_service(cls, imis_services, fhir_item):
-        price_asked = None
+        price_asked = cls.get_fhir_item_price_asked(fhir_item)
+        qty_provided = cls.get_fhir_item_qty_provided(fhir_item)
+        service_code = cls.get_fhir_item_code(fhir_item)
+        imis_services.append(ClaimServiceSubmit(service_code, qty_provided, price_asked))
+
+    @classmethod
+    def get_fhir_item_code(cls, fhir_item):
+        item_code = None
+        if fhir_item.service:
+            item_code = fhir_item.service.text
+        return item_code
+
+    @classmethod
+    def get_fhir_item_qty_provided(cls, fhir_item):
         qty_provided = None
-        service_code = None
-        if fhir_item.unitPrice:
-            price_asked = fhir_item.unitPrice.value
         if fhir_item.quantity:
             qty_provided = fhir_item.quantity.value
-        if fhir_item.service:
-            service_code = fhir_item.service.text
-        imis_services.append(ClaimServiceSubmit(service_code, qty_provided, price_asked))
+        return qty_provided
+
+    @classmethod
+    def get_fhir_item_price_asked(cls, fhir_item):
+        price_asked = None
+        if fhir_item.unitPrice:
+            price_asked = fhir_item.unitPrice.value
+        return price_asked

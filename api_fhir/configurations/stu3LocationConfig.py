@@ -23,6 +23,3 @@ class Stu3LocationConfig(LocationConfiguration):
     @classmethod
     def get_fhir_code_for_health_center(cls):
         return cls.get_config().stu3_fhir_location_role_type.get('fhir_code_for_health_center', "PC")
-
-    class Meta:
-        app_label = 'api_fhir'

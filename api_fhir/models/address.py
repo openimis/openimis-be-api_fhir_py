@@ -16,9 +16,6 @@ class Address(Element):
     type = Property('type', str)  # postal | physical | both
     use = Property('use', str)  # home | work | temp | old
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class AddressUse(Enum):
     HOME = "home"

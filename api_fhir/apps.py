@@ -21,6 +21,7 @@ DEFAULT_CFG = {
     "default_value_of_patient_card_issued_attribute": False,
     "default_value_of_location_offline_attribute": False,
     "default_value_of_location_care_type": "B",
+    "default_response_page_size": 10,
     "stu3_fhir_identifier_type_config": {
         "system": "https://hl7.org/fhir/valueset-identifier-type.html",
         "fhir_code_for_imis_db_id_type": "ACSN",
@@ -51,10 +52,49 @@ DEFAULT_CFG = {
     },
     "stu3_fhir_claim_config": {
         "fhir_claim_information_guarantee_id_code": "guarantee_id",
+        "fhir_claim_information_explanation_code": "explanation",
+        "fhir_claim_item_explanation_code": "item_explanation",
         "fhir_claim_item_code": "item",
-        "fhir_claim_service_code": "service"
+        "fhir_claim_service_code": "service",
+        "fhir_claim_status_rejected_code": "rejected",
+        "fhir_claim_status_entered_code": "entered",
+        "fhir_claim_status_checked_code": "checked",
+        "fhir_claim_status_processed_code": "processed",
+        "fhir_claim_status_valuated_code": "valuated",
+        "fhir_claim_item_status_code": "claim_item_status",
+        "fhir_claim_item_status_passed_code": "passed",
+        "fhir_claim_item_status_rejected_code": "rejected",
+        "fhir_claim_item_general_adjudication_code": "general",
+        "fhir_claim_item_rejected_reason_adjudication_code": "rejected_reason",
+    },
+    "stu3_fhir_eligibility_config": {
+        "fhir_item_code": "item",
+        "fhir_service_code": "service",
+        "fhir_total_admissions_code": "total_admissions",
+        "fhir_total_visits_code": "total_visits",
+        "fhir_total_consultations_code": "total_consultations",
+        "fhir_total_surgeries_code": "total_surgeries",
+        "fhir_total_deliveries_code": "total_deliveries",
+        "fhir_total_antenatal_code": "total_antenatal",
+        "fhir_consultation_amount_code": "consultation_amount",
+        "fhir_surgery_amount_code": "surgery_amount",
+        "fhir_delivery_amount_code": "delivery_amount",
+        "fhir_hospitalization_amount_code": "hospitalization_amount",
+        "fhir_antenatal_amount_code": "antenatal_amount",
+        "fhir_service_left_code": "service_left",
+        "fhir_item_left_code": "item_left",
+        "fhir_is_item_ok_code": "is_item_ok",
+        "fhir_is_service_ok_code": "is_service_ok"
+    },
+    "stu3_fhir_communication_request_config": {
+        "fhir_care_rendered_code": "care_rendered",
+        "fhir_payment_asked_code": "payment_asked",
+        "fhir_drug_prescribed_code": "drug_prescribed",
+        "fhir_drug_received_code": "drug_received",
+        "fhir_asessment_code": "asessment"
     }
 }
+
 
 class ApiFhirConfig(AppConfig):
     name = MODULE_NAME

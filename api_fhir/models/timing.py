@@ -21,15 +21,9 @@ class TimingRepeat(Element):
     timeOfDay = Property('timeOfDay', 'FHIRDate', count_max='*')
     when = Property('when', str, count_max='*')
 
-    class Meta:
-        app_label = 'api_fhir'
-
 
 class Timing(Element):
 
     code = Property('code', 'CodeableConcept')  # BID | TID | QID | AM | PM | QD | QOD | Q4H | Q6H +
     event = Property('event', 'FHIRDate', count_max='*')
     repeat = Property('repeat', 'TimingRepeat')
-
-    class Meta:
-        app_label = 'api_fhir'
