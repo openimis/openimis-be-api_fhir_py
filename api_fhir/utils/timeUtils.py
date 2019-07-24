@@ -1,6 +1,5 @@
 import core
-
-from api_fhir.configurations import GeneralConfiguration
+from dateutil import parser
 
 
 class TimeUtils(object):
@@ -15,9 +14,5 @@ class TimeUtils(object):
 
     @classmethod
     def str_to_date(cls, str_value):
-        date = None
-        try:
-            date = core.datetime.datetime.strptime(str_value, GeneralConfiguration.get_iso_date_format())
-        except ValueError:
-            date = core.datetime.datetime.strptime(str_value, GeneralConfiguration.get_iso_datetime_format())
-        return date
+        py_date = parser.parse(str_value)
+        return core.datetime.datetime.from_ad_datetime(py_date)

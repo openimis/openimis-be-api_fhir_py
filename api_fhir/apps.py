@@ -10,8 +10,6 @@ MODULE_NAME = "api_fhir"
 
 DEFAULT_CFG = {
     "default_audit_user_id": 1,
-    "iso_date_format": "%Y-%m-%d",
-    "iso_datetime_format": "%Y-%m-%dT%H:%M:%S",
     "gender_codes": {
         "male": "M",
         "female": "F",
