@@ -66,6 +66,7 @@ DEFAULT_CFG = {
         "fhir_claim_item_rejected_reason_adjudication_code": "rejected_reason",
     },
     "stu3_fhir_eligibility_config": {
+        "fhir_serializer": "EligibilityRequestSerializer",
         "fhir_item_code": "item",
         "fhir_service_code": "service",
         "fhir_total_admissions_code": "total_admissions",
@@ -82,7 +83,14 @@ DEFAULT_CFG = {
         "fhir_service_left_code": "service_left",
         "fhir_item_left_code": "item_left",
         "fhir_is_item_ok_code": "is_item_ok",
-        "fhir_is_service_ok_code": "is_service_ok"
+        "fhir_is_service_ok_code": "is_service_ok",
+        "fhir_balance_code": "balance",
+        "fhir_status_map": {
+            "I": "executable",
+            "A": "executed",
+            "S": "cancelled",
+            "E": "terminated"
+        }
     },
     "stu3_fhir_communication_request_config": {
         "fhir_care_rendered_code": "care_rendered",

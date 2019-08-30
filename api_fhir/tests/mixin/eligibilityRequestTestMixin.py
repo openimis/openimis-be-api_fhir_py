@@ -40,7 +40,7 @@ class EligibilityRequestTestMixin(GenericTestMixin):
             total_visits_left=self._TEST_TOTAL_VISITS,
             total_consultations_left=self._TEST_TOTAL_CONSULTATIONS,
             total_surgeries_left=self._TEST_TOTAL_SURGERIES,
-            total_delivieries_left=self._TEST_TOTAL_DELIVERIES,
+            total_deliveries_left=self._TEST_TOTAL_DELIVERIES,
             total_antenatal_left=self._TEST_TOTAL_ANTENATAL,
             consultation_amount_left=self._TEST_CONSULTATION_AMOUNT,
             surgery_amount_left=self._TEST_SURGERY_AMOUNT,

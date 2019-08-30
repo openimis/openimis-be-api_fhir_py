@@ -290,3 +290,5 @@ from api_fhir.models.claimResponse import ClaimResponse, ClaimResponseAddItem, C
 from api_fhir.models.communicationRequest import CommunicationRequest, CommunicationRequestPayload, \
     CommunicationRequestRequester
 from api_fhir.models.requestStatus import RequestStatus
+from api_fhir.models.contract import Contract
+from api_fhir.models.term import Term
