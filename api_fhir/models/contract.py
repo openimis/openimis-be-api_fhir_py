@@ -1,8 +1,5 @@
-from api_fhir.models import DomainResource, Property, BackboneElement
+from api_fhir.models import DomainResource
 
 
 class Contract(DomainResource):
-
-    identifier = Property('identifier', 'Identifier', count_max='*')
-    status = Property('status', str)
-    term = Property('term', 'BackboneElement')
+    pass

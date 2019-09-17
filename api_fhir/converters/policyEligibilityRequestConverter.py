@@ -1,9 +1,9 @@
 from policy.services import ByInsureeRequest
 
-from api_fhir.configurations import Stu3EligibilityConfiguration as Config, Stu3IdentifierConfig
-from api_fhir.converters import BaseFHIRConverter, PatientConverter
+from api_fhir.configurations import Stu3EligibilityConfiguration as Config
+from api_fhir.converters import BaseFHIRConverter, PatientConverter, ContractConverter
 from api_fhir.models import EligibilityResponse as FHIREligibilityResponse, InsuranceBenefitBalance, \
-    EligibilityResponseInsurance, InsuranceBenefitBalanceFinancial, Money, Contract, Term, Period, \
+    EligibilityResponseInsurance, InsuranceBenefitBalanceFinancial, Money, Reference, \
     Identifier
 
 
@@ -13,7 +13,8 @@ class PolicyEligibilityRequestConverter(BaseFHIRConverter):
     def to_fhir_obj(cls, eligibility_response):
         fhir_response = FHIREligibilityResponse()
         for item in eligibility_response.items:
-            cls.build_fhir_insurance(fhir_response, item)
+            if item.status in Config.get_fhir_active_policy_status():
+                cls.build_fhir_insurance(fhir_response, item)
         return fhir_response
 
     @classmethod
@@ -24,30 +25,15 @@ class PolicyEligibilityRequestConverter(BaseFHIRConverter):
     @classmethod
     def build_fhir_insurance(cls, fhir_response, response):
         result = EligibilityResponseInsurance()
-        cls.build_fhir_insurance_contract(result,                                        
-                                          response.product_code,
-                                          response.expiry_date.isoformat(),
-                                          response.status)
+        cls.build_fhir_insurance_contract(result, response)
         cls.build_fhir_money_benefit(result, Config.get_fhir_balance_code(),
                                      response.ceiling1,
                                      response.ded1)
         fhir_response.insurance.append(result)
 
     @classmethod
-    def build_fhir_insurance_contract(cls, insurance, product_code, expiry_date, status):
-        identifier = cls.build_fhir_identifier(f'{product_code}/{expiry_date}',
-                                               Stu3IdentifierConfig.get_fhir_identifier_type_system(),
-                                               Stu3IdentifierConfig.get_fhir_id_type_code())
-
-        period = Period()
-        period.end = expiry_date
-        term = Term()
-        term.applies = period
-        contract = Contract()        
-        contract.identifier = [identifier]
-        contract.status = Config.get_fhir_status_map().get(status)
-        contract.term = term
-        insurance.contract = contract
+    def build_fhir_insurance_contract(cls, insurance, contract):
+        insurance.contract = ContractConverter.build_fhir_resource_reference(contract)
 
     @classmethod
     def build_fhir_money_benefit(cls, insurance, code, allowed_value, used_value):

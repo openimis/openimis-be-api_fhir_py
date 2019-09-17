@@ -291,4 +291,3 @@ from api_fhir.models.communicationRequest import CommunicationRequest, Communica
     CommunicationRequestRequester
 from api_fhir.models.requestStatus import RequestStatus
 from api_fhir.models.contract import Contract
-from api_fhir.models.term import Term
