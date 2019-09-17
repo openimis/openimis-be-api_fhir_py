@@ -26,7 +26,8 @@ setup(
         'openimis-be-core',
         'openimis-be-insuree',
         'openimis-be-location',
-        'openimis-be-claim'
+        'openimis-be-claim',
+        'openimis-be-policy'
     ],
     classifiers=[
         'Environment :: Web Environment',
