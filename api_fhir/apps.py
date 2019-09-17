@@ -85,6 +85,7 @@ DEFAULT_CFG = {
         "fhir_is_item_ok_code": "is_item_ok",
         "fhir_is_service_ok_code": "is_service_ok",
         "fhir_balance_code": "balance",
+        "fhir_balance_default_category": "medical",
         "fhir_active_policy_status": ("A",)
     },
     "stu3_fhir_communication_request_config": {

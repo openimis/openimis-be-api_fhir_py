@@ -267,9 +267,13 @@ class EligibilityConfiguration(BaseConfiguration):  # pragma: no cover
         raise NotImplementedError('`get_fhir_balance_code()` must be implemented.')
 
     @classmethod
+    def get_fhir_balance_default_category(cls):
+        raise NotImplementedError('`get_fhir_balance_default_category()` must be implemented.')
+
+    @classmethod
     def get_fhir_status_map(cls):
         raise NotImplementedError('`get_fhir_status_map()` must be implemented.')        
-        
+ 
 
 class CommunicationRequestConfiguration(BaseConfiguration):  # pragma: no cover
 

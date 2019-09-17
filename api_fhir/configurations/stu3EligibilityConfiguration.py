@@ -90,5 +90,9 @@ class Stu3EligibilityConfiguration(EligibilityConfiguration):
         return cls.get_config().stu3_fhir_eligibility_config.get('fhir_balance_code', 'balance')
 
     @classmethod
+    def get_fhir_balance_default_category(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_balance_default_category', 'medical')
+
+    @classmethod
     def get_fhir_active_policy_status(cls):
         return cls.get_config().stu3_fhir_eligibility_config.get('fhir_active_policy_status', ('A,'))

@@ -45,7 +45,7 @@ class PolicyEligibilityRequestConverter(BaseFHIRConverter):
     @classmethod
     def build_fhir_generic_benefit_balance(cls, code):
         benefit_balance = InsuranceBenefitBalance()
-        benefit_balance.category = cls.build_simple_codeable_concept(code)
+        benefit_balance.category = Config.get_fhir_balance_default_category()
         return benefit_balance
 
     @classmethod
