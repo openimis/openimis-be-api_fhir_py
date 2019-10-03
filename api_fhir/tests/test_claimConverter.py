@@ -28,7 +28,7 @@ class ClaimConverterTestCase(ClaimTestMixin):
 
     @mock.patch.object(LocationConverter, 'get_imis_obj_by_fhir_reference')
     @mock.patch.object(PractitionerConverter, 'get_imis_obj_by_fhir_reference')
-    @mock.patch('claim.models.ClaimDiagnosisCode.objects')
+    @mock.patch('medical.models.Diagnosis.objects')
     @mock.patch.object(PatientConverter, 'get_imis_obj_by_fhir_reference')
     def test_to_imis_obj(self, mock_insuree, mock_cdc, mock_pc, mock_hfc):
         self.setUp()

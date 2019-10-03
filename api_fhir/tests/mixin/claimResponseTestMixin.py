@@ -54,7 +54,7 @@ class ClaimResponseTestMixin(GenericTestMixin):
         service.status = self._TEST_SERVICE_STATUS
         service.qty_approved = self._TEST_SERVICE_QUANTITY_APPROVED
         service.justification = self._TEST_SERVICE_JUSTIFICATION
-        service.rejectionreason = self._TEST_SERVICE_REJECTED_REASON
+        service.rejection_reason = self._TEST_SERVICE_REJECTED_REASON
         service.limitation_value = self._TEST_SERVICE_LIMITATION_VALUE
         return service
 

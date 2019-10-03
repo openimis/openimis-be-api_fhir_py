@@ -220,7 +220,7 @@ class EligibilityConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
     def get_fhir_total_deliveries_code(cls):
-        raise NotImplementedError('`get_fhir_total_delivieries_code()` must be implemented.')
+        raise NotImplementedError('`get_fhir_total_deliveries_code()` must be implemented.')
 
     @classmethod
     def get_fhir_total_antenatal_code(cls):
@@ -262,6 +262,18 @@ class EligibilityConfiguration(BaseConfiguration):  # pragma: no cover
     def get_fhir_is_service_ok_code(cls):
         raise NotImplementedError('`get_fhir_is_service_ok_code()` must be implemented.')
 
+    @classmethod
+    def get_fhir_balance_code(cls):
+        raise NotImplementedError('`get_fhir_balance_code()` must be implemented.')
+
+    @classmethod
+    def get_fhir_balance_default_category(cls):
+        raise NotImplementedError('`get_fhir_balance_default_category()` must be implemented.')
+
+    @classmethod
+    def get_fhir_status_map(cls):
+        raise NotImplementedError('`get_fhir_status_map()` must be implemented.')        
+ 
 
 class CommunicationRequestConfiguration(BaseConfiguration):  # pragma: no cover
 

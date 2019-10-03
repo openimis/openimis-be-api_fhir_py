@@ -1,4 +1,4 @@
-from claim import EligibilityRequest
+from policy.services import EligibilityRequest
 
 from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.converters import BaseFHIRConverter, PatientConverter
@@ -29,7 +29,7 @@ class EligibilityRequestConverter(BaseFHIRConverter):
         cls.build_fhir_int_benefit(result, Config.get_fhir_total_consultations_code(),
                                    response.total_consultations_left)
         cls.build_fhir_int_benefit(result, Config.get_fhir_total_surgeries_code(), response.total_surgeries_left)
-        cls.build_fhir_int_benefit(result, Config.get_fhir_total_deliveries_code(), response.total_delivieries_left)
+        cls.build_fhir_int_benefit(result, Config.get_fhir_total_deliveries_code(), response.total_deliveries_left)
         cls.build_fhir_int_benefit(result, Config.get_fhir_total_antenatal_code(), response.total_antenatal_left)
         cls.build_fhir_money_benefit(result, Config.get_fhir_consultation_amount_code(),
                                      response.consultation_amount_left)

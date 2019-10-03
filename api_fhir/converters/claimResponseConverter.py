@@ -99,7 +99,7 @@ class ClaimResponseConverter(BaseFHIRConverter):
             elif type == Stu3ClaimConfig.get_fhir_claim_service_code():
                 imis_service = cls.get_service_claim_item_by_code(code, imis_claim.id)
                 cls.build_fhir_item(fhir_claim_response, claim_item, imis_service,
-                                    rejected_reason=imis_service.rejectionreason)
+                                    rejected_reason=imis_service.rejection_reason)
 
     @classmethod
     def generate_fhir_claim_items(cls, imis_claim):
