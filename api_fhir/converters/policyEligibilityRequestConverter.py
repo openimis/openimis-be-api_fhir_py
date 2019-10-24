@@ -33,7 +33,8 @@ class PolicyEligibilityRequestConverter(BaseFHIRConverter):
 
     @classmethod
     def build_fhir_insurance_contract(cls, insurance, contract):
-        insurance.contract = ContractConverter.build_fhir_resource_reference(contract)
+        insurance.contract = ContractConverter.build_fhir_resource_reference(
+            contract)
 
     @classmethod
     def build_fhir_money_benefit(cls, insurance, code, allowed_value, used_value):
@@ -45,7 +46,8 @@ class PolicyEligibilityRequestConverter(BaseFHIRConverter):
     @classmethod
     def build_fhir_generic_benefit_balance(cls, code):
         benefit_balance = InsuranceBenefitBalance()
-        benefit_balance.category = Config.get_fhir_balance_default_category()
+        benefit_balance.category = cls.build_simple_codeable_concept(
+            Config.get_fhir_balance_default_category())
         return benefit_balance
 
     @classmethod
