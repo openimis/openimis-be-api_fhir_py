@@ -108,15 +108,15 @@ class ClaimResponseConverter(BaseFHIRConverter):
         return claim.item
 
     @classmethod
-    def get_imis_claim_item_by_code(cls, code, claim_id):
+    def get_imis_claim_item_by_code(cls, code, imis_claim_id):
         item_code_qs = Item.objects.filter(code=code)
-        result = ClaimItem.objects.filter(item_id__in=Subquery(item_code_qs.values('id')), claim_id=claim_id)
+        result = ClaimItem.objects.filter(item_id__in=Subquery(item_code_qs.values('id')), claim_id=imis_claim_id)
         return result[0] if len(result) > 0 else None
 
     @classmethod
-    def get_service_claim_item_by_code(cls, code, claim_id):
+    def get_service_claim_item_by_code(cls, code, imis_claim_id):
         service_code_qs = Service.objects.filter(code=code)
-        result = ClaimService.objects.filter(service_id__in=Subquery(service_code_qs.values('id')), claim_id=claim_id)
+        result = ClaimService.objects.filter(service_id__in=Subquery(service_code_qs.values('id')), claim_id=imis_claim_id)
         return result[0] if len(result) > 0 else None
 
     @classmethod

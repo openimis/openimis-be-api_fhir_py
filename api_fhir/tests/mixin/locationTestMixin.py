@@ -67,7 +67,7 @@ class LocationTestMixin(GenericTestMixin):
     def verify_fhir_instance(self, fhir_obj):
         for identifier in fhir_obj.identifier:
             code = LocationConverter.get_first_coding_from_codeable_concept(identifier.type).code
-            if code == Stu3IdentifierConfig.get_fhir_id_type_code():
+            if code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
                 self.assertEqual(str(self._TEST_ID), identifier.value)
             elif code == Stu3IdentifierConfig.get_fhir_facility_id_type():
                 self.assertEqual(self._TEST_HF_CODE, identifier.value)

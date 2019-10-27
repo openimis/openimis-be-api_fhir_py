@@ -70,7 +70,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_fhir_identifiers(cls, fhir_claim, imis_claim):
         identifiers = []
-        cls.build_fhir_id_identifier(identifiers, imis_claim)
+        cls.build_fhir_uuid_identifier(identifiers, imis_claim)
         claim_code = cls.build_fhir_identifier(imis_claim.code,
                                                Stu3IdentifierConfig.get_fhir_identifier_type_system(),
                                                Stu3IdentifierConfig.get_fhir_claim_code_type())

@@ -74,7 +74,7 @@ class PractitionerTestMixin(GenericTestMixin):
             code = PractitionerConverter.get_first_coding_from_codeable_concept(identifier.type).code
             if code == Stu3IdentifierConfig.get_fhir_claim_admin_code_type():
                 self.assertEqual(self._TEST_CODE, identifier.value)
-            elif code == Stu3IdentifierConfig.get_fhir_id_type_code():
+            elif code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
                 self.assertEqual(str(self._TEST_ID), identifier.value)
         self.assertEqual(self._TEST_DOB, fhir_obj.birthDate)
         self.assertEqual(2, len(fhir_obj.telecom))

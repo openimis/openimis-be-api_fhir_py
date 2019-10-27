@@ -142,7 +142,7 @@ class ClaimTestMixin(GenericTestMixin):
         self.assertIsNotNone(fhir_obj.patient.reference)
         self.assertEqual(str(self._TEST_CODE), fhir_obj.id)
         for identifier in fhir_obj.identifier:
-            if identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_id_type_code():
+            if identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
                 self.assertEqual(str(self._TEST_ID), identifier.value)
             elif identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_claim_code_type():
                 self.assertEqual(self._TEST_CODE, identifier.value)

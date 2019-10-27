@@ -76,8 +76,8 @@ class ClaimResponseTestMixin(GenericTestMixin):
         fhir_claim_response = ClaimResponse()
         fhir_claim_response.id = self._TEST_CODE
         pk_id = ClaimResponseConverter.build_fhir_identifier(self._TEST_ID,
-                                                          Stu3IdentifierConfig.get_fhir_identifier_type_system(),
-                                                          Stu3IdentifierConfig.get_fhir_id_type_code())
+                                                             Stu3IdentifierConfig.get_fhir_identifier_type_system(),
+                                                             Stu3IdentifierConfig.get_fhir_uuid_type_code())
         claim_code = ClaimResponseConverter.build_fhir_identifier(self._TEST_CODE,
                                                           Stu3IdentifierConfig.get_fhir_identifier_type_system(),
                                                           Stu3IdentifierConfig.get_fhir_claim_code_type())
@@ -158,7 +158,7 @@ class ClaimResponseTestMixin(GenericTestMixin):
     def verify_fhir_instance(self, fhir_obj):
         self.assertEqual(str(self._TEST_CODE), fhir_obj.id)
         for identifier in fhir_obj.identifier:
-            if identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_id_type_code():
+            if identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
                 self.assertEqual(str(self._TEST_ID), identifier.value)
             elif identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_claim_code_type():
                 self.assertEqual(self._TEST_CODE, identifier.value)

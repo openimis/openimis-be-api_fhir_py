@@ -13,7 +13,7 @@ class Stu3IdentifierConfig(IdentifierConfiguration):
                                                                 "https://hl7.org/fhir/valueset-identifier-type.html")
 
     @classmethod
-    def get_fhir_id_type_code(cls):
+    def get_fhir_uuid_type_code(cls):
         return cls.get_config().stu3_fhir_identifier_type_config.get('fhir_code_for_imis_db_id_type', "ACSN")
 
     @classmethod

@@ -49,7 +49,7 @@ class GenericFhirAPITestMixin(object):
         fhir_obj = FHIRBaseObject.loads(response.content, 'json')
         if hasattr(fhir_obj, 'identifier'):
             result = BaseFHIRConverter.get_fhir_identifier_by_code(fhir_obj.identifier,
-                                                                   Stu3IdentifierConfig.get_fhir_id_type_code())
+                                                                   Stu3IdentifierConfig.get_fhir_uuid_type_code())
         return result
 
     def get_fhir_obj_from_json_response(self, response):
