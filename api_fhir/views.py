@@ -11,7 +11,8 @@ from api_fhir.paginations import FhirBundleResultsSetPagination
 from api_fhir.permissions import FHIRApiPermissions
 from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
-    PractitionerSerializer, ClaimSerializer, ClaimResponseSerializer, CommunicationRequestSerializer
+    PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, PolicyEligibilityRequestSerializer, \
+    ClaimResponseSerializer, CommunicationRequestSerializer
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
