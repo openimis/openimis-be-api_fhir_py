@@ -107,11 +107,13 @@ class BaseFHIRConverter(ABC):
 
 from api_fhir.converters.personConverterMixin import PersonConverterMixin
 from api_fhir.converters.referenceConverterMixin import ReferenceConverterMixin
+from api_fhir.converters.contractConverter import ContractConverter
 from api_fhir.converters.patientConverter import PatientConverter
 from api_fhir.converters.locationConverter import LocationConverter
 from api_fhir.converters.operationOutcomeConverter import OperationOutcomeConverter
 from api_fhir.converters.practitionerConverter import PractitionerConverter
 from api_fhir.converters.practitionerRoleConverter import PractitionerRoleConverter
 from api_fhir.converters.eligibilityRequestConverter import EligibilityRequestConverter
+from api_fhir.converters.policyEligibilityRequestConverter import PolicyEligibilityRequestConverter
 from api_fhir.converters.communicationRequestConverter import CommunicationRequestConverter
 from api_fhir.converters.claimResponseConverter import ClaimResponseConverter

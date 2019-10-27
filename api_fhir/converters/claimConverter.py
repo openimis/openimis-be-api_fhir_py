@@ -1,5 +1,6 @@
 from claim import ClaimItemSubmit, ClaimServiceSubmit
-from claim.models import Claim, ClaimDiagnosisCode, ClaimItem, ClaimService
+from claim.models import Claim, ClaimItem, ClaimService
+from medical.models import Diagnosis
 from django.utils.translation import gettext
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
@@ -180,13 +181,13 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def get_claim_diagnosis_by_code(cls, icd_code):
-        return ClaimDiagnosisCode.objects.get(code=icd_code)
+        return Diagnosis.objects.get(code=icd_code)
 
     @classmethod
     def get_claim_diagnosis_code_by_id(cls, diagnosis_id):
         code = None
         if diagnosis_id is not None:
-            diagnosis = DbManagerUtils.get_object_or_none(ClaimDiagnosisCode, pk=diagnosis_id)
+            diagnosis = DbManagerUtils.get_object_or_none(Diagnosis, pk=diagnosis_id)
             if diagnosis:
                 code = diagnosis.code
         return code

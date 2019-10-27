@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='openimis-be-api_fhir',
-    version='0.0.4',
+    version='0.0.6',
     packages=find_packages(),
     include_package_data=True,
     license='GNU AGPL v3',
@@ -26,7 +26,8 @@ setup(
         'openimis-be-core',
         'openimis-be-insuree',
         'openimis-be-location',
-        'openimis-be-claim'
+        'openimis-be-claim',
+        'openimis-be-policy'
     ],
     classifiers=[
         'Environment :: Web Environment',

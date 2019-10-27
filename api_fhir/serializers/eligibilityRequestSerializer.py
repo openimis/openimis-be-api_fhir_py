@@ -1,6 +1,6 @@
 import logging
 
-from claim import EligibilityRequest, EligibilityService, EligibilityResponse
+from policy.services import EligibilityRequest, EligibilityService, EligibilityResponse
 
 from api_fhir.converters import EligibilityRequestConverter
 from api_fhir.serializers import BaseFHIRSerializer
@@ -12,7 +12,7 @@ class EligibilityRequestSerializer(BaseFHIRSerializer):
     logger = logging.getLogger(__name__)
 
     def create(self, validated_data):
-        eligibility_request = EligibilityRequest(chfid=validated_data.get('chfid'),
+        eligibility_request = EligibilityRequest(chf_id=validated_data.get('chf_id'),
                                                  service_code=validated_data.get('service_code'),
                                                  item_code=validated_data.get('item_code'))
         request = self.context.get("request")
@@ -33,7 +33,7 @@ class EligibilityRequestSerializer(BaseFHIRSerializer):
             total_visits_left=0,
             total_consultations_left=0,
             total_surgeries_left=0,
-            total_delivieries_left=0,
+            total_deliveries_left=0,
             total_antenatal_left=0,
             consultation_amount_left=0.0,
             surgery_amount_left=0.0,

@@ -1,4 +1,5 @@
-from claim.models import Claim, ClaimDiagnosisCode, ClaimItem, ClaimService
+from claim.models import Claim, ClaimItem, ClaimService
+from medical.models import Diagnosis
 from medical.models import Item, Service
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
@@ -35,7 +36,7 @@ class ClaimTestMixin(GenericTestMixin):
     _TEST_SERVICE_EXPLANATION = "service_explanation"
 
     def setUp(self):
-        self._TEST_DIAGNOSIS_CODE = ClaimDiagnosisCode()
+        self._TEST_DIAGNOSIS_CODE = Diagnosis()
         self._TEST_DIAGNOSIS_CODE.code = self._TEST_MAIN_ICD_CODE
         self._TEST_CLAIM_ADMIN = PractitionerTestMixin().create_test_imis_instance()
         self._TEST_HF = LocationTestMixin().create_test_imis_instance()
@@ -68,7 +69,7 @@ class ClaimTestMixin(GenericTestMixin):
         imis_claim.code = self._TEST_CODE
         imis_claim.date_from = TimeUtils.str_to_date(self._TEST_DATE_FROM)
         imis_claim.date_to = TimeUtils.str_to_date(self._TEST_DATE_TO)
-        icd = ClaimDiagnosisCode()
+        icd = Diagnosis()
         icd.code = self._TEST_MAIN_ICD_CODE
         imis_claim.icd = icd
         imis_claim.claimed = self._TEST_CLAIMED

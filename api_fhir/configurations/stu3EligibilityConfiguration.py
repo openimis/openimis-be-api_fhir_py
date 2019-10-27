@@ -1,3 +1,4 @@
+import json
 from api_fhir.configurations import EligibilityConfiguration
 
 
@@ -6,6 +7,10 @@ class Stu3EligibilityConfiguration(EligibilityConfiguration):
     @classmethod
     def build_configuration(cls, cfg):
         cls.get_config().stu3_fhir_eligibility_config = cfg['stu3_fhir_eligibility_config']
+
+    @classmethod
+    def get_serializer(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_serializer')
 
     @classmethod
     def get_fhir_financial_code(cls):
@@ -81,3 +86,14 @@ class Stu3EligibilityConfiguration(EligibilityConfiguration):
     def get_fhir_is_service_ok_code(cls):
         return cls.get_config().stu3_fhir_eligibility_config.get('fhir_is_service_ok_code', 'is_service_ok')
 
+    @classmethod
+    def get_fhir_balance_code(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_balance_code', 'balance')
+
+    @classmethod
+    def get_fhir_balance_default_category(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_balance_default_category', 'medical')
+
+    @classmethod
+    def get_fhir_active_policy_status(cls):
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_active_policy_status', ('A,'))
