@@ -20,7 +20,7 @@ class CommunicationRequestConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def get_reference_obj_id(cls, imis_feedback):
-        return imis_feedback.id
+        return imis_feedback.uuid
 
     @classmethod
     def get_fhir_resource_type(cls):
