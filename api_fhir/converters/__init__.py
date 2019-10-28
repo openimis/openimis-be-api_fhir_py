@@ -61,11 +61,11 @@ class BaseFHIRConverter(ABC):
         return result
 
     @classmethod
-    def build_fhir_id_identifier(cls, identifiers, imis_object):
-        if imis_object.id is not None:
-            identifier = cls.build_fhir_identifier(str(imis_object.id),
+    def build_fhir_uuid_identifier(cls, identifiers, imis_object):
+        if imis_object.uuid is not None:
+            identifier = cls.build_fhir_identifier(imis_object.uuid,
                                                    Stu3IdentifierConfig.get_fhir_identifier_type_system(),
-                                                   Stu3IdentifierConfig.get_fhir_id_type_code())
+                                                   Stu3IdentifierConfig.get_fhir_uuid_type_code())
             identifiers.append(identifier)
 
     @classmethod

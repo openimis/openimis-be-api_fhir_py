@@ -14,7 +14,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     @classmethod
     def to_fhir_obj(cls, imis_insuree):
         fhir_patient = Patient()
-        cls.build_fhir_pk(fhir_patient, imis_insuree.id)
+        cls.build_fhir_pk(fhir_patient, imis_insuree.uuid)
         cls.build_human_names(fhir_patient, imis_insuree)
         cls.build_fhir_identifiers(fhir_patient, imis_insuree)
         cls.build_fhir_birth_date(fhir_patient, imis_insuree)
@@ -79,7 +79,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     @classmethod
     def build_fhir_identifiers(cls, fhir_patient, imis_insuree):
         identifiers = []
-        cls.build_fhir_id_identifier(identifiers, imis_insuree)
+        cls.build_fhir_uuid_identifier(identifiers, imis_insuree)
         cls.build_fhir_chfid_identifier(identifiers, imis_insuree)
         cls.build_fhir_passport_identifier(identifiers, imis_insuree)
         fhir_patient.identifier = identifiers

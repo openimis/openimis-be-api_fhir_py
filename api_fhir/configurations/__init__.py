@@ -24,7 +24,7 @@ class IdentifierConfiguration(BaseConfiguration):  # pragma: no cover
         raise NotImplementedError('`get_fhir_identifier_type_system()` must be implemented.')
 
     @classmethod
-    def get_fhir_id_type_code(cls):
+    def get_fhir_uuid_type_code(cls):
         raise NotImplementedError('`get_fhir_id_type_code()` must be implemented.')
 
     @classmethod

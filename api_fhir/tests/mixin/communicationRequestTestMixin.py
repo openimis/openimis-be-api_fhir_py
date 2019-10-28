@@ -36,7 +36,7 @@ class CommunicationRequestTestMixin(GenericTestMixin):
         identifiers = []
         identifier = Converter.build_fhir_identifier(self._TEST_FEEDBACK_ID,
                                                      Stu3IdentifierConfig.get_fhir_identifier_type_system(),
-                                                     Stu3IdentifierConfig.get_fhir_id_type_code())
+                                                     Stu3IdentifierConfig.get_fhir_uuid_type_code())
         identifiers.append(identifier)
         fhir_communication_request.identifier = identifiers
         reasons = [Converter.build_codeable_concept(Config.get_fhir_care_rendered_code(),

@@ -13,14 +13,14 @@ class CommunicationRequestConverter(BaseFHIRConverter, ReferenceConverterMixin):
         fhir_communication_request = CommunicationRequest()
         fhir_communication_request.status = RequestStatus.UNKNOWN.value
         cls.build_fhir_occurrence_datetime(fhir_communication_request, imis_feedback)
-        cls.build_fhir_pk(fhir_communication_request, imis_feedback.id)
+        cls.build_fhir_pk(fhir_communication_request, imis_feedback.uuid)
         cls.build_fhir_identifiers(fhir_communication_request, imis_feedback)
         cls.build_fhir_reason_codes(fhir_communication_request, imis_feedback)
         return fhir_communication_request
 
     @classmethod
     def get_reference_obj_id(cls, imis_feedback):
-        return imis_feedback.id
+        return imis_feedback.uuid
 
     @classmethod
     def get_fhir_resource_type(cls):
@@ -40,7 +40,7 @@ class CommunicationRequestConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_fhir_identifiers(cls, fhir_communication_request, imis_feedback):
         identifiers = []
-        cls.build_fhir_id_identifier(identifiers, imis_feedback)
+        cls.build_fhir_uuid_identifier(identifiers, imis_feedback)
         fhir_communication_request.identifier = identifiers
 
     @classmethod

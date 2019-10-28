@@ -28,16 +28,19 @@ class BaseFHIRView(APIView):
 
 
 class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    lookup_field = 'uuid'
     queryset = Insuree.objects.all()
     serializer_class = PatientSerializer
 
 
 class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    lookup_field = 'uuid'
     queryset = HealthFacility.objects.all()
     serializer_class = LocationSerializer
 
 
 class PractitionerRoleViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    lookup_field = 'uuid'
     queryset = ClaimAdmin.objects.all()
     serializer_class = PractitionerRoleSerializer
 
@@ -47,24 +50,26 @@ class PractitionerRoleViewSet(BaseFHIRView, viewsets.ModelViewSet):
 
 
 class PractitionerViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    lookup_field = 'uuid'
     queryset = ClaimAdmin.objects.all()
     serializer_class = PractitionerSerializer
 
 
 class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin,
                    mixins.CreateModelMixin, GenericViewSet):
+    lookup_field = 'code'
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
-    lookup_field = 'code'
 
 
 class ClaimResponseViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    lookup_field = 'code'
     queryset = Claim.objects.all()
     serializer_class = ClaimResponseSerializer
-    lookup_field = 'code'
 
 
 class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    lookup_field = 'uuid'
     queryset = Feedback.objects.all()
     serializer_class = CommunicationRequestSerializer
 

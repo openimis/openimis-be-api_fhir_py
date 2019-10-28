@@ -110,7 +110,7 @@ class PatientTestMixin(GenericTestMixin):
             code = PatientConverter.get_first_coding_from_codeable_concept(identifier.type).code
             if code == Stu3IdentifierConfig.get_fhir_chfid_type_code():
                 self.assertEqual(self._TEST_CHF_ID, identifier.value)
-            elif code == Stu3IdentifierConfig.get_fhir_id_type_code():
+            elif code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
                 self.assertEqual(str(self._TEST_ID), identifier.value)
             elif code == Stu3IdentifierConfig.get_fhir_passport_type_code():
                 self.assertEqual(self._TEST_PASSPORT, identifier.value)
