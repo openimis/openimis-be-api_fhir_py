@@ -40,13 +40,22 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
             queryset = queryset.filter(chf_id=identifier)
 
         serializer = PatientSerializer(self.paginate_queryset(queryset), many=True)
-        return Response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
 
 class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
     lookup_field = 'uuid'
     queryset = HealthFacility.objects.all()
     serializer_class = LocationSerializer
+
+    def list(self, request, *args, **kwargs):
+        identifier = request.GET.get("identifier")
+        queryset = HealthFacility.objects.filter(validity_to__isnull=True)
+        if identifier:
+            queryset = queryset.filter(code=identifier)
+
+        serializer = LocationSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class PractitionerRoleViewSet(BaseFHIRView, viewsets.ModelViewSet):
