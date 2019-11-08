@@ -4,6 +4,7 @@ from location.models import HealthFacility
 
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
@@ -31,6 +32,15 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
     lookup_field = 'uuid'
     queryset = Insuree.objects.all()
     serializer_class = PatientSerializer
+
+    def list(self, request, *args, **kwargs):
+        identifier = request.GET.get("identifier")
+        queryset = Insuree.objects.filter(validity_to__isnull=True)
+        if identifier:
+            queryset = queryset.filter(chf_id=identifier)
+
+        serializer = PatientSerializer(self.paginate_queryset(queryset), many=True)
+        return Response(serializer.data)
 
 
 class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
