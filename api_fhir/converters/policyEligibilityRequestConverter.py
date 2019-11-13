@@ -19,8 +19,8 @@ class PolicyEligibilityRequestConverter(BaseFHIRConverter):
 
     @classmethod
     def to_imis_obj(cls, fhir_eligibility_request, audit_user_id):
-        chfid = cls.build_imis_chfid(fhir_eligibility_request)
-        return ByInsureeRequest(chfid)
+        uuid = cls.build_imis_uuid(fhir_eligibility_request)
+        return ByInsureeRequest(uuid)
 
     @classmethod
     def build_fhir_insurance(cls, fhir_response, response):
@@ -69,10 +69,10 @@ class PolicyEligibilityRequestConverter(BaseFHIRConverter):
         return financial
 
     @classmethod
-    def build_imis_chfid(cls, fhir_eligibility_request):
-        chfid = None
+    def build_imis_uuid(cls, fhir_eligibility_request):
+        uuid = None
         patient_reference = fhir_eligibility_request.patient
         if patient_reference:
-            chfid = PatientConverter.get_resource_id_from_reference(
+            uuid = PatientConverter.get_resource_id_from_reference(
                 patient_reference)
-        return chfid
+        return uuid

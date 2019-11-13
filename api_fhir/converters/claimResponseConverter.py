@@ -17,7 +17,7 @@ class ClaimResponseConverter(BaseFHIRConverter):
         fhir_claim_response = ClaimResponse()
         fhir_claim_response.created = TimeUtils.date().isoformat()
         fhir_claim_response.request = ClaimConverter.build_fhir_resource_reference(imis_claim)
-        cls.build_fhir_pk(fhir_claim_response, imis_claim.code)
+        cls.build_fhir_pk(fhir_claim_response, imis_claim.uuid)
         ClaimConverter.build_fhir_identifiers(fhir_claim_response, imis_claim)
         cls.build_fhir_outcome(fhir_claim_response, imis_claim)
         cls.build_fhir_payment(fhir_claim_response, imis_claim)

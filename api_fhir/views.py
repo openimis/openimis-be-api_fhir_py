@@ -76,13 +76,13 @@ class PractitionerViewSet(BaseFHIRView, viewsets.ModelViewSet):
 
 class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin,
                    mixins.CreateModelMixin, GenericViewSet):
-    lookup_field = 'code'
+    lookup_field = 'uuid'
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
 
 
 class ClaimResponseViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
-    lookup_field = 'code'
+    lookup_field = 'uuid'
     queryset = Claim.objects.all()
     serializer_class = ClaimResponseSerializer
 

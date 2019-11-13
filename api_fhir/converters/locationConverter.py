@@ -36,7 +36,7 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def get_reference_obj_id(cls, imis_hf):
-        return imis_hf.code
+        return imis_hf.uuid
 
     @classmethod
     def get_fhir_resource_type(cls):
@@ -44,8 +44,8 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        location_code = cls.get_resource_id_from_reference(reference)
-        return DbManagerUtils.get_object_or_none(HealthFacility, code=location_code)
+        location_uuid = cls.get_resource_id_from_reference(reference)
+        return DbManagerUtils.get_object_or_none(HealthFacility, uuid=location_uuid)
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):
