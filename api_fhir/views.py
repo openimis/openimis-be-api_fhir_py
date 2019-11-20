@@ -4,6 +4,7 @@ from location.models import HealthFacility
 
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
@@ -32,11 +33,29 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
     queryset = Insuree.objects.all()
     serializer_class = PatientSerializer
 
+    def list(self, request, *args, **kwargs):
+        identifier = request.GET.get("identifier")
+        queryset = Insuree.objects.filter(validity_to__isnull=True)
+        if identifier:
+            queryset = queryset.filter(chf_id=identifier)
+
+        serializer = PatientSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
     lookup_field = 'uuid'
     queryset = HealthFacility.objects.all()
     serializer_class = LocationSerializer
+
+    def list(self, request, *args, **kwargs):
+        identifier = request.GET.get("identifier")
+        queryset = HealthFacility.objects.filter(validity_to__isnull=True)
+        if identifier:
+            queryset = queryset.filter(code=identifier)
+
+        serializer = LocationSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class PractitionerRoleViewSet(BaseFHIRView, viewsets.ModelViewSet):
@@ -57,13 +76,13 @@ class PractitionerViewSet(BaseFHIRView, viewsets.ModelViewSet):
 
 class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin,
                    mixins.CreateModelMixin, GenericViewSet):
-    lookup_field = 'code'
+    lookup_field = 'uuid'
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
 
 
 class ClaimResponseViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
-    lookup_field = 'code'
+    lookup_field = 'uuid'
     queryset = Claim.objects.all()
     serializer_class = ClaimResponseSerializer
 

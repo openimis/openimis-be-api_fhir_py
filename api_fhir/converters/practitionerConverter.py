@@ -32,7 +32,7 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
 
     @classmethod
     def get_reference_obj_id(cls, imis_claim_admin):
-        return imis_claim_admin.code
+        return imis_claim_admin.uuid
 
     @classmethod
     def get_fhir_resource_type(cls):
@@ -40,8 +40,8 @@ class PractitionerConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceCo
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        imis_claim_admin_code = cls.get_resource_id_from_reference(reference)
-        return DbManagerUtils.get_object_or_none(ClaimAdmin, code=imis_claim_admin_code)
+        imis_claim_admin_uuid = cls.get_resource_id_from_reference(reference)
+        return DbManagerUtils.get_object_or_none(ClaimAdmin, uuid=imis_claim_admin_uuid)
 
     @classmethod
     def create_default_claim_admin(cls, audit_user_id):

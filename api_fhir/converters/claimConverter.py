@@ -16,7 +16,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def to_fhir_obj(cls, imis_claim):
         fhir_claim = FHIRClaim()
-        cls.build_fhir_pk(fhir_claim, imis_claim.code)
+        cls.build_fhir_pk(fhir_claim, imis_claim.uuid)
         fhir_claim.created = imis_claim.date_claimed.isoformat()
         fhir_claim.facility = LocationConverter.build_fhir_resource_reference(imis_claim.health_facility)
         cls.build_fhir_identifiers(fhir_claim, imis_claim)
@@ -50,7 +50,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def get_reference_obj_id(cls, imis_claim):
-        return imis_claim.code
+        return imis_claim.uuid
 
     @classmethod
     def get_fhir_resource_type(cls):
