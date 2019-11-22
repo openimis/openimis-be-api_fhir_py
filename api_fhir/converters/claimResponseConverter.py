@@ -5,6 +5,7 @@ from medical.models import Item, Service
 from api_fhir.configurations import Stu3ClaimConfig
 from api_fhir.converters import BaseFHIRConverter, CommunicationRequestConverter
 from api_fhir.converters.claimConverter import ClaimConverter
+from api_fhir.exceptions import FHIRRequestProcessException
 from api_fhir.models import ClaimResponse, Money, ClaimResponsePayment, ClaimResponseError, ClaimResponseItem, Claim, \
     ClaimResponseItemAdjudication, ClaimResponseProcessNote, ClaimResponseAddItem
 from api_fhir.utils import TimeUtils, FhirUtils
@@ -92,16 +93,30 @@ class ClaimResponseConverter(BaseFHIRConverter):
         for claim_item in cls.generate_fhir_claim_items(imis_claim):
             type = claim_item.category.text
             code = claim_item.service.text
-            if type == Stu3ClaimConfig.get_fhir_claim_item_code():
-                imis_item = cls.get_imis_claim_item_by_code(code, imis_claim.id)
-                cls.build_fhir_item(fhir_claim_response, claim_item, imis_item,
-                                    rejected_reason=imis_item.rejection_reason)
-                cls.build_fhir_claim_add_item(fhir_claim_response, claim_item)
-            elif type == Stu3ClaimConfig.get_fhir_claim_service_code():
-                imis_service = cls.get_service_claim_item_by_code(code, imis_claim.id)
-                cls.build_fhir_item(fhir_claim_response, claim_item, imis_service,
-                                    rejected_reason=imis_service.rejection_reason)
-                cls.build_fhir_claim_add_item(fhir_claim_response, claim_item)
+
+            if cls._is_fhir_item(type):
+                serviced = cls.get_imis_claim_item_by_code(code, imis_claim.id)
+            elif cls._is_fhir_service(type):
+                serviced = cls.get_service_claim_item_by_code(code, imis_claim.id)
+            else:
+                raise FHIRRequestProcessException(['Could not assign category {} for claim_item: {}'
+                                                  .format(type, claim_item)])
+
+            cls._build_response_items(fhir_claim_response, claim_item, serviced, serviced.rejection_reason)
+
+    @classmethod
+    def _build_response_items(cls, fhir_claim_response, claim_item, imis_service, rejected_reason):
+        cls.build_fhir_item(fhir_claim_response, claim_item, imis_service,
+                            rejected_reason=rejected_reason)
+        cls.build_fhir_claim_add_item(fhir_claim_response, claim_item)
+
+    @classmethod
+    def _is_fhir_item(cls, type):
+        return type == Stu3ClaimConfig.get_fhir_claim_item_code()
+
+    @classmethod
+    def _is_fhir_service(cls, type):
+        return type == Stu3ClaimConfig.get_fhir_claim_service_code()
 
     @classmethod
     def generate_fhir_claim_items(cls, imis_claim):
