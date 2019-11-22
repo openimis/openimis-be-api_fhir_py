@@ -94,9 +94,9 @@ class ClaimResponseConverter(BaseFHIRConverter):
             type = claim_item.category.text
             code = claim_item.service.text
 
-            if cls._is_fhir_item(type):
+            if type == Stu3ClaimConfig.get_fhir_claim_item_code():
                 serviced = cls.get_imis_claim_item_by_code(code, imis_claim.id)
-            elif cls._is_fhir_service(type):
+            elif  type == Stu3ClaimConfig.get_fhir_claim_service_code():
                 serviced = cls.get_service_claim_item_by_code(code, imis_claim.id)
             else:
                 raise FHIRRequestProcessException(['Could not assign category {} for claim_item: {}'
@@ -109,14 +109,6 @@ class ClaimResponseConverter(BaseFHIRConverter):
         cls.build_fhir_item(fhir_claim_response, claim_item, imis_service,
                             rejected_reason=rejected_reason)
         cls.build_fhir_claim_add_item(fhir_claim_response, claim_item)
-
-    @classmethod
-    def _is_fhir_item(cls, type):
-        return type == Stu3ClaimConfig.get_fhir_claim_item_code()
-
-    @classmethod
-    def _is_fhir_service(cls, type):
-        return type == Stu3ClaimConfig.get_fhir_claim_service_code()
 
     @classmethod
     def generate_fhir_claim_items(cls, imis_claim):
