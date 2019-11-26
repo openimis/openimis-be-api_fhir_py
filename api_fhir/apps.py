@@ -66,7 +66,7 @@ DEFAULT_CFG = {
         "fhir_claim_item_rejected_reason_adjudication_code": "rejected_reason",
     },
     "stu3_fhir_eligibility_config": {
-        "fhir_serializer": "EligibilityRequestSerializer",
+        "fhir_serializer": "PolicyEligibilityRequestSerializer",
         "fhir_item_code": "item",
         "fhir_service_code": "service",
         "fhir_total_admissions_code": "total_admissions",

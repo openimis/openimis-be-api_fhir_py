@@ -27,8 +27,8 @@ class PolicyEligibilityRequestConverter(BaseFHIRConverter):
         result = EligibilityResponseInsurance()
         cls.build_fhir_insurance_contract(result, response)
         cls.build_fhir_money_benefit(result, Config.get_fhir_balance_code(),
-                                     response.ceiling1,
-                                     response.ded1)
+                                     response.ceiling,
+                                     response.ded)
         fhir_response.insurance.append(result)
 
     @classmethod
