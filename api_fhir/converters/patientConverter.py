@@ -1,18 +1,20 @@
 from django.utils.translation import gettext
-from insuree.models import Insuree, Gender
+from insuree.models import Insuree, Gender, Education, Profession, Family
+from location.models import Location
 
 from api_fhir.configurations import Stu3IdentifierConfig, GeneralConfiguration, Stu3MaritalConfig
 from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
-from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus
-
+from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus, Extension
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.utils import TimeUtils, DbManagerUtils
-
 
 class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_insuree):
+        # flag = views.InsureeViewSet.check_for_extension(views.InsureeViewSet,request)
+        # <rest_framework.request.Request object at 0x110452b90>
+        # flag = 1
         fhir_patient = Patient()
         cls.build_fhir_pk(fhir_patient, imis_insuree.uuid)
         cls.build_human_names(fhir_patient, imis_insuree)
@@ -22,6 +24,8 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_marital_status(fhir_patient, imis_insuree)
         cls.build_fhir_telecom(fhir_patient, imis_insuree)
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
+        # if flag:
+        cls.build_fhir_extentions(fhir_patient, imis_insuree)
         return fhir_patient
 
     @classmethod
@@ -222,3 +226,54 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                     imis_insuree.current_address = address.text
                 elif address.type == AddressType.BOTH.value:
                     imis_insuree.geolocation = address.text
+
+    @classmethod
+    def build_fhir_extentions(cls, fhir_patient, imis_insuree):
+        fhir_patient.extension = []
+        
+        def build_extention_isHead(fhir_patient, imis_insuree):
+            
+            extension = Extension()
+            extension.url = "http://hispindia.org/fhir/StructureDefinition/isHead"
+            extension.valueBoolean = imis_insuree.head
+
+            fhir_patient.extension.append(extension)
+
+        def build_extention_registrationDate(fhir_patient, imis_insuree):
+            
+            extension = Extension()
+            extension.url = "http://hispindia.org/fhir/StructureDefinition/registrationDate"
+            extension.valueString = imis_insuree.validity_from
+
+            fhir_patient.extension.append(extension)
+
+        def build_extention_locationCode(fhir_patient, imis_insuree):
+
+            extension = Extension()
+            if hasattr(imis_insuree, "family") and imis_insuree.family is not None:
+                extension.url = "http://hispindia.org/fhir/StructureDefinition/locationCode"
+                extension.valueString = imis_insuree.family.location.code
+            
+            fhir_patient.extension.append(extension)
+
+        def build_extention_education(fhir_patient, imis_insuree):
+
+            extension = Extension()
+            if hasattr(imis_insuree, "education") and imis_insuree.education is not None:
+                extension.url = "http://hispindia.org/fhir/StructureDefinition/education_id"
+                extension.valueString = imis_insuree.education.education
+            fhir_patient.extension.append(extension)
+        
+        def build_extention_profession(fhir_patient, imis_insuree):
+            
+            extension = Extension()
+            if hasattr(imis_insuree, "profession") and imis_insuree.profession is not None:
+                extension.url = "http://hispindia.org/fhir/StructureDefinition/profession_id"
+                extension.valueString = imis_insuree.profession.profession
+
+            fhir_patient.extension.append(extension)
+        build_extention_isHead(fhir_patient, imis_insuree)
+        build_extention_registrationDate(fhir_patient, imis_insuree)
+        build_extention_locationCode(fhir_patient, imis_insuree)
+        build_extention_education(fhir_patient, imis_insuree)
+        build_extention_profession(fhir_patient, imis_insuree)

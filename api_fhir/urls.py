@@ -13,5 +13,5 @@ router.register(r'CommunicationRequest', views.CommunicationRequestViewSet)
 router.register(r'EligibilityRequest', views.EligibilityRequestViewSet, base_name='EligibilityRequest')
 
 urlpatterns = [
-    path('', include(router.urls)),
-]
+    path('', include(router.urls))
+    ]
