@@ -34,7 +34,7 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
     serializer_class = PatientSerializer
 
     def list(self, request, *args, **kwargs):
-        refeDate = request.GET.get('refDate')
+        refeDate = request.GET.get('claimDateFrom')
         if refeDate != None:
             day,month,year = refeDate.split('-')
             isValidDate = True
