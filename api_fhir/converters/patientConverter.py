@@ -227,33 +227,46 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                 elif address.type == AddressType.BOTH.value:
                     imis_insuree.geolocation = address.text
 
-        @classmethod
-        def build_fhir_extentions(cls, fhir_patient, imis_insuree):
-            fhir_patient.extension = []
-            
-            def build_extension(fhir_patient, imis_insuree,value):
-                extension = Extension()
-                if value == "head":
-                    extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960069653/FHIR+extension+isHead"
-                    extension.valueBoolean = imis_insuree.head
-                elif value == "validity_from":
-                    extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331779/FHIR+extension+registrationDate"
-                    extension.valueBoolean = imis_insuree.validity_from
-                elif value == "family.location.code":
-                    extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960495619/FHIR+extension+Location"
-                    if hasattr(imis_insuree, "family") and imis_insuree.family is not None:
-                        extension.valueBoolean = imis_insuree.family.location.code
-                elif value == "education.education":
-                    extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331788/FHIR+extension+Education"
-                    if hasattr(imis_insuree, "education") and imis_insuree.education is not None:
-                        extension.valueBoolean = imis_insuree.education.education
+    @classmethod
+    def build_fhir_extentions(cls, fhir_patient, imis_insuree):
+        fhir_patient.extension = []
+        
+        def build_extension(fhir_patient, imis_insuree,value):
+            extension = Extension()
+            if value == "head":
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960069653/FHIR+extension+isHead"
+                extension.valueBoolean = imis_insuree.head
+            elif value == "validity_from":
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331779/FHIR+extension+registrationDate"
+                if imis_insuree.validity_from == None:
+                    extension.valueString = "null"
                 else :
-                    extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960135203/FHIE+extension+Profession"
-                    if hasattr(imis_insuree, "profession") and imis_insuree.profession is not None:
-                        extension.valueBoolean = imis_insuree.profession.profession
-                fhir_patient.extension.append(extension)
-            build_extension(fhir_patient, imis_insuree,"head")
-            build_extension(fhir_patient, imis_insuree,"validity_from")
-            build_extension(fhir_patient, imis_insuree,"family.location.code")
-            build_extension(fhir_patient, imis_insuree,"education.education")
-            build_extension(fhir_patient, imis_insuree,"profession.profession")
+                    extension.valueString = imis_insuree.validity_from
+            elif value == "family.location.code":
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960495619/FHIR+extension+Location"
+                if hasattr(imis_insuree, "family") and imis_insuree.family is not None:
+                    if imis_insuree.family.location.code == None:
+                        extension.valueString = "null"
+                    else :
+                        extension.valueString = imis_insuree.family.location.code
+
+            elif value == "education.education":
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331788/FHIR+extension+Education"
+                if hasattr(imis_insuree, "education") and imis_insuree.education is not None:
+                    if imis_insuree.education.education == None:
+                        extension.valueString = "null"
+                    else :
+                        extension.valueString = imis_insuree.education.education
+            else :
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960135203/FHIE+extension+Profession"
+                if hasattr(imis_insuree, "profession") and imis_insuree.profession is not None:
+                    if imis_insuree.profession.profession == None:
+                        extension.valueString = "null"
+                    else :
+                        extension.valueString = imis_insuree.profession.profession
+            fhir_patient.extension.append(extension)
+        build_extension(fhir_patient, imis_insuree,"head")
+        build_extension(fhir_patient, imis_insuree,"validity_from")
+        build_extension(fhir_patient, imis_insuree,"family.location.code")
+        build_extension(fhir_patient, imis_insuree,"education.education")
+        build_extension(fhir_patient, imis_insuree,"profession.profession")
