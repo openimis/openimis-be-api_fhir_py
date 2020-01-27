@@ -10,7 +10,7 @@ class CoverageGrouping(BackboneElement):
     planDisplay = Property('planDisplay', str)
     subPlan = Property('subPlan', str)
     subPlanDisplay = Property('subPlanDisplay', str)
-    clazz = Property('class', str)
+    clazz = Property('clazz', 'string')
     classDisplay = Property('classDisplay', str)
     subClass = Property('subClass', str)
     subClassDisplay = Property('subClassDisplay', str)

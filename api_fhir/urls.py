@@ -11,6 +11,7 @@ router.register(r'Claim', views.ClaimViewSet)
 router.register(r'ClaimResponse', views.ClaimResponseViewSet)
 router.register(r'CommunicationRequest', views.CommunicationRequestViewSet)
 router.register(r'EligibilityRequest', views.EligibilityRequestViewSet)
+router.register(r'Coverage', views.CoverageRequestQuerySet)
 
 urlpatterns = [
     path('', include(router.urls)),

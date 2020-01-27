@@ -1,6 +1,7 @@
 from api_fhir.configurations import BaseApiFhirConfiguration, Stu3IdentifierConfig, \
     Stu3LocationConfig, Stu3MaritalConfig, Stu3IssueTypeConfig, Stu3ClaimConfig, Stu3EligibilityConfiguration, \
     Stu3CommunicationRequestConfig
+from api_fhir.configurations.stu3CoverageConfig import Stu3CoverageConfig
 
 
 class Stu3ApiFhirConfig(BaseApiFhirConfiguration):
@@ -32,3 +33,7 @@ class Stu3ApiFhirConfig(BaseApiFhirConfiguration):
     @classmethod
     def get_communication_request_configuration(cls):
         return Stu3CommunicationRequestConfig
+
+    @classmethod
+    def get_coverage_configuration(cls):
+        return Stu3CoverageConfig

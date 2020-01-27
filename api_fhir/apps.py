@@ -94,6 +94,17 @@ DEFAULT_CFG = {
         "fhir_drug_prescribed_code": "drug_prescribed",
         "fhir_drug_received_code": "drug_received",
         "fhir_asessment_code": "asessment"
+    },
+    "stu3_fhir_coverage_config": {
+        "fhir_family_refereence_code": "FamilyReference",
+        "fhir_status_idle_code": "Idle",
+        "fhir_status_active_code": "active",
+        "fhir_status_suspended_code": "suspended",
+        "fhir_status_expired_code": "Expired",
+        "fhir_item_code": "item",
+        "fhir_service_code": "service",
+        "fhir_practitioner_role_code": "Practitioner",
+        "fhir_product_code": "Product"
     }
 }
 

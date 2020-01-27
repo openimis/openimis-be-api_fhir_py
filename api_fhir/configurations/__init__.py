@@ -302,6 +302,49 @@ class CommunicationRequestConfiguration(BaseConfiguration):  # pragma: no cover
         raise NotImplementedError('`get_fhir_asessment_code()` must be implemented.')
 
 
+class CoverageConfiguration(BaseConfiguration):  # pragma: no cover
+
+    @classmethod
+    def build_configuration(cls, cfg):
+        raise NotImplementedError('`build_configuration()` must be implemented.')
+
+    @classmethod
+    def get_family_reference_code(cls):
+        raise NotImplementedError('`get_family_reference_code()` must be implemented.')
+
+    @classmethod
+    def get_status_idle_code(cls):
+        raise NotImplementedError('`get_status_idle_code()` must be implemented.')
+
+    @classmethod
+    def get_status_active_code(cls):
+        raise NotImplementedError('`get_status_active_code()` must be implemented.')
+
+    @classmethod
+    def get_status_suspended_code(cls):
+        raise NotImplementedError('`get_status_suspended_code()` must be implemented.')
+
+    @classmethod
+    def get_status_expired_code(cls):
+        raise NotImplementedError('`get_status_expired_code()` must be implemented.')
+
+    @classmethod
+    def get_item_code(cls):
+        raise NotImplementedError('`get_item_code()` must be implemented.')
+
+    @classmethod
+    def get_service_code(cls):
+        raise NotImplementedError('`get_service_code()` must be implemented.')
+
+    @classmethod
+    def get_service_code(cls):
+        raise NotImplementedError('`get_practitioner_role_code()` must be implemented.')
+
+    @classmethod
+    def get_product_code(cls):
+        raise NotImplementedError('`get_product_code()` must be implemented.')
+
+
 class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
 
     @classmethod
@@ -313,6 +356,7 @@ class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
         cls.get_claim_configuration().build_configuration(cfg)
         cls.get_eligibility_configuration().build_configuration(cfg)
         cls.get_communication_request_configuration().build_configuration(cfg)
+        cls.get_coverage_configuration().build_configuration(cfg)
 
     @classmethod
     def get_identifier_configuration(cls):
@@ -342,6 +386,10 @@ class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
     def get_communication_request_configuration(cls):
         raise NotImplementedError('`get_communication_request_configuration()` must be implemented.')
 
+    @classmethod
+    def get_coverage_configuration(cls):
+        raise NotImplementedError('`get_coverage_configuration()` must be implemented.')
+
 
 from api_fhir.configurations.generalConfiguration import GeneralConfiguration
 from api_fhir.configurations.stu3IdentifierConfig import Stu3IdentifierConfig
@@ -353,3 +401,4 @@ from api_fhir.configurations.stu3EligibilityConfiguration import Stu3Eligibility
 from api_fhir.configurations.stu3CommunicationRequestConfig import Stu3CommunicationRequestConfig
 from api_fhir.configurations.stu3ApiFhirConfig import Stu3ApiFhirConfig
 from api_fhir.configurations.moduleConfiguration import ModuleConfiguration
+from api_fhir.configurations.stu3CoverageConfig import Stu3CoverageConfig
