@@ -104,7 +104,9 @@ DEFAULT_CFG = {
         "fhir_item_code": "item",
         "fhir_service_code": "service",
         "fhir_practitioner_role_code": "Practitioner",
-        "fhir_product_code": "Product"
+        "fhir_product_code": "Product",
+        "fhir_effective_date_code": "EffectiveDate",
+        "fhir_enroll_date_code": "EnrollDate"
     }
 }
 

@@ -10,25 +10,24 @@ class CoverageConventer(BaseFHIRConverter):
     @classmethod
     def to_fhir_obj(cls, imis_policy):
         fhir_coverage = Coverage()
-        cls.build_policy_identifier(fhir_coverage, imis_policy)
-        cls.build_policy_holder(fhir_coverage, imis_policy)
+        cls.build_coverage_identifier(fhir_coverage, imis_policy)
+        cls.build_coverage_policy_holder(fhir_coverage, imis_policy)
         cls.build_coverage_period(fhir_coverage, imis_policy)
-        cls.build_policy_status(fhir_coverage, imis_policy)
+        cls.build_coverage_status(fhir_coverage, imis_policy)
         cls.build_coverage_contract(fhir_coverage, imis_policy)
         cls.build_coverage_grouping(fhir_coverage, imis_policy)
         cls.build_coverage_extension(fhir_coverage, imis_policy)
-
         return fhir_coverage
 
     @classmethod
-    def build_policy_identifier(cls, fhir_coverage, imis_policy):
+    def build_coverage_identifier(cls, fhir_coverage, imis_policy):
         identifiers = []
         cls.build_fhir_uuid_identifier(identifiers, imis_policy)
         fhir_coverage.identifier = identifiers
         return fhir_coverage
 
     @classmethod
-    def build_policy_holder(cls, fhir_coverage, imis_policy):
+    def build_coverage_policy_holder(cls, fhir_coverage, imis_policy):
         reference = Reference()
         resource_type = Stu3CoverageConfig.get_family_reference_code()
         resource_id = imis_policy.family.uuid
@@ -45,7 +44,7 @@ class CoverageConventer(BaseFHIRConverter):
         return period
 
     @classmethod
-    def build_policy_status(cls, fhir_coverage, imis_policy):
+    def build_coverage_status(cls, fhir_coverage, imis_policy):
         code = imis_policy.status
         fhir_coverage.status = cls.__map_status(code)
         return fhir_coverage
@@ -104,12 +103,14 @@ class CoverageConventer(BaseFHIRConverter):
 
     @classmethod
     def __build_effective_date(cls, fhir_coverage, imis_coverage):
-        enroll_date = cls.__build_date_extension(imis_coverage.effective_date, "EffectiveDate")
+        enroll_date = cls.__build_date_extension(imis_coverage.effective_date,
+                                                 Stu3CoverageConfig.get_effective_date_code())
         fhir_coverage.extension.append(enroll_date)
 
     @classmethod
     def __build_enroll_date(cls, fhir_coverage, imis_coverage):
-        enroll_date = cls.__build_date_extension(imis_coverage.enroll_date, "EnrollDate")
+        enroll_date = cls.__build_date_extension(imis_coverage.enroll_date,
+                                                 Stu3CoverageConfig.get_enroll_date_code())
         fhir_coverage.extension.append(enroll_date)
 
     @classmethod

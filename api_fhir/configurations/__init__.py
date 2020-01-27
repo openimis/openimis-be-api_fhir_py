@@ -344,6 +344,14 @@ class CoverageConfiguration(BaseConfiguration):  # pragma: no cover
     def get_product_code(cls):
         raise NotImplementedError('`get_product_code()` must be implemented.')
 
+    @classmethod
+    def get_enroll_date_code(cls):
+        raise NotImplementedError('`get_enroll_date_code()` must be implemented.')
+
+    @classmethod
+    def get_effective_date_code(cls):
+        raise NotImplementedError('`get_effective_date_code()` must be implemented.')
+
 
 class BaseApiFhirConfiguration(BaseConfiguration):  # pragma: no cover
 

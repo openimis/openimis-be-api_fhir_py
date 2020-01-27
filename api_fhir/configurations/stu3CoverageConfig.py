@@ -42,3 +42,11 @@ class Stu3CoverageConfig(CoverageConfiguration):
     @classmethod
     def get_product_code(cls):
         return cls.get_config().stu3_fhir_claim_config.get('fhir_product_code', "Product")
+
+    @classmethod
+    def get_enroll_date_code(cls):
+        return cls.get_config().stu3_fhir_claim_config.get('fhir_enroll_date_code', "EnrollDate")
+
+    @classmethod
+    def get_effective_date_code(cls):
+        return cls.get_config().stu3_fhir_claim_config.get('fhir_effective_date_code', "EffectiveDate")
