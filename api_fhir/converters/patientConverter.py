@@ -12,9 +12,6 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
     @classmethod
     def to_fhir_obj(cls, imis_insuree):
-        # flag = views.InsureeViewSet.check_for_extension(views.InsureeViewSet,request)
-        # <rest_framework.request.Request object at 0x110452b90>
-        # flag = 1
         fhir_patient = Patient()
         cls.build_fhir_pk(fhir_patient, imis_insuree.uuid)
         cls.build_human_names(fhir_patient, imis_insuree)
@@ -24,7 +21,6 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_marital_status(fhir_patient, imis_insuree)
         cls.build_fhir_telecom(fhir_patient, imis_insuree)
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
-        # if flag:
         cls.build_fhir_extentions(fhir_patient, imis_insuree)
         return fhir_patient
 
