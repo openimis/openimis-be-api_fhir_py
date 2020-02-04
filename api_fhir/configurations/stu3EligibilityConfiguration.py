@@ -96,4 +96,4 @@ class Stu3EligibilityConfiguration(EligibilityConfiguration):
 
     @classmethod
     def get_fhir_active_policy_status(cls):
-        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_active_policy_status', ('A,'))
+        return cls.get_config().stu3_fhir_eligibility_config.get('fhir_active_policy_status', ('A', 2))
