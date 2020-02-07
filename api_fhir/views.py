@@ -7,7 +7,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
-
+import datetime
 from api_fhir.paginations import FhirBundleResultsSetPagination
 from api_fhir.permissions import FHIRApiPermissions
 from api_fhir.configurations import Stu3EligibilityConfiguration as Config
@@ -34,8 +34,20 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
     serializer_class = PatientSerializer
 
     def list(self, request, *args, **kwargs):
+        refeDate = request.GET.get('claimDateFrom')
+        if refeDate != None:
+            day,month,year = refeDate.split('-')
+            isValidDate = True
+            try :
+                datetime.datetime(int(year),int(month),int(day))
+            except ValueError :
+                isValidDate = False
+            datevar = refeDate
+            insureeid = Claim.objects.all().filter(date_claimed__gte=datevar).values('insuree')
+            queryset = Insuree.objects.filter(validity_to__isnull=True).filter(id__in=insureeid)
+        else:
+            queryset = Insuree.objects.filter(validity_to__isnull=True)
         identifier = request.GET.get("identifier")
-        queryset = Insuree.objects.filter(validity_to__isnull=True)
         if identifier:
             queryset = queryset.filter(chf_id=identifier)
 
