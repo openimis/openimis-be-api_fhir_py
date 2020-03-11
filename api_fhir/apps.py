@@ -86,7 +86,7 @@ DEFAULT_CFG = {
         "fhir_is_service_ok_code": "is_service_ok",
         "fhir_balance_code": "balance",
         "fhir_balance_default_category": "medical",
-        "fhir_active_policy_status": ("A",)
+        "fhir_active_policy_status": ("A", 2)
     },
     "stu3_fhir_communication_request_config": {
         "fhir_care_rendered_code": "care_rendered",
@@ -94,6 +94,19 @@ DEFAULT_CFG = {
         "fhir_drug_prescribed_code": "drug_prescribed",
         "fhir_drug_received_code": "drug_received",
         "fhir_asessment_code": "asessment"
+    },
+    "stu3_fhir_coverage_config": {
+        "fhir_family_refereence_code": "FamilyReference",
+        "fhir_status_idle_code": "Idle",
+        "fhir_status_active_code": "active",
+        "fhir_status_suspended_code": "suspended",
+        "fhir_status_expired_code": "Expired",
+        "fhir_item_code": "item",
+        "fhir_service_code": "service",
+        "fhir_practitioner_role_code": "Practitioner",
+        "fhir_product_code": "Product",
+        "fhir_effective_date_code": "EffectiveDate",
+        "fhir_enroll_date_code": "EnrollDate"
     }
 }
 

@@ -1,6 +1,8 @@
 from claim.models import ClaimAdmin, Claim, Feedback
 from insuree.models import Insuree
 from location.models import HealthFacility
+from policy.models import Policy
+from product.models import Product
 
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication
@@ -14,6 +16,7 @@ from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
     PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, PolicyEligibilityRequestSerializer, \
     ClaimResponseSerializer, CommunicationRequestSerializer
+from api_fhir.serializers.coverageSerializer import CoverageSerializer
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -108,3 +111,9 @@ class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixin
 class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericViewSet):
     queryset = Insuree.objects.none()
     serializer_class = eval(Config.get_serializer())
+
+
+class CoverageRequestQuerySet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    lookup_field = 'uuid'
+    queryset = Policy.objects.all()
+    serializer_class = CoverageSerializer
