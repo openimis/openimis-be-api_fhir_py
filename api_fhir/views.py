@@ -88,6 +88,15 @@ class PractitionerViewSet(BaseFHIRView, viewsets.ModelViewSet):
     queryset = ClaimAdmin.objects.all()
     serializer_class = PractitionerSerializer
 
+    def list(self, request, *args, **kwargs):
+        identifier = request.GET.get("identifier")
+        queryset = ClaimAdmin.objects.filter(validity_to__isnull=True)
+        if identifier:
+            queryset = queryset.filter(code=identifier)
+
+        serializer = PractitionerSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin,
                    mixins.CreateModelMixin, GenericViewSet):
