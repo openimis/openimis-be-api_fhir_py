@@ -1,10 +1,12 @@
+from api_fhir.converters import OperationOutcomeConverter
 from claim.models import ClaimAdmin, Claim, Feedback
+from django.db.models import OuterRef, Exists
 from insuree.models import Insuree
 from location.models import HealthFacility
 from policy.models import Policy
 from product.models import Product
 
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -37,20 +39,24 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
     serializer_class = PatientSerializer
 
     def list(self, request, *args, **kwargs):
-        refeDate = request.GET.get('claimDateFrom')
-        if refeDate != None:
-            day,month,year = refeDate.split('-')
-            isValidDate = True
-            try :
-                datetime.datetime(int(year),int(month),int(day))
-            except ValueError :
-                isValidDate = False
-            datevar = refeDate
-            insureeid = Claim.objects.all().filter(date_claimed__gte=datevar).values('insuree')
-            queryset = Insuree.objects.filter(validity_to__isnull=True).filter(id__in=insureeid)
-        else:
-            queryset = Insuree.objects.filter(validity_to__isnull=True)
+        claim_date = request.GET.get('claimDateFrom')
         identifier = request.GET.get("identifier")
+
+        queryset = Insuree.objects.all()
+
+        if claim_date is not None:
+            day, month, year = claim_date.split('-')
+            try:
+                claim_date_parsed = datetime.datetime(int(year), int(month), int(day))
+            except ValueError:
+                result = OperationOutcomeConverter.build_for_400_bad_request("claimDateFrom should be in dd-mm-yyyy format")
+                return Response(result.toDict(), status.HTTP_400_BAD_REQUEST)
+            has_claim_in_range = Claim.objects\
+                .filter(date_claimed__gte=claim_date_parsed)\
+                .filter(insuree_id=OuterRef("id"))\
+                .values("id")
+            queryset = queryset.annotate(has_claim_in_range=Exists(has_claim_in_range)).filter(has_claim_in_range=True)
+
         if identifier:
             queryset = queryset.filter(chf_id=identifier)
 
