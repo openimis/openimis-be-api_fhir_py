@@ -13,7 +13,10 @@ class PractitionerRoleConverterTestCase(PractitionerRoleTestMixin):
     def setUp(self):
         super(PractitionerRoleConverterTestCase, self).setUp()
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        self._test_practitioner_role_json_representation = open(dir_path + self.__TEST_PRACTITIONER_ROLE_JSON_PATH).read()
+        self._test_practitioner_role_json_representation = open(
+            dir_path + self.__TEST_PRACTITIONER_ROLE_JSON_PATH).read()
+        if self._test_practitioner_role_json_representation[-1:] == "\n":
+            self._test_practitioner_role_json_representation = self._test_practitioner_role_json_representation[:-1]
 
     def test_to_fhir_obj(self):
         self.setUp()

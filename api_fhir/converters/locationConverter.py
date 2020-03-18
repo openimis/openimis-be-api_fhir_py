@@ -19,7 +19,7 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_fhir_location_name(fhir_location, imis_hf)
         cls.build_fhir_location_type(fhir_location, imis_hf)
         cls.build_fhir_location_address(fhir_location, imis_hf)
-        cls.build_fhir_location_telcome(fhir_location, imis_hf)
+        cls.build_fhir_location_telecom(fhir_location, imis_hf)
         return fhir_location
 
     @classmethod
@@ -110,9 +110,9 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
         location_type = fhir_location.type
         if not cls.valid_condition(location_type is None,
                                    gettext('Missing patient `type` attribute'), errors):
-            for maritialCoding in location_type.coding:
-                if maritialCoding.system == Stu3LocationConfig.get_fhir_location_role_type_system():
-                    code = maritialCoding.code
+            for maritalCoding in location_type.coding:
+                if maritalCoding.system == Stu3LocationConfig.get_fhir_location_role_type_system():
+                    code = maritalCoding.code
                     if code == Stu3LocationConfig.get_fhir_code_for_health_center():
                         imis_hf.level = ImisHfLevel.HEALTH_CENTER.value
                     elif code == Stu3LocationConfig.get_fhir_code_for_hospital():
@@ -135,7 +135,7 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
                 imis_hf.address = address.text
 
     @classmethod
-    def build_fhir_location_telcome(cls, fhir_location, imis_hf):
+    def build_fhir_location_telecom(cls, fhir_location, imis_hf):
         telecom = []
         if imis_hf.phone is not None:
             phone = LocationConverter.build_fhir_contact_point(imis_hf.phone, ContactPointSystem.PHONE.value,

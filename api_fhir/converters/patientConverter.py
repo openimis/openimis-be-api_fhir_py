@@ -226,7 +226,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     @classmethod
     def build_fhir_extentions(cls, fhir_patient, imis_insuree):
         fhir_patient.extension = []
-        
+
         def build_extension(fhir_patient, imis_insuree,value):
             extension = Extension()
             if value == "head":
@@ -256,7 +256,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                     else :
                         extension.valueString = ""
                 else:
-                     extension.valueString = ""        
+                     extension.valueString = ""
             else :
                 extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960135203/FHIE+extension+Profession"
                 if hasattr(imis_insuree, "profession") and imis_insuree.profession is not None:
