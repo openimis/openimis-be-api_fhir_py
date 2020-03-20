@@ -15,6 +15,8 @@ class ClaimConverterTestCase(ClaimTestMixin):
         super(ClaimConverterTestCase, self).setUp()
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self._test_claim_json_representation = open(dir_path + self.__TEST_CLAIM_JSON_PATH).read()
+        if self._test_claim_json_representation[-1:] == "\n":
+            self._test_claim_json_representation = self._test_claim_json_representation[:-1]
 
     @mock.patch('claim.models.ClaimItem.objects')
     @mock.patch('claim.models.ClaimService.objects')

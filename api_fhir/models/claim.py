@@ -141,7 +141,7 @@ class Claim(DomainResource):
     use = Property('use', str)
     patient = Property('patient', 'Reference')  # referencing `Patient`
     billablePeriod = Property('billablePeriod', 'Period')
-    created	= Property('created', 'FHIRDate')
+    created = Property('created', 'FHIRDate')
     enterer = Property('enterer', 'Reference')  # referencing `Practitioner`
     insurer = Property('insurer', 'Reference')  # referencing `Organization`
     provider = Property('provider', 'Reference')  # referencing `Practitioner`

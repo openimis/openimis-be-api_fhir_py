@@ -11,6 +11,7 @@ from api_fhir.utils import TimeUtils
 class CommunicationRequestTestMixin(GenericTestMixin):
 
     _TEST_FEEDBACK_ID = "1"
+    _TEST_FEEDBACK_UUID = "612a1e12-ce44-4632-90a8-129ec714ec59"
     _TEST_FEEDBACK_DATE = "2010-11-16T00:00:00"
     _TEST_CARE_RENDERED = True
     _TEST_PAYMENT_ASKED = False
@@ -21,6 +22,7 @@ class CommunicationRequestTestMixin(GenericTestMixin):
     def create_test_imis_instance(self):
         imis_feedback = Feedback()
         imis_feedback.id = self._TEST_FEEDBACK_ID
+        imis_feedback.uuid = self._TEST_FEEDBACK_UUID
         imis_feedback.feedback_date = TimeUtils.str_to_date(self._TEST_FEEDBACK_DATE)
         imis_feedback.care_rendered = self._TEST_CARE_RENDERED
         imis_feedback.payment_asked = self._TEST_PAYMENT_ASKED
@@ -31,10 +33,10 @@ class CommunicationRequestTestMixin(GenericTestMixin):
 
     def create_test_fhir_instance(self):
         fhir_communication_request = CommunicationRequest()
-        fhir_communication_request.id = self._TEST_FEEDBACK_ID
+        fhir_communication_request.id = self._TEST_FEEDBACK_UUID
         fhir_communication_request.occurrenceDateTime = self._TEST_FEEDBACK_DATE
         identifiers = []
-        identifier = Converter.build_fhir_identifier(self._TEST_FEEDBACK_ID,
+        identifier = Converter.build_fhir_identifier(self._TEST_FEEDBACK_UUID,
                                                      Stu3IdentifierConfig.get_fhir_identifier_type_system(),
                                                      Stu3IdentifierConfig.get_fhir_uuid_type_code())
         identifiers.append(identifier)
@@ -53,8 +55,8 @@ class CommunicationRequestTestMixin(GenericTestMixin):
         return fhir_communication_request
 
     def verify_fhir_instance(self, fhir_obj):
-        self.assertEqual(self._TEST_FEEDBACK_ID, fhir_obj.id)
-        self.assertEqual(self._TEST_FEEDBACK_ID, fhir_obj.identifier[0].value)
+        self.assertEqual(self._TEST_FEEDBACK_UUID, fhir_obj.id)
+        self.assertEqual(self._TEST_FEEDBACK_UUID, fhir_obj.identifier[0].value)
         self.assertEqual(self._TEST_FEEDBACK_DATE, fhir_obj.occurrenceDateTime)
         for reason in fhir_obj.reasonCode:
             value = reason.text
