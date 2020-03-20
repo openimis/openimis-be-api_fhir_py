@@ -50,7 +50,7 @@ class ClaimResponseAddItemDetail(BackboneElement):
 
 class ClaimResponseAddItem(BackboneElement):
 
-    sequenceLinkId = Property('sequence', int, count_max='*')
+    sequenceLinkId = Property('sequenceLinkId', int, count_max='*')
     revenue = Property('revenue', 'CodeableConcept')
     category = Property('category', 'CodeableConcept')
     service = Property('service', 'CodeableConcept')
