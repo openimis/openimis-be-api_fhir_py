@@ -1,18 +1,12 @@
 from api_fhir.converters import OperationOutcomeConverter
-from api_fhir.paginations import FhirBundleResultsSetPagination
-from api_fhir.permissions import FHIRApiPermissions, FHIRApiClaimPermissions, FHIRApiEligibilityRequestPermissions, \
+from api_fhir.permissions import FHIRApiClaimPermissions, FHIRApiEligibilityRequestPermissions, \
     FHIRApiCoverageRequestPermissions, FHIRApiCommunicationRequestPermissions, FHIRApiPractitionerPermissions, \
     FHIRApiHFPermissions, FHIRApiInsureePermissions
-from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
-    PractitionerSerializer, ClaimSerializer, ClaimResponseSerializer, CommunicationRequestSerializer
-from claim import ClaimConfig
 from claim.models import ClaimAdmin, Claim, Feedback
-from django.contrib.auth.models import PermissionsMixin
 from django.db.models import OuterRef, Exists
 from insuree.models import Insuree
 from location.models import HealthFacility
 from policy.models import Policy
-from product.models import Product
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import SessionAuthentication
