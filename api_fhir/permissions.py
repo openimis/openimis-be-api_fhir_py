@@ -1,4 +1,4 @@
-from claim import ClaimConfig
+from claim.apps import ClaimConfig
 from insuree.apps import InsureeConfig
 from location.apps import LocationConfig
 from policy.apps import PolicyConfig
