@@ -1,5 +1,6 @@
-from claim import ClaimSubmitService, ClaimSubmit
+from claim import ClaimSubmitService, ClaimSubmit, ClaimConfig
 from claim.models import Claim
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 
 from api_fhir.converters import ClaimResponseConverter
@@ -32,8 +33,11 @@ class ClaimSerializer(BaseFHIRSerializer):
                                    comment=validated_data.get('explanation')
                                    )
         request = self.context.get("request")
-        ClaimSubmitService(request.user).submit(claim_submit)
-        return self.create_claim_response(validated_data.get('code'))
+        if request.user and request.user.has_perms(ClaimConfig.gql_mutation_create_claims_perms):
+            ClaimSubmitService(request.user).submit(claim_submit)
+            return self.create_claim_response(validated_data.get('code'))
+        else:
+            return HttpResponseForbidden()
 
     def create_claim_response(self, claim_code):
         claim = get_object_or_404(Claim, code=claim_code)

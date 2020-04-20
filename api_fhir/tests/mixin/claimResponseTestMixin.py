@@ -1,12 +1,13 @@
-from claim.models import Claim, Feedback, ClaimItem, ClaimService
-from medical.models import Item, Service
+import uuid
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3ClaimConfig
 from api_fhir.converters import ClaimResponseConverter, CommunicationRequestConverter
 from api_fhir.models import ClaimResponse, ClaimResponsePayment, Money, ClaimResponseError, ClaimResponseItem, \
-    ClaimResponseItemAdjudication, ClaimResponseProcessNote
+    ClaimResponseItemAdjudication, ClaimResponseProcessNote, CommunicationRequest
 from api_fhir.tests import GenericTestMixin
 from api_fhir.utils import TimeUtils
+from claim.models import Claim, Feedback, ClaimItem, ClaimService
+from medical.models import Item, Service
 
 
 class ClaimResponseTestMixin(GenericTestMixin):
@@ -18,6 +19,7 @@ class ClaimResponseTestMixin(GenericTestMixin):
     _TEST_APPROVED = 214.25
     _TEST_REJECTION_REASON = '1'
     _TEST_FEEDBACK_ID = 1
+    _TEST_FEEDBACK_UUID = "6ed1dec4-1dbd-4da2-840d-8383e45419a6"
     _TEST_ITEM_CODE = "iCode"
     _TEST_ITEM_STATUS = 1
     _TEST_ITEM_QUANTITY_APPROVED = 4
@@ -31,6 +33,7 @@ class ClaimResponseTestMixin(GenericTestMixin):
     _TEST_SERVICE_REJECTED_REASON = 3
     _TEST_SERVICE_LIMITATION_VALUE = 4
     _TEST_ID = 1
+    _TEST_UUID = "ae580700-0277-4c98-adab-d98c0f7e681b"
 
     def setUp(self):
         self._TEST_ITEM = self.create_test_claim_item()
@@ -61,6 +64,7 @@ class ClaimResponseTestMixin(GenericTestMixin):
     def create_test_imis_instance(self):
         imis_claim = Claim()
         imis_claim.id = self._TEST_ID
+        imis_claim.uuid = self._TEST_UUID
         imis_claim.code = self._TEST_CODE
         imis_claim.status = self._TEST_STATUS
         imis_claim.adjustment = self._TEST_ADJUSTMENT
@@ -69,18 +73,20 @@ class ClaimResponseTestMixin(GenericTestMixin):
         imis_claim.rejection_reason = self._TEST_REJECTION_REASON
         feedback = Feedback()
         feedback.id = self._TEST_FEEDBACK_ID
+        feedback.uuid = self._TEST_FEEDBACK_UUID
         imis_claim.feedback = feedback
         return imis_claim
 
     def create_test_fhir_instance(self):
         fhir_claim_response = ClaimResponse()
-        fhir_claim_response.id = self._TEST_CODE
-        pk_id = ClaimResponseConverter.build_fhir_identifier(self._TEST_ID,
+        fhir_claim_response.id = self._TEST_UUID
+        pk_id = ClaimResponseConverter.build_fhir_identifier(self._TEST_UUID,
                                                              Stu3IdentifierConfig.get_fhir_identifier_type_system(),
                                                              Stu3IdentifierConfig.get_fhir_uuid_type_code())
-        claim_code = ClaimResponseConverter.build_fhir_identifier(self._TEST_CODE,
-                                                          Stu3IdentifierConfig.get_fhir_identifier_type_system(),
-                                                          Stu3IdentifierConfig.get_fhir_claim_code_type())
+        claim_code = ClaimResponseConverter.build_fhir_identifier(
+            self._TEST_CODE,
+            Stu3IdentifierConfig.get_fhir_identifier_type_system(),
+            Stu3IdentifierConfig.get_fhir_claim_code_type())
         fhir_claim_response.identifier = [pk_id, claim_code]
         display = Stu3ClaimConfig.get_fhir_claim_status_rejected_code()
         fhir_claim_response.outcome = ClaimResponseConverter.build_codeable_concept(self._TEST_STATUS, system=None,
@@ -95,8 +101,10 @@ class ClaimResponseTestMixin(GenericTestMixin):
         fhir_error = ClaimResponseError()
         fhir_error.code = ClaimResponseConverter.build_codeable_concept(self._TEST_REJECTION_REASON)
         fhir_claim_response.error = [fhir_error]
+        # This is an IMIS object that is converted to FHIR
         feedback = Feedback()
         feedback.id = self._TEST_FEEDBACK_ID
+        feedback.uuid = self._TEST_FEEDBACK_UUID
         fhir_claim_response.communicationRequest = \
             [CommunicationRequestConverter.build_fhir_resource_reference(feedback)]
         self.build_response_item(fhir_claim_response)
@@ -139,7 +147,8 @@ class ClaimResponseTestMixin(GenericTestMixin):
         item_limitation.value = self._TEST_SERVICE_LIMITATION_VALUE
         service_general_adjudication.amount = item_limitation
         service_general_adjudication.reason = ClaimResponseConverter \
-            .build_codeable_concept(self._TEST_SERVICE_STATUS, Stu3ClaimConfig.get_fhir_claim_item_status_rejected_code())
+            .build_codeable_concept(self._TEST_SERVICE_STATUS,
+                                    Stu3ClaimConfig.get_fhir_claim_item_status_rejected_code())
         service_general_adjudication.value = self._TEST_SERVICE_QUANTITY_APPROVED
         service.adjudication.append(service_general_adjudication)
         item_rejection_adjudication = ClaimResponseItemAdjudication()
@@ -156,18 +165,22 @@ class ClaimResponseTestMixin(GenericTestMixin):
         fhir_claim_response.processNote.append(item_note)
 
     def verify_fhir_instance(self, fhir_obj):
-        self.assertEqual(str(self._TEST_CODE), fhir_obj.id)
+        self.assertEqual(self._TEST_UUID, fhir_obj.id)
+        main_id_check = False
         for identifier in fhir_obj.identifier:
+            if identifier.value == fhir_obj.id:
+                main_id_check = True
             if identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
-                self.assertEqual(str(self._TEST_ID), identifier.value)
+                self.assertEqual(str(self._TEST_UUID), identifier.value)
             elif identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_claim_code_type():
                 self.assertEqual(self._TEST_CODE, identifier.value)
+        self.assertTrue(main_id_check, "One of the identifiers should match the main ID")
         self.assertEqual(self._TEST_STATUS, fhir_obj.outcome.coding[0].code)
         self.assertEqual(self._TEST_ADJUSTMENT, fhir_obj.payment.adjustmentReason.text)
         self.assertEqual(self._TEST_DATE_PROCESSED, fhir_obj.payment.date)
         self.assertEqual(self._TEST_APPROVED, fhir_obj.totalBenefit.value)
         self.assertEqual(self._TEST_REJECTION_REASON, fhir_obj.error[0].code.coding[0].code)
-        self.assertEqual(str(self._TEST_FEEDBACK_ID), CommunicationRequestConverter.get_resource_id_from_reference(
+        self.assertEqual(str(self._TEST_FEEDBACK_UUID), CommunicationRequestConverter.get_resource_id_from_reference(
             fhir_obj.communicationRequest[0]))
         self.assertEqual(str(self._TEST_ITEM_STATUS), fhir_obj.item[0].adjudication[0].reason.coding[0].code)
         self.assertEqual(self._TEST_ITEM_QUANTITY_APPROVED, fhir_obj.item[0].adjudication[0].value)

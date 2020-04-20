@@ -1,13 +1,12 @@
 from django.utils.translation import gettext
-from insuree.models import Insuree, Gender
+from insuree.models import Insuree, Gender, Education, Profession, Family
+from location.models import Location
 
 from api_fhir.configurations import Stu3IdentifierConfig, GeneralConfiguration, Stu3MaritalConfig
 from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
-from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus
-
+from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus, Extension
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.utils import TimeUtils, DbManagerUtils
-
 
 class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
 
@@ -22,6 +21,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_marital_status(fhir_patient, imis_insuree)
         cls.build_fhir_telecom(fhir_patient, imis_insuree)
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
+        cls.build_fhir_extentions(fhir_patient, imis_insuree)
         return fhir_patient
 
     @classmethod
@@ -222,3 +222,54 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                     imis_insuree.current_address = address.text
                 elif address.type == AddressType.BOTH.value:
                     imis_insuree.geolocation = address.text
+
+    @classmethod
+    def build_fhir_extentions(cls, fhir_patient, imis_insuree):
+        fhir_patient.extension = []
+
+        def build_extension(fhir_patient, imis_insuree,value):
+            extension = Extension()
+            if value == "head":
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960069653/FHIR+extension+isHead"
+                extension.valueBoolean = imis_insuree.head
+            elif value == "validity_from":
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331779/FHIR+extension+registrationDate"
+                if imis_insuree.validity_from is  None:
+                    extension.valueString = ""
+                else :
+                    extension.valueString = imis_insuree.validity_from
+            elif value == "family.location.code":
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960495619/FHIR+extension+Location"
+                if hasattr(imis_insuree, "family") and imis_insuree.family is not None:
+                    if imis_insuree.family.location.code is not None:
+                        extension.valueString = imis_insuree.family.location.code
+                    else :
+                        extension.valueString = ""
+                else:
+                     extension.valueString = ""
+
+            elif value == "education.education":
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331788/FHIR+extension+Education"
+                if hasattr(imis_insuree, "education") and imis_insuree.education is not None:
+                    if imis_insuree.education.education is not None:
+                        extension.valueString = imis_insuree.education.education
+                    else :
+                        extension.valueString = ""
+                else:
+                     extension.valueString = ""
+            else :
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960135203/FHIE+extension+Profession"
+                if hasattr(imis_insuree, "profession") and imis_insuree.profession is not None:
+                    if imis_insuree.profession.profession is not None:
+                        extension.valueString = imis_insuree.profession.profession
+                    else :
+                        extension.valueString = ""
+                else:
+                     extension.valueString = ""
+
+            fhir_patient.extension.append(extension)
+        build_extension(fhir_patient, imis_insuree,"head")
+        build_extension(fhir_patient, imis_insuree,"validity_from")
+        build_extension(fhir_patient, imis_insuree,"family.location.code")
+        build_extension(fhir_patient, imis_insuree,"education.education")
+        build_extension(fhir_patient, imis_insuree,"profession.profession")
