@@ -1,6 +1,6 @@
 import copy
 
-from insuree.models import Insuree, Gender, Education, Profession
+from insuree.models import Insuree, Gender
 
 from api_fhir.converters import PatientConverter
 from api_fhir.exceptions import FHIRException

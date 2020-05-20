@@ -18,7 +18,7 @@ from api_fhir.paginations import FhirBundleResultsSetPagination
 from api_fhir.permissions import FHIRApiPermissions
 from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
-    PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, PolicyEligibilityRequestSerializer, \
+    PractitionerSerializer, ClaimSerializer, \
     ClaimResponseSerializer, CommunicationRequestSerializer
 from api_fhir.serializers.coverageSerializer import CoverageSerializer
 
@@ -50,7 +50,8 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
             try:
                 claim_date_parsed = datetime.datetime(int(year), int(month), int(day))
             except ValueError:
-                result = OperationOutcomeConverter.build_for_400_bad_request("claimDateFrom should be in dd-mm-yyyy format")
+                result = OperationOutcomeConverter.build_for_400_bad_request(
+                    "claimDateFrom should be in dd-mm-yyyy format")
                 return Response(result.toDict(), status.HTTP_400_BAD_REQUEST)
             has_claim_in_range = Claim.objects\
                 .filter(date_claimed__gte=claim_date_parsed)\
@@ -66,6 +67,11 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Insuree.get_queryset(None, self.request.user)
+
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
+
 
 class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
     lookup_field = 'uuid'
@@ -84,6 +90,10 @@ class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
     def get_queryset(self):
         return HealthFacility.get_queryset(None, self.request.user)
 
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
+
 
 class PractitionerRoleViewSet(BaseFHIRView, viewsets.ModelViewSet):
     lookup_field = 'uuid'
@@ -96,6 +106,10 @@ class PractitionerRoleViewSet(BaseFHIRView, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ClaimAdmin.get_queryset(None, self.request.user)
+
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
 
 
 class PractitionerViewSet(BaseFHIRView, viewsets.ModelViewSet):
@@ -115,6 +129,10 @@ class PractitionerViewSet(BaseFHIRView, viewsets.ModelViewSet):
     def get_queryset(self):
         return ClaimAdmin.get_queryset(None, self.request.user)
 
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
+
 
 class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin,
                    mixins.CreateModelMixin, GenericViewSet):
@@ -125,6 +143,10 @@ class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixi
     def get_queryset(self):
         return Claim.get_queryset(None, self.request.user)
 
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
+
 
 class ClaimResponseViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
     lookup_field = 'uuid'
@@ -133,6 +155,10 @@ class ClaimResponseViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListM
 
     def get_queryset(self):
         return Claim.get_queryset(None, self.request.user)
+
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
 
 
 class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
@@ -143,6 +169,10 @@ class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixin
     def get_queryset(self):
         return Feedback.get_queryset(None, self.request.user)
 
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
+
 
 class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericViewSet):
     queryset = Insuree.filter_queryset()
@@ -152,6 +182,10 @@ class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericVi
     def get_queryset(self):
         return Insuree.get_queryset(None, self.request.user)
 
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
+
 
 class CoverageRequestQuerySet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
     lookup_field = 'uuid'
@@ -160,3 +194,7 @@ class CoverageRequestQuerySet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.Li
 
     def get_queryset(self):
         return Policy.get_queryset(None, self.request.user)
+
+    def initialize_request(self, request, *args, **kwargs):
+        return BaseFHIRView.initialize_request(self, request, *args, **kwargs)
+        # return viewsets.ModelViewSet.initialize_request(self, request, *args, **kwargs)
