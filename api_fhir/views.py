@@ -20,6 +20,7 @@ from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
     PractitionerSerializer, ClaimSerializer, \
     ClaimResponseSerializer, CommunicationRequestSerializer
+import api_fhir.serializers
 from api_fhir.serializers.coverageSerializer import CoverageSerializer
 
 
@@ -176,7 +177,7 @@ class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixin
 
 class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericViewSet):
     queryset = Insuree.filter_queryset()
-    serializer_class = eval(Config.get_serializer())
+    serializer_class = getattr(api_fhir.serializers, Config.get_serializer())
     permission_classes = (FHIRApiEligibilityRequestPermissions,)
 
     def get_queryset(self):
