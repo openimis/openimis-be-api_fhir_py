@@ -52,14 +52,6 @@ class PropertyList(list, PropertyMixin):
         super(PropertyList, self).__init__(*args, **kwargs)
         self.definition = definition
 
-    def __eq__(self, other):
-        if not isinstance(other, PropertyList):
-            return False
-        return list.__eq__(self, other) and self.definition == other.definition
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def append(self, value):
         self.validate_type(value)
         if len(self) >= self.definition.count_max:
