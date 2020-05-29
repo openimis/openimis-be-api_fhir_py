@@ -15,7 +15,7 @@ class PolicyEligibilityRequestSerializer(BaseFHIRSerializer):
         eligibility_request = ByInsureeRequest(chf_id=validated_data.get('chf_id'))
         request = self.context.get("request")
         try:
-            response = ByInsureeService(request.user).request(eligibility_request)            
+            response = ByInsureeService(request.user).request(eligibility_request)
         except TypeError:
             self.logger.warning('The insuree with chfid `{}` is not connected with policy. '
                                 'The default eligibility response will be used.'
@@ -25,6 +25,6 @@ class PolicyEligibilityRequestSerializer(BaseFHIRSerializer):
 
     def create_default_eligibility_response(self):
         return ByInsureeResponse(
-            eligibility_request=None,
+            by_insuree_request=None,
             items=[]
         )
