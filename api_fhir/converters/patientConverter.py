@@ -1,12 +1,12 @@
 from django.utils.translation import gettext
-from insuree.models import Insuree, Gender, Education, Profession, Family
-from location.models import Location
+from insuree.models import Insuree, Gender
 
 from api_fhir.configurations import Stu3IdentifierConfig, GeneralConfiguration, Stu3MaritalConfig
 from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
 from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus, Extension
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.utils import TimeUtils, DbManagerUtils
+
 
 class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
 

@@ -3,8 +3,7 @@ from policy.services import ByInsureeRequest
 from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.converters import BaseFHIRConverter, PatientConverter, ContractConverter
 from api_fhir.models import EligibilityResponse as FHIREligibilityResponse, InsuranceBenefitBalance, \
-    EligibilityResponseInsurance, InsuranceBenefitBalanceFinancial, Money, Reference, \
-    Identifier
+    EligibilityResponseInsurance, InsuranceBenefitBalanceFinancial, Money
 
 
 class PolicyEligibilityRequestConverter(BaseFHIRConverter):
