@@ -1,0 +1,123 @@
+{
+  "resourceType": "Claim",
+  "billablePeriod": {
+    "end": "2019-06-12T00:00:00",
+    "start": "2019-06-01T00:00:00"
+  },
+  "created": "2019-06-12T00:00:00",
+  "diagnosis": [
+    {
+      "diagnosisCodeableConcept": {
+        "coding": [
+          {
+            "code": "ICD_CD"
+          }
+        ]
+      },
+      "sequence": 1,
+      "type": [
+        {
+          "text": "icd_0"
+        }
+      ]
+    }
+  ],
+  "enterer": {
+    "reference": "Practitioner/254f6268-964b-4d8d-aa26-20081f22235e"
+  },
+  "facility": {
+    "reference": "Location/6d0eea8c-62eb-11ea-94d6-c36229a16c2f"
+  },
+  "id": "315c3b16-62eb-11ea-8e75-df3492b349f6",
+  "identifier": [
+    {
+      "type": {
+        "coding": [
+          {
+            "code": "MR",
+            "system": "https://hl7.org/fhir/valueset-identifier-type.html"
+          }
+        ]
+      },
+      "use": "usual",
+      "value": "code"
+    }
+  ],
+  "information": [
+    {
+      "category": {
+        "text": "guarantee_id"
+      },
+      "sequence": 1,
+      "valueString": "guarantee_id"
+    },
+    {
+      "category": {
+        "text": "explanation"
+      },
+      "sequence": 2,
+      "valueString": "explanation"
+    },
+    {
+      "category": {
+        "text": "item_explanation"
+      },
+      "sequence": 3,
+      "valueString": "item_explanation"
+    },
+    {
+      "category": {
+        "text": "item_explanation"
+      },
+      "sequence": 4,
+      "valueString": "service_explanation"
+    }
+  ],
+  "item": [
+    {
+      "category": {
+        "text": "item"
+      },
+      "informationLinkId": [
+        3
+      ],
+      "quantity": {
+        "value": 4
+      },
+      "sequence": 1,
+      "service": {
+        "text": "iCode"
+      },
+      "unitPrice": {
+        "value": 21.1
+      }
+    },
+    {
+      "category": {
+        "text": "service"
+      },
+      "informationLinkId": [
+        4
+      ],
+      "quantity": {
+        "value": 3
+      },
+      "sequence": 2,
+      "service": {
+        "text": "sCode"
+      },
+      "unitPrice": {
+        "value": 16.1
+      }
+    }
+  ],
+  "patient": {
+    "reference": "Patient/0a60f36c-62eb-11ea-bb93-93ec0339a3dd"
+  },
+  "total": {
+    "value": 42
+  },
+  "type": {
+    "text": "E"
+  }
+}

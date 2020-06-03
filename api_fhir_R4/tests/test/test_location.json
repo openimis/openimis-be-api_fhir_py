@@ -1,0 +1,48 @@
+{
+  "resourceType": "Location",
+  "address": {
+    "text": "TEST_ADDRESS",
+    "type": "physical",
+    "use": "home"
+  },
+  "identifier": [
+    {
+      "type": {
+        "coding": [
+          {
+            "code": "FI",
+            "system": "https://hl7.org/fhir/valueset-identifier-type.html"
+          }
+        ]
+      },
+      "use": "usual",
+      "value": "12345678"
+    }
+  ],
+  "name": "TEST_NAME",
+  "telecom": [
+    {
+      "system": "phone",
+      "use": "home",
+      "value": "133-996-476"
+    },
+    {
+      "system": "fax",
+      "use": "home",
+      "value": "1-408-999 8888"
+    },
+    {
+      "system": "email",
+      "use": "home",
+      "value": "TEST@TEST.com"
+    }
+  ],
+  "type": {
+    "coding": [
+      {
+        "code": "HOSP",
+        "system": "http://hl7.org/fhir/v3/ServiceDeliveryLocationRoleType/vs.html"
+      }
+    ]
+  }
+}
