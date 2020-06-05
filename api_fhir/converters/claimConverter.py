@@ -31,7 +31,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         return fhir_claim
 
     @classmethod
-    def to_imis_obj(cls, fhir_claim, audit_user_id):
+    def to_imis_obj(cls, fhir_claim, audit_user_id, submit_itemsvc=True):
         errors = []
         imis_claim = Claim()
         cls.build_imis_date_claimed(imis_claim, fhir_claim, errors)
@@ -44,7 +44,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_imis_claim_admin(imis_claim, fhir_claim, errors)
         cls.build_imis_visit_type(imis_claim, fhir_claim)
         cls.build_imis_information(imis_claim, fhir_claim)
-        cls.build_imis_submit_items_and_services(imis_claim, fhir_claim)
+        cls.build_imis_items_and_services(imis_claim, fhir_claim, submit_itemsvc)
         cls.check_errors(errors)
         return imis_claim
 
@@ -320,17 +320,24 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         return services
 
     @classmethod
-    def build_imis_submit_items_and_services(cls, imis_claim, fhir_claim):
+    def build_imis_items_and_services(cls, imis_claim, fhir_claim, submit_itemsvc=True):
         imis_items = []
         imis_services = []
         if fhir_claim.item:
             for item in fhir_claim.item:
                 if item.category:
                     if item.category.text == Stu3ClaimConfig.get_fhir_claim_item_code():
-                        cls.build_imis_submit_item(imis_items, item)
+                        if submit_itemsvc:
+                            cls.build_imis_submit_item(imis_items, item)
+                        else:
+                            cls.build_imis_item(imis_items, item)
                     elif item.category.text == Stu3ClaimConfig.get_fhir_claim_service_code():
-                        cls.build_imis_submit_service(imis_services, item)
+                        if submit_itemsvc:
+                            cls.build_imis_submit_service(imis_services, item)
+                        else:
+                            cls.build_imis_service(imis_services, item)
         # added additional attributes which will be used to create ClaimRequest in serializer
+        # Even in submit_itemsvc==False, we cannot save these as the claim is not saved yet either
         imis_claim.submit_items = imis_items
         imis_claim.submit_services = imis_services
 
@@ -347,6 +354,22 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         qty_provided = cls.get_fhir_item_qty_provided(fhir_item)
         service_code = cls.get_fhir_item_code(fhir_item)
         imis_services.append(ClaimServiceSubmit(service_code, qty_provided, price_asked))
+
+    @classmethod
+    def build_imis_item(cls, imis_items, fhir_item):
+        imis_item = ClaimItem()
+        imis_item.price_asked = cls.get_fhir_item_price_asked(fhir_item)
+        imis_item.qty_provided = cls.get_fhir_item_qty_provided(fhir_item)
+        imis_item.item_code = cls.get_fhir_item_code(fhir_item)
+        imis_items.append(imis_item)
+
+    @classmethod
+    def build_imis_service(cls, imis_services, fhir_item):
+        imis_service = ClaimService()
+        imis_service.price_asked = cls.get_fhir_item_price_asked(fhir_item)
+        imis_service.qty_provided = cls.get_fhir_item_qty_provided(fhir_item)
+        imis_service.service_code = cls.get_fhir_item_code(fhir_item)
+        imis_services.append(imis_service)
 
     @classmethod
     def get_fhir_item_code(cls, fhir_item):

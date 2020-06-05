@@ -13,6 +13,7 @@ class GeneralConfiguration(BaseConfiguration):
         config.default_value_of_location_offline_attribute = cfg['default_value_of_location_offline_attribute']
         config.default_value_of_location_care_type = cfg['default_value_of_location_care_type']
         config.default_response_page_size = cfg['default_response_page_size']
+        config.claim_submit_legacy = cfg['claim_submit_legacy']
 
     @classmethod
     def get_default_audit_user_id(cls):
@@ -49,3 +50,7 @@ class GeneralConfiguration(BaseConfiguration):
     @classmethod
     def get_default_response_page_size(cls):
         return cls.get_config().default_response_page_size
+
+    @classmethod
+    def get_claim_submit_legacy(cls):
+        return cls.get_config().claim_submit_legacy
