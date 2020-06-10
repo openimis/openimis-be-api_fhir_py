@@ -145,7 +145,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                 imis_gender_code = GeneralConfiguration.get_male_gender_code()
             elif gender == AdministrativeGender.FEMALE.value:
                 imis_gender_code = GeneralConfiguration.get_female_gender_code()
-            elif gender == AdministrativeGender.FEMALE.value:
+            elif gender == AdministrativeGender.OTHER.value:
                 imis_gender_code = GeneralConfiguration.get_other_gender_code()
             if imis_gender_code is not None:
                 imis_insuree.gender = Gender.objects.get(pk=imis_gender_code)
@@ -234,7 +234,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                 extension.valueBoolean = imis_insuree.head
             elif value == "validity_from":
                 extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331779/FHIR+extension+registrationDate"
-                if imis_insuree.validity_from is  None:
+                if imis_insuree.validity_from is None:
                     extension.valueString = ""
                 else :
                     extension.valueString = imis_insuree.validity_from

@@ -302,5 +302,13 @@ from api_fhir_R4.models.coverage import Coverage, CoverageClass, CoverageCostToB
 from api_fhir_R4.models.condition import Condition, ConditionClinicalStatusCodes, ConditionEvidence, ConditionStage, \
     ConditionVerificationStatus
 from api_fhir_R4.models.medication import MedicationBatch, Medication, MedicationIngredient, MedicationStatusCodes
+from api_fhir_R4.models.dosage import Dosage, DosageDoseAndRate
+from api_fhir_R4.models.expression import Expression
+from api_fhir_R4.models.usageContext import UsageContext, UsageContextType
+from api_fhir_R4.models.activityDefinition import ActivityDefinition, ActivityDefinitionDynamicValue, \
+    ActivityDefinitionParticipant, PublicationStatus, RequestIntent, RequestPriority, RequestResourceType
+from api_fhir_R4.models.contactDetail import ContactDetail
+from api_fhir_R4.models.relatedArtifact import RelatedArtifact, RelatedArtifactType
+
 
 

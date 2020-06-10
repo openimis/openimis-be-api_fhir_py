@@ -1,9 +1,11 @@
 from medical.models import Item
-from api_fhir_R4.converters import R4IdentifierConfig, BaseFHIRConverter
-from api_fhir_R4.models import Medication as FHIRMedication, Money
+from api_fhir_R4.converters import R4IdentifierConfig, BaseFHIRConverter, ReferenceConverterMixin
+from api_fhir_R4.models import Medication as FHIRMedication, Extension
 from django.utils.translation import gettext
+from api_fhir_R4.utils import DbManagerUtils
 
-class MedicationConverter(BaseFHIRConverter):
+
+class MedicationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_medication):
@@ -12,13 +14,18 @@ class MedicationConverter(BaseFHIRConverter):
         cls.build_fhir_identifiers(fhir_medication, imis_medication)
         cls.build_fhir_package_form(fhir_medication, imis_medication)
         cls.build_fhir_package_amount(fhir_medication, imis_medication)
-        cls.build_fhir_unitPrice(fhir_medication, imis_medication)
+        cls.build_medication_extension(fhir_medication, imis_medication)
+        cls.build_fhir_code(fhir_medication, imis_medication)
+        return fhir_medication
 
     @classmethod
     def to_imis_obj(cls, fhir_medication, audit_user_id):
         errors = []
         imis_medication = Item()
         cls.build_imis_identifier(imis_medication, fhir_medication, errors)
+        cls.build_imis_item_code(imis_medication, fhir_medication, errors)
+        cls.build_imis_item_name(imis_medication, fhir_medication, errors)
+        cls.build_imis_item_package(imis_medication, fhir_medication, errors)
         cls.check_errors(errors)
         return imis_medication
 
@@ -29,6 +36,11 @@ class MedicationConverter(BaseFHIRConverter):
     @classmethod
     def get_fhir_resource_type(cls):
         return FHIRMedication
+
+    @classmethod
+    def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
+        imis_medication_code = cls.get_resource_id_from_reference(reference)
+        return DbManagerUtils.get_object_or_none(Item, code=imis_medication_code)
 
     @classmethod
     def build_fhir_identifiers(cls, fhir_medication, imis_medication):
@@ -48,29 +60,70 @@ class MedicationConverter(BaseFHIRConverter):
         cls.valid_condition(imis_medication.code is None, gettext('Missing the item code'), errors)
 
     @classmethod
-    def build_fhir_package_form(cls, fhir_medication, imis_mediaction):
-        form = cls.split_package_form(imis_mediaction.package)
+    def build_fhir_package_form(cls, fhir_medication, imis_medication):
+        form = cls.split_package_form(imis_medication.package)
         fhir_medication.form = form
 
     @classmethod
     def split_package_form(cls, form):
-        form = form.split(' ')
-        form = form[1]
+        if " " in form:
+            form = form.split(' ', 1)
+            form = form[1]
         return form
 
     @classmethod
-    def build_fhir_package_amount(cls, fhir_medication, imis_medicaton):
-        amount = cls.split_package_amount(imis_medicaton.package)
+    def build_fhir_package_amount(cls, fhir_medication, imis_medication):
+        amount = cls.split_package_amount(imis_medication.package)
         fhir_medication.amount = amount
 
     @classmethod
     def split_package_amount(cls, amount):
-        amount = amount.split(' ')
-        amount = int(amount[0])
+        if " " in amount:
+            amount = amount.split(' ', 1)
+            amount = int(amount[0])
         return amount
 
     @classmethod
-    def build_fhir_unitPrice(cls, fhir_medication, imis_medication):
-        
+    def build_medication_extension(cls, fhir_medication, imis_medication):
+        cls.build_unit_price(fhir_medication, imis_medication)
+        return fhir_medication
+
+    @classmethod
+    def build_unit_price(cls, fhir_medication, imis_medication):
+        unit_price = cls.build_unit_price_extension(imis_medication.price)
+        fhir_medication.extension.append(unit_price)
+
+    @classmethod
+    def build_unit_price_extension(cls, value):
+        extension = Extension()
+        extension.valueUnitPrice = value
+        return extension
+
+    @classmethod
+    def build_fhir_code(cls, fhir_medication, imis_medication):
+        fhir_medication.code = cls.build_codeable_concept(imis_medication.code, text=imis_medication.name)
+
+    @classmethod
+    def build_imis_item_code(cls, imis_medication, fhir_medication, errors):
+        item_code = fhir_medication.code.coding
+        if not cls.valid_condition(item_code is None,
+                                   gettext('Missing medication `item_code` attribute'), errors):
+            imis_medication.code = item_code
+
+    @classmethod
+    def build_imis_item_name(cls, imis_medication, fhir_medication, errors):
+        item_name = fhir_medication.code.text
+        if not cls.valid_condition(item_name is None,
+                                   gettext('Missing medication `item_name` attribute'), errors):
+            imis_medication.name = item_name
+
+    @classmethod
+    def build_imis_item_package(cls, imis_medication, fhir_medication, errors):
+        form = fhir_medication.form
+        amount = fhir_medication.amount
+        package = [amount, form]
+        if not cls.valid_condition(package is None,
+                                   gettext('Missing medication `form` and `amount` attribute'), errors):
+            imis_medication.package = package
 
 

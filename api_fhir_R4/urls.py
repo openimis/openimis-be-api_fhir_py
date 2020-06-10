@@ -12,7 +12,9 @@ router.register(r'ClaimResponse', views.ClaimResponseViewSet, basename="ClaimRes
 router.register(r'CommunicationRequest', views.CommunicationRequestViewSet, basename="CommunicationRequest_R4")
 router.register(r'CoverageEligibilityRequest', views.CoverageEligibilityRequestViewSet, basename="CoverageEligibilityRequest_R4")
 router.register(r'Coverage', views.CoverageRequestQuerySet, basename="Coverage_R4")
-#router.register(r'Medication', views.CoverageRequestQuerySet, basename="Coverage_R4")
+router.register(r'Medication', views.MedicationViewSet, basename="Medication_R4")
+router.register(r'Condition', views.ConditionViewSet, basename="Condition_R4")
+router.register(r'ActivityDefinition', views.ActivityDefinitionViewSet, basename="ActivityDefinition_R4")
 
 urlpatterns = [
     path('', include(router.urls))

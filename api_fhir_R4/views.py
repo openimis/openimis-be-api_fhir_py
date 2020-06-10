@@ -1,12 +1,14 @@
 from api_fhir_R4.converters import OperationOutcomeConverter
-from api_fhir_R4.permissions import FHIRApiClaimPermissions, FHIRApiEligibilityRequestPermissions, \
+from api_fhir_R4.permissions import FHIRApiClaimPermissions, FHIRApiCoverageEligibilityRequestPermissions, \
     FHIRApiCoverageRequestPermissions, FHIRApiCommunicationRequestPermissions, FHIRApiPractitionerPermissions, \
-    FHIRApiHFPermissions, FHIRApiInsureePermissions
+    FHIRApiHFPermissions, FHIRApiInsureePermissions, FHIRApiMedicationPermissions, FHIRApiConditionPermissions, \
+    FHIRApiActivityDefinitionPermissions
 from claim.models import ClaimAdmin, Claim, Feedback
 from django.db.models import OuterRef, Exists
 from insuree.models import Insuree
 from location.models import HealthFacility
 from policy.models import Policy
+from medical.models import Item, Diagnosis, Service
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import SessionAuthentication
@@ -18,8 +20,9 @@ from api_fhir_R4.paginations import FhirBundleResultsSetPagination
 from api_fhir_R4.permissions import FHIRApiPermissions
 from api_fhir_R4.configurations import R4CoverageEligibilityConfiguration as Config
 from api_fhir_R4.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
-    PractitionerSerializer, ClaimSerializer, CoverageEligibilityRequestSerializer, PolicyCoverageEligibilityRequestSerializer, \
-    ClaimResponseSerializer, CommunicationRequestSerializer
+    PractitionerSerializer, ClaimSerializer, CoverageEligibilityRequestSerializer, \
+    PolicyCoverageEligibilityRequestSerializer, ClaimResponseSerializer, CommunicationRequestSerializer, \
+    MedicationSerializer, ConditionSerializer, ActivityDefinitionSerializer
 from api_fhir_R4.serializers.coverageSerializer import CoverageSerializer
 
 
@@ -148,7 +151,8 @@ class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixin
 class CoverageEligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericViewSet):
     queryset = Insuree.filter_queryset()
     serializer_class = eval(Config.get_serializer())
-    permission_classes = (FHIRApiEligibilityRequestPermissions,)
+    #serializer_class = CoverageEligibilityRequestSerializer
+    permission_classes = (FHIRApiCoverageEligibilityRequestPermissions,)
 
     def get_queryset(self):
         return Insuree.get_queryset(None, self.request.user)
@@ -161,3 +165,30 @@ class CoverageRequestQuerySet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.Li
 
     def get_queryset(self):
         return Policy.get_queryset(None, self.request.user)
+
+
+class MedicationViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    lookup_field = 'uuid'
+    serializer_class = MedicationSerializer
+    permission_classes = (FHIRApiMedicationPermissions,)
+
+    def get_queryset(self):
+        return Item.get_queryset(None, self.request.user)
+
+
+class ConditionViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    lookup_field = 'id'
+    serializer_class = ConditionSerializer
+    permission_classes = (FHIRApiConditionPermissions,)
+
+    def get_queryset(self):
+        return Diagnosis.get_queryset(None, self.request.user)
+
+
+class ActivityDefinitionViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    lookup_field = 'uuid'
+    serializer_class = ActivityDefinitionSerializer
+    permission_classes = (FHIRApiActivityDefinitionPermissions,)
+
+    def get_queryset(self):
+        return Service.get_queryset(None, self.request.user)

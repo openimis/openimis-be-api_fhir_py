@@ -2,6 +2,7 @@ from claim.apps import ClaimConfig
 from insuree.apps import InsureeConfig
 from location.apps import LocationConfig
 from policy.apps import PolicyConfig
+from medical.apps import MedicalConfig
 from rest_framework import exceptions
 from rest_framework.permissions import DjangoModelPermissions
 
@@ -51,7 +52,7 @@ class FHIRApiPractitionerPermissions(FHIRApiPermissions):
     permissions_delete = ClaimConfig.gql_query_claim_admins_perms
 
 
-class FHIRApiEligibilityRequestPermissions(FHIRApiPermissions):
+class FHIRApiCoverageEligibilityRequestPermissions(FHIRApiPermissions):
     permissions_get = PolicyConfig.gql_query_eligibilities_perms
     permissions_post = []
     permissions_put = []
@@ -81,3 +82,28 @@ class FHIRApiInsureePermissions(FHIRApiPermissions):
     permissions_put = []
     permissions_patch = []
     permissions_delete = []
+
+
+class FHIRApiMedicationPermissions(FHIRApiPermissions):
+    permissions_get = MedicalConfig.gql_query_medical_items_perms
+    permissions_post = []
+    permissions_put = []
+    permissions_patch = []
+    permissions_delete = []
+
+
+class FHIRApiConditionPermissions(FHIRApiPermissions):
+    permissions_get = MedicalConfig.gql_query_diagnosis_perms
+    permissions_post = []
+    permissions_put = []
+    permissions_patch = []
+    permissions_delete = []
+
+
+class FHIRApiActivityDefinitionPermissions(FHIRApiPermissions):
+    permissions_get = MedicalConfig.gql_query_medical_services_perms
+    permissions_post = []
+    permissions_put = []
+    permissions_patch = []
+    permissions_delete = []
+

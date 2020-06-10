@@ -10,6 +10,7 @@ class Extension(Element):
     valueAttachment = Property('valueAttachment', 'Attachment')
     valueBase64Binary = Property('valueBase64Binary', str)
     valueBoolean = Property('valueBoolean', bool)
+    valueCanonical = Property('valueCanonical', str)
     valueCode = Property('valueCode', str)
     valueCodeableConcept = Property('valueCodeableConcept', 'CodeableConcept')
     valueCoding = Property('valueCoding', 'Coding')
@@ -42,3 +43,4 @@ class Extension(Element):
     valueTiming = Property('valueTiming', 'Timing')
     valueUnsignedInt = Property('valueUnsignedInt', int)
     valueUri = Property('valueUri', str)
+    valueUnitPrice = Property('valueUnitPrice', 'Money')
