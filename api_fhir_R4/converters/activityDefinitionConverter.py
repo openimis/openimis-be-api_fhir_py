@@ -1,10 +1,8 @@
 from medical.models import Service
-from api_fhir_R4.models import ActivityDefinition, UsageContext, UsageContextType, AdministrativeGender, Age, Money, \
-    Extension
+from api_fhir_R4.models import ActivityDefinition, Extension
 from api_fhir_R4.converters import R4IdentifierConfig, BaseFHIRConverter, ReferenceConverterMixin
 from django.utils.translation import gettext
 from api_fhir_R4.utils import DbManagerUtils, TimeUtils
-from api_fhir_R4.configurations import GeneralConfiguration
 
 
 class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -14,13 +12,14 @@ class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
         fhir_activity_definition = ActivityDefinition()
         cls.build_fhir_pk(fhir_activity_definition, imis_activity_definition.uuid)
         cls.build_fhir_identifiers(fhir_activity_definition, imis_activity_definition)
+        cls.build_fhir_status(fhir_activity_definition, imis_activity_definition)
         cls.build_fhir_date(fhir_activity_definition, imis_activity_definition)
         cls.build_fhir_name(fhir_activity_definition, imis_activity_definition)
         cls.build_fhir_title(fhir_activity_definition, imis_activity_definition)
-        cls.build_fhir_use_context_code(fhir_activity_definition, imis_activity_definition)
-        cls.build_fhir_use_context_value_codeable_concept_text(fhir_activity_definition, imis_activity_definition)
+        cls.build_fhir_use_context(fhir_activity_definition, imis_activity_definition)
         cls.build_fhir_topic(fhir_activity_definition, imis_activity_definition)
         cls.build_activity_definition_extension(fhir_activity_definition, imis_activity_definition)
+        return fhir_activity_definition
 
     @classmethod
     def to_imis_obj(cls, fhir_activity_definition, audit_user_id):
@@ -31,6 +30,9 @@ class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_imis_serv_code(imis_activity_definition, fhir_activity_definition, errors)
         cls.build_imis_serv_name(imis_activity_definition, fhir_activity_definition, errors)
         cls.build_imis_serv_type(imis_activity_definition, fhir_activity_definition, errors)
+        cls.build_imis_serv_pat_cat(imis_activity_definition, fhir_activity_definition)
+        cls.build_imis_serv_category(imis_activity_definition, fhir_activity_definition, errors)
+        cls.build_imis_serv_care_type(imis_activity_definition, fhir_activity_definition, errors)
         cls.check_errors(errors)
         return imis_activity_definition
 
@@ -66,6 +68,10 @@ class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.valid_condition(imis_activity_definition.code is None, gettext('Missing the service code'), errors)
 
     @classmethod
+    def build_fhir_status(cls, fhir_activity_definition, imis_activity_definition):
+        fhir_activity_definition.status = "active"
+
+    @classmethod
     def build_fhir_date(cls, fhir_activity_definition, imis_activity_definition):
         fhir_activity_definition.date = imis_activity_definition.validity_from.isoformat()
 
@@ -98,46 +104,90 @@ class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
                                    gettext('Missing activity definition `serv name` attribute'), errors):
             imis_activity_definition.name = serv_name
 
-
-
-
-
-
+    @classmethod
+    def build_fhir_use_context(cls, fhir_activity_definition, imis_activity_definition):
+        fhir_activity_definition.useContext = [cls.build_codeable_concept("gender",
+                                                            text=cls.build_fhir_gender(imis_activity_definition)),
+                                               cls.build_codeable_concept("age",
+                                                            text=cls.build_fhir_age(imis_activity_definition)),
+                                               cls.build_codeable_concept("workflow",
+                                                            text=imis_activity_definition.category),
+                                               cls.build_codeable_concept("venue",
+                                                            text=imis_activity_definition.care_type)]
 
     @classmethod
-    def build_fhir_use_context_code(cls, fhir_activity_definition, imis_activity_definition):
-        usage_context = UsageContext()
-        code = ' '
-        if usage_context.code == UsageContextType.GENDER.value:
-            code = usage_context.code
-        elif usage_context.code == UsageContextType.AGE_RANGE.value:
-            code = usage_context.code
-        elif usage_context.code == UsageContextType.WORKFLOW_SETTING.value:
-            code = usage_context.code
-        elif usage_context.code == UsageContextType.CLINICAL_VENUE.value:
-            code = usage_context.code
+    def build_fhir_gender(cls, imis_activity_definition):
+        serv_pat_cat = imis_activity_definition.patient_category
+        gender1 = ""
+        gender2 = ""
+        if serv_pat_cat > 8:
+            age1 = "K"
+            serv_pat_cat = serv_pat_cat - 8
+        if serv_pat_cat > 4:
+            age2 = "A"
+            serv_pat_cat = serv_pat_cat - 4
+        if serv_pat_cat > 2:
+            gender1 = "F"
+            serv_pat_cat = serv_pat_cat - 2
+        if serv_pat_cat > 1:
+            gender2 = "M"
+            serv_pat_cat = serv_pat_cat - 1
 
-        fhir_activity_definition.useContext.code = code
+        return gender1, gender2
 
     @classmethod
-    def build_fhir_use_context_value_codeable_concept_text(cls, fhir_activity_definition, imis_activity_definition):
-        usage_context = UsageContext()
-        usage_context.valueCodeableConcept.text = [imis_activity_definition.patient_category,
-                                                   imis_activity_definition.category, imis_activity_definition.care_type]
-        fhir_activity_definition.useContext.text = usage_context.valueCodeableConcept.text
+    def build_fhir_age(cls, imis_activity_definition):
+        serv_pat_cat = imis_activity_definition.patient_category
+        age1 = ""
+        age2 = ""
+        if serv_pat_cat > 8:
+            age1 = "K"
+            serv_pat_cat = serv_pat_cat - 8
+        if serv_pat_cat > 4:
+            age2 = "A"
+            serv_pat_cat = serv_pat_cat - 4
+        if serv_pat_cat > 2:
+            gender1 = "F"
+            serv_pat_cat = serv_pat_cat - 2
+        if serv_pat_cat > 1:
+            gender2 = "M"
+            serv_pat_cat = serv_pat_cat - 1
 
+        return age1, age2
 
+    @classmethod
+    def build_imis_serv_pat_cat(cls, imis_activity_definition, fhir_activity_definition):
+        serv_pat_cat = fhir_activity_definition.useContext.code
+        number = 0
+        if "K" in serv_pat_cat:
+            number = number + 8
+        if "A" in serv_pat_cat:
+            number = number + 4
+        if "F" in serv_pat_cat:
+            number = number + 2
+        if "M" in serv_pat_cat:
+            number = number + 1
 
+        imis_activity_definition.patient_category = number
 
+    @classmethod
+    def build_imis_serv_category(cls, imis_activity_definition, fhir_activity_definition, errors):
+        serv_category = fhir_activity_definition.useContext.text
+        if not cls.valid_condition(serv_category is None,
+                                   gettext('Missing activity definition `serv category` attribute'), errors):
+            imis_activity_definition.category = serv_category
 
-
-
-
-
+    @classmethod
+    def build_imis_serv_care_type(cls, imis_activity_definition, fhir_activity_definition, errors):
+        serv_care_type = fhir_activity_definition.useContext.text
+        if not cls.valid_condition(serv_care_type is None,
+                                   gettext('Missing activity definition `serv care type` attribute'), errors):
+            imis_activity_definition.care_type = serv_care_type
 
     @classmethod
     def build_fhir_topic(cls, fhir_activity_definition, imis_activity_definition):
-        fhir_activity_definition.topic = imis_activity_definition.type
+        fhir_activity_definition.topic = []
+        fhir_activity_definition.topic.append(imis_activity_definition.type)
 
     @classmethod
     def build_imis_serv_type(cls, imis_activity_definition, fhir_activity_definition, errors):
