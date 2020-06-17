@@ -1,8 +1,9 @@
 from medical.models import Service
-from api_fhir_R4.models import ActivityDefinition, Extension
+from api_fhir_R4.models import ActivityDefinition, Extension, Money, UsageContext, CodeableConcept
 from api_fhir_R4.converters import R4IdentifierConfig, BaseFHIRConverter, ReferenceConverterMixin
 from django.utils.translation import gettext
 from api_fhir_R4.utils import DbManagerUtils, TimeUtils
+import core
 
 
 class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -106,54 +107,137 @@ class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_fhir_use_context(cls, fhir_activity_definition, imis_activity_definition):
-        fhir_activity_definition.useContext = [cls.build_codeable_concept("gender",
-                                                            text=cls.build_fhir_gender(imis_activity_definition)),
-                                               cls.build_codeable_concept("age",
-                                                            text=cls.build_fhir_age(imis_activity_definition)),
-                                               cls.build_codeable_concept("workflow",
-                                                            text=imis_activity_definition.category),
-                                               cls.build_codeable_concept("venue",
-                                                            text=imis_activity_definition.care_type)]
+
+        male = cls.build_fhir_male(imis_activity_definition)
+        female = cls.build_fhir_female(imis_activity_definition)
+        adult = cls.build_fhir_adult(imis_activity_definition)
+        kid = cls.build_fhir_kid(imis_activity_definition)
+
+        if male.valueCodeableConcept.text == "":
+            fhir_activity_definition.useContext = [female, adult, kid,
+                                                   cls.build_fhir_workflow(imis_activity_definition),
+                                                   cls.build_fhir_venue(imis_activity_definition)]
+
+        elif female.valueCodeableConcept.text == "":
+            fhir_activity_definition.useContext = [male, adult, kid,
+                                                   cls.build_fhir_workflow(imis_activity_definition),
+                                                   cls.build_fhir_venue(imis_activity_definition)]
+
+        elif adult.valueCodeableConcept.text == "":
+            fhir_activity_definition.useContext = [male, female, kid,
+                                                   cls.build_fhir_workflow(imis_activity_definition),
+                                                   cls.build_fhir_venue(imis_activity_definition)]
+
+        elif kid.valueCodeableConcept.text == "":
+            fhir_activity_definition.useContext = [male, female, adult,
+                                                   cls.build_fhir_workflow(imis_activity_definition),
+                                                   cls.build_fhir_venue(imis_activity_definition)]
+
+        elif male.valueCodeableConcept.text == "" and adult.valueCodeableConcept.tetx == "":
+            fhir_activity_definition.useContext = [female, kid,
+                                                   cls.build_fhir_workflow(imis_activity_definition),
+                                                   cls.build_fhir_venue(imis_activity_definition)]
+
+        elif male.valueCodeableConcept.text == "" and kid.valueCodeableConcept.text == "":
+            fhir_activity_definition.useContext = [female, adult,
+                                                   cls.build_fhir_workflow(imis_activity_definition),
+                                                   cls.build_fhir_venue(imis_activity_definition)]
+
+        elif female.valueCodeableConcept.text == "" and adult.valueCodeableConcept.text == "":
+            fhir_activity_definition.useContext = [male, kid,
+                                                   cls.build_fhir_workflow(imis_activity_definition),
+                                                   cls.build_fhir_venue(imis_activity_definition)]
+
+        elif female.valueCodeableConcept.text == "" and kid.valueCodeableConcept.text == "":
+            fhir_activity_definition.useContext = [male, adult,
+                                                   cls.build_fhir_workflow(imis_activity_definition),
+                                                   cls.build_fhir_venue(imis_activity_definition)]
 
     @classmethod
-    def build_fhir_gender(cls, imis_activity_definition):
+    def build_fhir_male(cls, imis_activity_definition):
+        extension = Extension()
         serv_pat_cat = imis_activity_definition.patient_category
-        gender1 = ""
-        gender2 = ""
+        male = ""
         if serv_pat_cat > 8:
-            age1 = "K"
+            kid = "K"
             serv_pat_cat = serv_pat_cat - 8
         if serv_pat_cat > 4:
-            age2 = "A"
+            adult = "A"
             serv_pat_cat = serv_pat_cat - 4
         if serv_pat_cat > 2:
-            gender1 = "F"
+            female = "F"
             serv_pat_cat = serv_pat_cat - 2
         if serv_pat_cat > 1:
-            gender2 = "M"
-            serv_pat_cat = serv_pat_cat - 1
+            male = "M"
 
-        return gender1, gender2
+        extension.valueCodeableConcept = CodeableConcept()
+        extension.valueCodeableConcept.text = male
+        extension.valueCodeableConcept.coding = ["gender"]
+        return extension
 
     @classmethod
-    def build_fhir_age(cls, imis_activity_definition):
+    def build_fhir_female(cls, imis_activity_definition):
+        extension = Extension()
         serv_pat_cat = imis_activity_definition.patient_category
-        age1 = ""
-        age2 = ""
+        female = ""
         if serv_pat_cat > 8:
-            age1 = "K"
+            kid = "K"
             serv_pat_cat = serv_pat_cat - 8
         if serv_pat_cat > 4:
-            age2 = "A"
+            adult = "A"
             serv_pat_cat = serv_pat_cat - 4
         if serv_pat_cat > 2:
-            gender1 = "F"
-            serv_pat_cat = serv_pat_cat - 2
-        if serv_pat_cat > 1:
-            gender2 = "M"
-            serv_pat_cat = serv_pat_cat - 1
+            female = "F"
 
-        return age1, age2
+        extension.valueCodeableConcept = CodeableConcept()
+        extension.valueCodeableConcept.text = female
+        extension.valueCodeableConcept.coding = ["gender"]
+        return extension
+
+    @classmethod
+    def build_fhir_adult(cls, imis_activity_definition):
+        extension = Extension()
+        serv_pat_cat = imis_activity_definition.patient_category
+        adult = ""
+        if serv_pat_cat > 8:
+            kid = "K"
+            serv_pat_cat = serv_pat_cat - 8
+        if serv_pat_cat > 4:
+            adult = "A"
+
+        extension.valueCodeableConcept = CodeableConcept()
+        extension.valueCodeableConcept.text = adult
+        extension.valueCodeableConcept.coding = ["age"]
+        return extension
+
+    @classmethod
+    def build_fhir_kid(cls, imis_activity_definition):
+        extension = Extension()
+        serv_pat_cat = imis_activity_definition.patient_category
+        kid = ""
+        if serv_pat_cat > 8:
+            kid = "K"
+
+        extension.valueCodeableConcept = CodeableConcept()
+        extension.valueCodeableConcept.text = kid
+        extension.valueCodeableConcept.coding = ["age"]
+        return extension
+
+    @classmethod
+    def build_fhir_workflow(cls, imis_activity_definition):
+        extension = Extension()
+        extension.valueCodeableConcept = CodeableConcept()
+        extension.valueCodeableConcept.text = imis_activity_definition.category
+        extension.valueCodeableConcept.coding = ["workflow"]
+        return extension
+
+    @classmethod
+    def build_fhir_venue(cls, imis_activity_definition):
+        extension = Extension()
+        extension.valueCodeableConcept = CodeableConcept()
+        extension.valueCodeableConcept.text = imis_activity_definition.care_type
+        extension.valueCodeableConcept.coding = ["venue"]
+        return extension
 
     @classmethod
     def build_imis_serv_pat_cat(cls, imis_activity_definition, fhir_activity_definition):
@@ -186,8 +270,9 @@ class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_fhir_topic(cls, fhir_activity_definition, imis_activity_definition):
-        fhir_activity_definition.topic = []
-        fhir_activity_definition.topic.append(imis_activity_definition.type)
+        fhir_activity_definition.topic = [cls.build_codeable_concept(
+            "DefinitionTopic", "http://terminology.hl7.org/CodeSystem/definition-topic",
+            text=imis_activity_definition.type)]
 
     @classmethod
     def build_imis_serv_type(cls, imis_activity_definition, fhir_activity_definition, errors):
@@ -214,5 +299,9 @@ class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_unit_price_extension(cls, value):
         extension = Extension()
-        extension.valueUnitPrice = value
+        money = Money()
+        extension.url = "unitPrice"
+        extension.valueMoney = money
+        extension.valueMoney.value = value
+        extension.valueMoney.currency = core.currency
         return extension

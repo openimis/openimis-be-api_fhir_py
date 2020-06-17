@@ -28,6 +28,10 @@ class ConditionConverter(BaseFHIRConverter, ReferenceConverterMixin):
         return imis_condition
 
     @classmethod
+    def get_reference_obj_id(cls, imis_condition):
+        return imis_condition.id
+
+    @classmethod
     def get_fhir_resource_type(cls):
         return FHIRCondition
 

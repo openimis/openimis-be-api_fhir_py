@@ -1,8 +1,9 @@
 from medical.models import Item
 from api_fhir_R4.converters import R4IdentifierConfig, BaseFHIRConverter, ReferenceConverterMixin
-from api_fhir_R4.models import Medication as FHIRMedication, Extension
+from api_fhir_R4.models import Medication as FHIRMedication, Extension, Money
 from django.utils.translation import gettext
 from api_fhir_R4.utils import DbManagerUtils
+import core
 
 
 class MedicationConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -13,7 +14,7 @@ class MedicationConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_fhir_pk(fhir_medication, imis_medication.uuid)
         cls.build_fhir_identifiers(fhir_medication, imis_medication)
         cls.build_fhir_package_form(fhir_medication, imis_medication)
-        cls.build_fhir_package_amount(fhir_medication, imis_medication)
+        #cls.build_fhir_package_amount(fhir_medication, imis_medication)
         cls.build_medication_extension(fhir_medication, imis_medication)
         cls.build_fhir_code(fhir_medication, imis_medication)
         return fhir_medication
@@ -61,15 +62,20 @@ class MedicationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_fhir_package_form(cls, fhir_medication, imis_medication):
-        form = cls.split_package_form(imis_medication.package)
-        fhir_medication.form = form
+        #form = cls.split_package_form(imis_medication.package)
+        #fhir_medication.form = form
+        fhir_medication.form = imis_medication.package.lstrip()
 
+    """
     @classmethod
     def split_package_form(cls, form):
+        form = form.lstrip()
+        if " " not in form:
+            return form
         if " " in form:
             form = form.split(' ', 1)
             form = form[1]
-        return form
+            return form
 
     @classmethod
     def build_fhir_package_amount(cls, fhir_medication, imis_medication):
@@ -78,10 +84,14 @@ class MedicationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def split_package_amount(cls, amount):
+        amount = amount.lstrip()
+        if " " not in amount:
+            return None
         if " " in amount:
             amount = amount.split(' ', 1)
-            amount = int(amount[0])
-        return amount
+            amount = amount[0]
+            return int(amount)
+    """
 
     @classmethod
     def build_medication_extension(cls, fhir_medication, imis_medication):
@@ -96,7 +106,11 @@ class MedicationConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_unit_price_extension(cls, value):
         extension = Extension()
-        extension.valueUnitPrice = value
+        money = Money()
+        extension.url = "unitPrice"
+        extension.valueMoney = money
+        extension.valueMoney.value = value
+        extension.valueMoney.currency = core.currency
         return extension
 
     @classmethod

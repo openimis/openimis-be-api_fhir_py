@@ -43,4 +43,3 @@ class Extension(Element):
     valueTiming = Property('valueTiming', 'Timing')
     valueUnsignedInt = Property('valueUnsignedInt', int)
     valueUri = Property('valueUri', str)
-    valueUnitPrice = Property('valueUnitPrice', 'Money')

@@ -6,8 +6,11 @@ from django.utils.translation import gettext
 from api_fhir_R4.configurations import R4IdentifierConfig, R4ClaimConfig
 from api_fhir_R4.converters import BaseFHIRConverter, LocationConverter, PatientConverter, PractitionerConverter, \
     ReferenceConverterMixin
+from api_fhir_R4.converters.conditionConverter import ConditionConverter
+from api_fhir_R4.converters.medicationConverter import MedicationConverter
+from api_fhir_R4.converters.activityDefinitionConverter import ActivityDefinitionConverter
 from api_fhir_R4.models import Claim as FHIRClaim, ClaimItem as FHIRClaimItem, Period, ClaimDiagnosis, Money, \
-    ImisClaimIcdTypes, ClaimSupportingInfo, Quantity
+    ImisClaimIcdTypes, ClaimSupportingInfo, Quantity, Condition, Extension, Reference
 from api_fhir_R4.utils import TimeUtils, FhirUtils, DbManagerUtils
 
 
@@ -27,7 +30,8 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         fhir_claim.enterer = PractitionerConverter.build_fhir_resource_reference(imis_claim.admin)
         cls.build_fhir_type(fhir_claim, imis_claim)
         cls.build_fhir_supportingInfo(fhir_claim, imis_claim)
-        cls.build_fhir_items(fhir_claim, imis_claim)
+        #cls.build_fhir_items(fhir_claim, imis_claim)
+        #cls.build_fhir_provider(fhir_claim, imis_claim)
         return fhir_claim
 
     @classmethod
@@ -45,6 +49,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_imis_visit_type(imis_claim, fhir_claim)
         cls.build_imis_supportingInfo(imis_claim, fhir_claim)
         cls.build_imis_submit_items_and_services(imis_claim, fhir_claim)
+        #cls.build_imis_adjuster(imis_claim, fhir_claim, errors)
         cls.check_errors(errors)
         return imis_claim
 
@@ -134,7 +139,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         if imis_claim.icd_4:
             cls.build_fhir_diagnosis(diagnoses, imis_claim.icd_4, ImisClaimIcdTypes.ICD_4.value)
         fhir_claim.diagnosis = diagnoses
-
+    
     @classmethod
     def build_fhir_diagnosis(cls, diagnoses, icd_code, icd_type):
         claim_diagnosis = ClaimDiagnosis()
@@ -268,11 +273,13 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
             result = supportingInfo_concept
         return result
 
+    #TODO
     @classmethod
     def build_fhir_items(cls, fhir_claim, imis_claim):
         cls.build_items_for_imis_item(fhir_claim, imis_claim)
         cls.build_items_for_imis_productOrService(fhir_claim, imis_claim)
 
+    #TODO
     @classmethod
     def build_items_for_imis_item(cls, fhir_claim, imis_claim):
         for item in cls.get_imis_items_for_claim(imis_claim):
@@ -280,13 +287,15 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
                 type = R4ClaimConfig.get_fhir_claim_item_code()
                 cls.build_fhir_item(fhir_claim, item.item.code, type, item)
 
+    #TODO
     @classmethod
     def build_items_for_imis_productOrService(cls, fhir_claim, imis_claim):
         for productOrService in cls.get_imis_services_for_claim(imis_claim):
-            if productOrService.productOrService:
+            if productOrService.product:
                 type = R4ClaimConfig.get_fhir_claim_service_code()
-                cls.build_fhir_item(fhir_claim, productOrService.productOrService.code, type, productOrService)
+                cls.build_fhir_item(fhir_claim, productOrService.product.code, type, productOrService)
 
+    #TODO
     @classmethod
     def build_fhir_item(cls, fhir_claim, code, item_type, item):
         fhir_item = FHIRClaimItem()
@@ -305,6 +314,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
             fhir_item.informationLinkId = [supportingInfo.sequence]
         fhir_claim.item.append(fhir_item)
 
+    #TODO
     @classmethod
     def get_imis_items_for_claim(cls, imis_claim):
         items = []
@@ -312,6 +322,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
             items = ClaimItem.objects.filter(claim_id=imis_claim.id)
         return items
 
+    #TODO
     @classmethod
     def get_imis_services_for_claim(cls, imis_claim):
         services = []
@@ -368,3 +379,14 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         if fhir_item.unitPrice:
             price_asked = fhir_item.unitPrice.value
         return price_asked
+
+    @classmethod
+    def build_fhir_provider(cls, fhir_claim, imis_claim):
+        fhir_claim.provider = imis_claim.adjuster
+
+    @classmethod
+    def build_imis_adjuster(cls, imis_claim, fhir_claim, errors):
+        adjuster = fhir_claim.provider
+        if not cls.valid_condition(adjuster is None,
+                                   gettext('Missing claim `adjuster` attribute'), errors):
+            imis_claim.adjuster = adjuster
