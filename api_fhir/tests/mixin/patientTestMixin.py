@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from insuree.models import Gender, Insuree
 
 from api_fhir.configurations import Stu3IdentifierConfig, Stu3MaritalConfig
@@ -16,7 +14,6 @@ class PatientTestMixin(GenericTestMixin):
     _TEST_OTHER_NAME = "TEST_OTHER_NAME"
     _TEST_DOB = "1990-03-24T00:00:00"
     _TEST_ID = 1
-    _TEST_UUID = "0a60f36c-62eb-11ea-bb93-93ec0339a3dd"
     _TEST_CHF_ID = "TEST_CHF_ID"
     _TEST_PASSPORT = "TEST_PASSPORT"
     _TEST_GENDER_CODE = "M"
@@ -36,7 +33,6 @@ class PatientTestMixin(GenericTestMixin):
         imis_insuree.last_name = self._TEST_LAST_NAME
         imis_insuree.other_names = self._TEST_OTHER_NAME
         imis_insuree.id = self._TEST_ID
-        imis_insuree.uuid = self._TEST_UUID
         imis_insuree.chf_id = self._TEST_CHF_ID
         imis_insuree.passport = self._TEST_PASSPORT
         imis_insuree.dob = TimeUtils.str_to_date(self._TEST_DOB)
@@ -114,8 +110,8 @@ class PatientTestMixin(GenericTestMixin):
             code = PatientConverter.get_first_coding_from_codeable_concept(identifier.type).code
             if code == Stu3IdentifierConfig.get_fhir_chfid_type_code():
                 self.assertEqual(self._TEST_CHF_ID, identifier.value)
-            elif code == Stu3IdentifierConfig.get_fhir_uuid_type_code() and not isinstance(identifier.value, UUID):
-                self.assertEqual(self._TEST_UUID, identifier.value)
+            elif code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
+                self.assertEqual(str(self._TEST_ID), identifier.value)
             elif code == Stu3IdentifierConfig.get_fhir_passport_type_code():
                 self.assertEqual(self._TEST_PASSPORT, identifier.value)
         self.assertEqual(self._TEST_DOB, fhir_obj.birthDate)

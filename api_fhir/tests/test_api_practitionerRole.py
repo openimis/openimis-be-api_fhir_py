@@ -17,7 +17,6 @@ class PractitionerRoleAPITests(GenericFhirAPITestMixin, FhirApiReadTestMixin, Fh
     _TEST_CLAIM_ADMIN_CODE = "1234abcd"
     _TEST_UPDATED_LOCATION_CODE = "newCode"
     _TEST_UPDATED_LOCATION_NAME = "newLocation"
-    _TEST_LEGAL_FORM = "G"
     _TEST_ADMIN_USER_ID = 1
 
     def setUp(self):

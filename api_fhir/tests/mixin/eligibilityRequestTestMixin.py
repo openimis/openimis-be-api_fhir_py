@@ -1,6 +1,4 @@
-import uuid
-
-from policy.services import EligibilityResponse
+from claim import EligibilityResponse
 
 from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.converters import PatientConverter
@@ -11,7 +9,6 @@ from api_fhir.tests import GenericTestMixin, PatientTestMixin
 class EligibilityRequestTestMixin(GenericTestMixin):
 
     _TEST_ADMIN_USER_ID = 1
-    _TEST_ADMIN_USER_UUID = "90b0cee2-73ae-4705-af8d-8fe035209ab2"
     _TEST_SERVICE_CODE = 'serviceCode'
     _TEST_ITEM_CODE = 'itemCode'
     _TEST_CHFID = 'chfid'
@@ -59,9 +56,7 @@ class EligibilityRequestTestMixin(GenericTestMixin):
         )
 
     def verify_imis_instance(self, imis_obj):
-        # The reference used to be the CHFID but reference are now all on UUID
-        # self.assertEqual(self._TEST_CHFID, imis_obj.chf_id)
-        self.assertEqual(str(self._TEST_INSUREE.uuid), imis_obj.chf_id)
+        self.assertEqual(self._TEST_CHFID, imis_obj.chfid)
         self.assertEqual(self._TEST_ITEM_CODE, imis_obj.item_code)
         self.assertEqual(self._TEST_SERVICE_CODE, imis_obj.service_code)
 

@@ -39,8 +39,6 @@ class EligibilityRequestConverterTestCase(EligibilityRequestTestMixin):
     def test_fhir_object_to_json_request(self):
         self.setUp()
         fhir_eligibility_request = self.create_test_fhir_instance()
-        self.assertTrue(fhir_eligibility_request.patient.reference.startswith("Patient/"))
-        fhir_eligibility_request.patient.reference = "Patient/chfid"
         actual_representation = fhir_eligibility_request.dumps(format_='json')
         self.assertEqual(self._test_eligibility_request_json_representation, actual_representation)
 

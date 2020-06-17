@@ -2,7 +2,7 @@
   "resourceType": "ClaimResponse",
   "communicationRequest": [
     {
-      "reference": "CommunicationRequest/6ed1dec4-1dbd-4da2-840d-8383e45419a6"
+      "reference": "CommunicationRequest/1"
     }
   ],
   "error": [
@@ -16,7 +16,7 @@
       }
     }
   ],
-  "id": "ae580700-0277-4c98-adab-d98c0f7e681b",
+  "id": "code",
   "identifier": [
     {
       "type": {
@@ -28,7 +28,7 @@
         ]
       },
       "use": "usual",
-      "value": "ae580700-0277-4c98-adab-d98c0f7e681b"
+      "value": 1
     },
     {
       "type": {

@@ -2,10 +2,10 @@
   "resourceType": "PractitionerRole",
   "location": [
     {
-      "reference": "Location/6d0eea8c-62eb-11ea-94d6-c36229a16c2f"
+      "reference": "Location/12345678"
     }
   ],
   "practitioner": {
-    "reference": "Practitioner/254f6268-964b-4d8d-aa26-20081f22235e"
+    "reference": "Practitioner/1234abcd"
   }
 }

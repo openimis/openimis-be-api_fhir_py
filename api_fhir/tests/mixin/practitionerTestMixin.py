@@ -14,7 +14,6 @@ class PractitionerTestMixin(GenericTestMixin):
     _TEST_OTHER_NAME = "John"
     _TEST_DOB = "1990-03-24T00:00:00"
     _TEST_ID = 1
-    _TEST_UUID = "254f6268-964b-4d8d-aa26-20081f22235e"
     _TEST_CODE = "1234abcd"
     _TEST_PHONE = "813-996-476"
     _TEST_EMAIL = "TEST@TEST.com"
@@ -24,7 +23,6 @@ class PractitionerTestMixin(GenericTestMixin):
         imis_claim_admin.last_name = self._TEST_LAST_NAME
         imis_claim_admin.other_names = self._TEST_OTHER_NAME
         imis_claim_admin.id = self._TEST_ID
-        imis_claim_admin.uuid = self._TEST_UUID
         imis_claim_admin.code = self._TEST_CODE
         imis_claim_admin.dob = TimeUtils.str_to_date(self._TEST_DOB)
         imis_claim_admin.phone = self._TEST_PHONE
@@ -77,7 +75,7 @@ class PractitionerTestMixin(GenericTestMixin):
             if code == Stu3IdentifierConfig.get_fhir_claim_admin_code_type():
                 self.assertEqual(self._TEST_CODE, identifier.value)
             elif code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
-                self.assertEqual(self._TEST_UUID, identifier.value)
+                self.assertEqual(str(self._TEST_ID), identifier.value)
         self.assertEqual(self._TEST_DOB, fhir_obj.birthDate)
         self.assertEqual(2, len(fhir_obj.telecom))
         for telecom in fhir_obj.telecom:

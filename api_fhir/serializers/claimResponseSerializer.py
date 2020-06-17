@@ -4,4 +4,4 @@ from api_fhir.serializers import BaseFHIRSerializer
 
 class ClaimResponseSerializer(BaseFHIRSerializer):
 
-    fhirConverter = ClaimResponseConverter
+    fhirConverter = ClaimResponseConverter()

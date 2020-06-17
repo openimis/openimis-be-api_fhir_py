@@ -13,7 +13,6 @@ from api_fhir.utils import TimeUtils
 class ClaimTestMixin(GenericTestMixin):
 
     _TEST_ID = 1
-    _TEST_UUID = "315c3b16-62eb-11ea-8e75-df3492b349f6"
     _TEST_CODE = 'code'
     _TEST_DATE_FROM = '2019-06-01T00:00:00'
     _TEST_DATE_TO = '2019-06-12T00:00:00'
@@ -66,7 +65,6 @@ class ClaimTestMixin(GenericTestMixin):
     def create_test_imis_instance(self):
         imis_claim = Claim()
         imis_claim.id = self._TEST_ID
-        imis_claim.uuid = self._TEST_UUID
         imis_claim.insuree = PatientTestMixin().create_test_imis_instance()
         imis_claim.code = self._TEST_CODE
         imis_claim.date_from = TimeUtils.str_to_date(self._TEST_DATE_FROM)
@@ -79,10 +77,10 @@ class ClaimTestMixin(GenericTestMixin):
         imis_claim.health_facility = LocationTestMixin().create_test_imis_instance()
         imis_claim.guarantee_id = self._TEST_GUARANTEE_ID
         imis_claim.admin = PractitionerTestMixin().create_test_imis_instance()
-        imis_claim.icd_1 = Diagnosis(code=self._TEST_ICD_1)
-        imis_claim.icd_2 = Diagnosis(code=self._TEST_ICD_2)
-        imis_claim.icd_3 = Diagnosis(code=self._TEST_ICD_3)
-        imis_claim.icd_4 = Diagnosis(code=self._TEST_ICD_4)
+        imis_claim.icd_1 = self._TEST_ICD_1
+        imis_claim.icd_2 = self._TEST_ICD_2
+        imis_claim.icd_3 = self._TEST_ICD_3
+        imis_claim.icd_4 = self._TEST_ICD_4
         imis_claim.visit_type = self._TEST_VISIT_TYPE
         return imis_claim
 
@@ -108,7 +106,7 @@ class ClaimTestMixin(GenericTestMixin):
 
     def create_test_fhir_instance(self):
         fhir_claim = FHIRClaim()
-        fhir_claim.id = self._TEST_UUID
+        fhir_claim.id = self._TEST_CODE
         fhir_claim.patient = PatientConverter.build_fhir_resource_reference(self._TEST_INSUREE)
         claim_code = ClaimConverter.build_fhir_identifier(self._TEST_CODE,
                                                Stu3IdentifierConfig.get_fhir_identifier_type_system(),
@@ -142,13 +140,12 @@ class ClaimTestMixin(GenericTestMixin):
 
     def verify_fhir_instance(self, fhir_obj):
         self.assertIsNotNone(fhir_obj.patient.reference)
-        self.assertEqual(str(self._TEST_UUID), fhir_obj.id)
+        self.assertEqual(str(self._TEST_CODE), fhir_obj.id)
         for identifier in fhir_obj.identifier:
             if identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_uuid_type_code():
-                self.assertEqual(fhir_obj.id, identifier.value)
+                self.assertEqual(str(self._TEST_ID), identifier.value)
             elif identifier.type.coding[0].code == Stu3IdentifierConfig.get_fhir_claim_code_type():
                 self.assertEqual(self._TEST_CODE, identifier.value)
-
         self.assertEqual(self._TEST_DATE_FROM, fhir_obj.billablePeriod.start)
         self.assertEqual(self._TEST_DATE_TO, fhir_obj.billablePeriod.end)
         for diagnosis in fhir_obj.diagnosis:

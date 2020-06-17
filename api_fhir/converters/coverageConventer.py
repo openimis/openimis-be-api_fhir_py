@@ -3,6 +3,7 @@ from api_fhir.converters import BaseFHIRConverter, PractitionerConverter
 from api_fhir.models import Coverage, Reference, Period, Contract, ContractValuedItem, Money, CoverageGrouping, \
     ContractAgent, Extension
 from product.models import ProductItem, ProductService
+from insuree.models import Insuree
 
 
 class CoverageConventer(BaseFHIRConverter):
@@ -58,7 +59,7 @@ class CoverageConventer(BaseFHIRConverter):
         return fhir_coverage
 
     @classmethod
-    def build_contract_valued_item(self, contract, imis_coverage):
+    def build_contract_valued_item(cls, contract, imis_coverage):
         valued_item = ContractValuedItem()
         policy_value = Money()
         policy_value.value = imis_coverage.value
@@ -99,6 +100,8 @@ class CoverageConventer(BaseFHIRConverter):
     def build_coverage_extension(cls, fhir_coverage, imis_coverage):
         cls.__build_effective_date(fhir_coverage, imis_coverage)
         cls.__build_enroll_date(fhir_coverage, imis_coverage)
+        cls.__build_insuree_extension(fhir_coverage, imis_coverage)
+        cls.__build_stage_extension(fhir_coverage, imis_coverage)
         return fhir_coverage
 
     @classmethod
@@ -119,6 +122,28 @@ class CoverageConventer(BaseFHIRConverter):
         ext_date.url = name
         ext_date.valueDate = value.isoformat() if value else None
         return ext_date
+
+    @classmethod
+    def __build_insuree_extension(cls, fhir_coverage, imis_coverage):
+        extension = Extension()
+        extension.url = "Insuree"
+        queryset = Insuree.objects.filter(validity_to__isnull=True).filter(family_id = imis_coverage.family.id)
+        valueString = ""
+        count = 1
+        for insuree in queryset:
+            valueString = (valueString + insuree.uuid + ":" + insuree.family.location.code)
+            if count < len(queryset):
+                valueString = (valueString + ";")
+            count = count + 1
+        extension.valueString = valueString
+        fhir_coverage.extension.append(extension)
+
+    @classmethod
+    def __build_stage_extension(cls, fhir_coverage, imis_coverage):
+        ext_stage = Extension()
+        ext_stage.url = "Stage"
+        ext_stage.valueString = imis_coverage.stage
+        fhir_coverage.extension.append(ext_stage)
 
     @classmethod
     def __build_product_plan_display(cls, grouping, product):

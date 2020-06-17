@@ -62,12 +62,6 @@ class OperationOutcomeConverter(BaseFHIRConverter):
         return cls.build_outcome(severity, code)
 
     @classmethod
-    def build_for_400_bad_request(cls, details_text=None):
-        severity = IssueSeverity.ERROR.value
-        code = Stu3IssueTypeConfig.get_fhir_code_for_exception()
-        return cls.build_outcome(severity, code, details_text)
-
-    @classmethod
     def build_for_key_error(cls, obj):
         severity = IssueSeverity.ERROR.value
         code = Stu3IssueTypeConfig.get_fhir_code_for_exception()

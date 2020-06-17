@@ -11,10 +11,10 @@ class PractitionerRoleTestMixin(GenericTestMixin):
 
     def setUp(self):
         self._TEST_CLAIM_ADMIN = PractitionerTestMixin().create_test_imis_instance()
-        self._TEST_PRACTITIONER_REFERENCE = "Practitioner/" + self._TEST_CLAIM_ADMIN.uuid
+        self._TEST_PRACTITIONER_REFERENCE = "Practitioner/" + self._TEST_CLAIM_ADMIN.code
 
         self._TEST_HF = LocationTestMixin().create_test_imis_instance()
-        self._TEST_LOCATION_REFERENCE = "Location/" + self._TEST_HF.uuid
+        self._TEST_LOCATION_REFERENCE = "Location/" + self._TEST_HF.code
 
     def create_test_imis_instance(self):
         self.setUp()
