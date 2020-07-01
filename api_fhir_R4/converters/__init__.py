@@ -3,6 +3,7 @@ from abc import ABC
 from api_fhir_R4.configurations import R4IdentifierConfig
 from api_fhir_R4.exceptions import FHIRRequestProcessException
 from api_fhir_R4.models import CodeableConcept, ContactPoint, Address, Coding, Identifier, IdentifierUse
+from api_fhir_R4.configurations import GeneralConfiguration
 
 
 class BaseFHIRConverter(ABC):
@@ -65,7 +66,7 @@ class BaseFHIRConverter(ABC):
         if imis_object.uuid is not None:
             identifier = cls.build_fhir_identifier(imis_object.uuid,
                                                    R4IdentifierConfig.get_fhir_identifier_type_system(),
-                                                   R4IdentifierConfig.get_fhir_uuid_type_code())
+                                                   GeneralConfiguration.get_default_uuid_code())
             identifiers.append(identifier)
 
     @classmethod

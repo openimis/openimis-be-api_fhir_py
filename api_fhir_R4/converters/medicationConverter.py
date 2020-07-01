@@ -3,6 +3,7 @@ from api_fhir_R4.converters import R4IdentifierConfig, BaseFHIRConverter, Refere
 from api_fhir_R4.models import Medication as FHIRMedication, Extension, Money
 from django.utils.translation import gettext
 from api_fhir_R4.utils import DbManagerUtils
+from api_fhir_R4.configurations import GeneralConfiguration
 import core
 
 

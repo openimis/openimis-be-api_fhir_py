@@ -1,11 +1,11 @@
 from django.utils.translation import gettext
-from location.models import HealthFacility
+from location.models import HealthFacility, Location
 
 from api_fhir_R4.configurations import GeneralConfiguration, R4IdentifierConfig, R4LocationConfig
 from api_fhir_R4.converters import BaseFHIRConverter, ReferenceConverterMixin
-from api_fhir_R4.models import Location, ContactPointSystem, ContactPointUse
+from api_fhir_R4.models import Location as FHIRLocation, ContactPointSystem, ContactPointUse
 from api_fhir_R4.models.address import AddressUse, AddressType
-from api_fhir_R4.models.imisModelEnums import ImisHfLevel
+from api_fhir_R4.models.imisModelEnums import ImisHfLevel, ImisLocationType
 from api_fhir_R4.utils import TimeUtils, DbManagerUtils
 
 
@@ -13,13 +13,15 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_hf):
-        fhir_location = Location()
-        cls.build_fhir_pk(fhir_location, imis_hf.uuid)
+        fhir_location = FHIRLocation()
+        cls.build_fhir_pk(fhir_location, imis_hf.uuid + ", " + imis_hf.location.uuid)
         cls.build_fhir_location_identifier(fhir_location, imis_hf)
         cls.build_fhir_location_name(fhir_location, imis_hf)
         cls.build_fhir_location_type(fhir_location, imis_hf)
         cls.build_fhir_location_address(fhir_location, imis_hf)
         cls.build_fhir_location_telecom(fhir_location, imis_hf)
+        cls.build_fhir_physical_type(fhir_location, imis_hf)
+        cls.build_fhir_part_of(fhir_location, imis_hf)
         return fhir_location
 
     @classmethod
@@ -27,10 +29,14 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
         errors = []
         imis_hf = cls.createDefaultInsuree(audit_user_id)
         cls.build_imis_hf_identiftier(imis_hf, fhir_location, errors)
+        cls.build_imis_location_identiftier(imis_hf, fhir_location, errors)
         cls.build_imis_hf_name(imis_hf, fhir_location, errors)
+        cls.build_imis_location_name(imis_hf, fhir_location, errors)
         cls.build_imis_hf_level(imis_hf, fhir_location, errors)
         cls.build_imis_hf_address(imis_hf, fhir_location)
         cls.build_imis_hf_contacts(imis_hf, fhir_location)
+        cls.build_imis_location_type(imis_hf, fhir_location, errors)
+        cls.build_imis_parent_location_id(imis_hf, fhir_location, errors)
         cls.check_errors(errors)
         return imis_hf
 
@@ -63,6 +69,8 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
         identifiers = []
         cls.build_fhir_uuid_identifier(identifiers, imis_hf)
         cls.build_fhir_hf_code_identifier(identifiers, imis_hf)
+        cls.build_fhir_uuid_identifier(identifiers, imis_hf.location)
+        cls.build_fhir_hf_code_identifier(identifiers, imis_hf.location)
         fhir_location.identifier = identifiers
 
     @classmethod
@@ -82,28 +90,52 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.valid_condition(imis_hf.code is None, gettext('Missing hf code'), errors)
 
     @classmethod
+    def build_imis_location_identiftier(cls, imis_hf, fhir_location, errors):
+        value = cls.get_fhir_identifier_by_code(fhir_location.identifier,
+                                                R4IdentifierConfig.get_fhir_facility_id_type())
+        if value:
+            imis_hf.location.code = value
+        cls.valid_condition(imis_hf.location.code is None, gettext('Missing location code'), errors)
+
+    @classmethod
     def build_fhir_location_name(cls, fhir_location, imis_hf):
-        fhir_location.name = imis_hf.name
+        fhir_location.name = imis_hf.name + ", " + imis_hf.location.name
 
     @classmethod
     def build_imis_hf_name(cls, imis_hf, fhir_location, errors):
         name = fhir_location.name
+        name = name.split(',')
+        name = name[0]
         if not cls.valid_condition(name is None,
                                    gettext('Missing patient `name` attribute'), errors):
             imis_hf.name = name
 
     @classmethod
+    def build_imis_location_name(cls, imis_hf, fhir_location, errors):
+        name = fhir_location.name
+        name = name.split(',')
+        name = name[1]
+        name = name.lstrip()
+        if not cls.valid_condition(name is None,
+                                   gettext('Missing location `name` attribute'), errors):
+            imis_hf.location.name = name
+
+    @classmethod
     def build_fhir_location_type(cls, fhir_location, imis_hf):
         code = ""
+        text = ""
         if imis_hf.level == ImisHfLevel.HEALTH_CENTER.value:
             code = R4LocationConfig.get_fhir_code_for_health_center()
+            text = "hospital center"
         elif imis_hf.level == ImisHfLevel.HOSPITAL.value:
             code = R4LocationConfig.get_fhir_code_for_hospital()
+            text = "hospital"
         elif imis_hf.level == ImisHfLevel.DISPENSARY.value:
             code = R4LocationConfig.get_fhir_code_for_dispensary()
+            text = "dispensary"
 
         fhir_location.type = \
-            cls.build_codeable_concept(code, R4LocationConfig.get_fhir_location_role_type_system())
+            [cls.build_codeable_concept(code, R4LocationConfig.get_fhir_location_role_type_system(), text=text)]
 
     @classmethod
     def build_imis_hf_level(cls, imis_hf, fhir_location, errors):
@@ -162,3 +194,53 @@ class LocationConverter(BaseFHIRConverter, ReferenceConverterMixin):
                     imis_hf.fax = contact_point.value
                 elif contact_point.system == ContactPointSystem.EMAIL.value:
                     imis_hf.email = contact_point.value
+
+    @classmethod
+    def build_fhir_physical_type(cls, fhir_location, imis_hf):
+        code = ""
+        text = ""
+        if imis_hf.location.type == ImisLocationType.REGION.value:
+            code = R4LocationConfig.get_fhir_code_for_region()
+            text = "region"
+        elif imis_hf.location.type == ImisLocationType.DISTRICT.value:
+            code = R4LocationConfig.get_fhir_code_for_district()
+            text = "district"
+        elif imis_hf.location.type == ImisLocationType.WARD.value:
+            code = R4LocationConfig.get_fhir_code_for_ward()
+            text = "ward"
+        elif imis_hf.location.type == ImisLocationType.VILLAGE.value:
+            code = R4LocationConfig.get_fhir_code_for_village()
+            text = "village"
+
+        fhir_location.physicalType = \
+            cls.build_codeable_concept(code, R4LocationConfig.get_fhir_location_physical_type_system(), text=text)
+
+    @classmethod
+    def build_imis_location_type(cls, imis_hf, fhir_location, errors):
+        location_type = fhir_location.physicalType
+        if not cls.valid_condition(location_type is None,
+                                   gettext('Missing location `type` attribute'), errors):
+            for maritalCoding in location_type.coding:
+                if maritalCoding.system == R4LocationConfig.get_fhir_location_physical_type_system():
+                    code = maritalCoding.code
+                    if code == R4LocationConfig.get_fhir_code_for_region():
+                        imis_hf.location.type = ImisLocationType.REGION.value
+                    elif code == R4LocationConfig.get_fhir_code_for_district():
+                        imis_hf.location.type = ImisLocationType.DISTRICT.value
+                    elif code == R4LocationConfig.get_fhir_code_for_ward():
+                        imis_hf.location.type = ImisLocationType.WARD.value
+                    elif code == R4LocationConfig.get_fhir_code_for_village():
+                        imis_hf.location.type = ImisLocationType.VILLAGE.value
+
+            cls.valid_condition(imis_hf.location.type is None, gettext('Missing location type'), errors)
+
+    @classmethod
+    def build_fhir_part_of(cls, fhir_location, imis_hf):
+        fhir_location.partOf = LocationConverter.build_fhir_resource_reference(imis_hf.location.parent)
+
+    @classmethod
+    def build_imis_parent_location_id(cls, imis_hf, fhir_location, errors):
+        parent_id = fhir_location.partOf
+        if not cls.valid_condition(parent_id is None,
+                                   gettext('Missing location `parent id` attribute'), errors):
+            imis_hf.location.parent = parent_id

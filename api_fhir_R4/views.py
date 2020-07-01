@@ -177,7 +177,7 @@ class MedicationViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListMode
 
 
 class ConditionViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
-    lookup_field = 'id'
+    lookup_field = 'code'
     serializer_class = ConditionSerializer
     permission_classes = (FHIRApiConditionPermissions,)
 

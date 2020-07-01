@@ -27,9 +27,10 @@ class ConditionConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.check_errors(errors)
         return imis_condition
 
+    #  TODO: replace code with uuid when it's implemented into database
     @classmethod
     def get_reference_obj_id(cls, imis_condition):
-        return imis_condition.id
+        return imis_condition.code
 
     @classmethod
     def get_fhir_resource_type(cls):

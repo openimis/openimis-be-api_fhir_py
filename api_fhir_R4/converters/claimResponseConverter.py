@@ -1,13 +1,15 @@
 from claim.models import Feedback, ClaimItem, ClaimService
 from django.db.models import Subquery
 from medical.models import Item, Service
+import core
 
 from api_fhir_R4.configurations import R4ClaimConfig
 from api_fhir_R4.converters import BaseFHIRConverter, CommunicationRequestConverter
 from api_fhir_R4.converters.claimConverter import ClaimConverter
+from api_fhir_R4.converters.patientConverter import PatientConverter
 from api_fhir_R4.exceptions import FHIRRequestProcessException
 from api_fhir_R4.models import ClaimResponse, Money, ClaimResponsePayment, ClaimResponseError, ClaimResponseItem, Claim, \
-    ClaimResponseItemAdjudication, ClaimResponseProcessNote, ClaimResponseAddItem
+    ClaimResponseItemAdjudication, ClaimResponseProcessNote, ClaimResponseAddItem, ClaimResponseTotal
 from api_fhir_R4.utils import TimeUtils, FhirUtils
 
 
@@ -21,11 +23,14 @@ class ClaimResponseConverter(BaseFHIRConverter):
         cls.build_fhir_pk(fhir_claim_response, imis_claim.uuid)
         ClaimConverter.build_fhir_identifiers(fhir_claim_response, imis_claim)
         cls.build_fhir_outcome(fhir_claim_response, imis_claim)
-        cls.build_fhir_payment(fhir_claim_response, imis_claim)
+        #cls.build_fhir_payment(fhir_claim_response, imis_claim)
         #cls.build_fhir_total_benefit(fhir_claim_response, imis_claim)
         cls.build_fhir_errors(fhir_claim_response, imis_claim)
-        cls.build_fhir_communication_request_reference(fhir_claim_response, imis_claim)
+        #cls.build_fhir_request_reference(fhir_claim_response, imis_claim)
         cls.build_fhir_items(fhir_claim_response, imis_claim)
+        cls.build_patient_reference(fhir_claim_response, imis_claim)
+        cls.build_fhir_total(fhir_claim_response, imis_claim)
+        cls.build_fhir_communication_request_reference(fhir_claim_response, imis_claim)
         return fhir_claim_response
 
     @classmethod
@@ -50,6 +55,7 @@ class ClaimResponseConverter(BaseFHIRConverter):
             display = R4ClaimConfig.get_fhir_claim_status_valuated_code()
         return display
 
+    """
     @classmethod
     def build_fhir_payment(cls, fhir_claim_response, imis_claim):
         fhir_payment = ClaimResponsePayment()
@@ -58,14 +64,14 @@ class ClaimResponseConverter(BaseFHIRConverter):
         if date_processed:
             fhir_payment.date = date_processed.isoformat()
         fhir_claim_response.payment = fhir_payment
-
-    '''
+    """
+    """
     @classmethod
     def build_fhir_total_benefit(cls, fhir_claim_response, imis_claim):
         total_approved = Money()
         total_approved.value = imis_claim.approved
         fhir_claim_response.totalBenefit = total_approved
-    '''
+    """
 
     @classmethod
     def build_fhir_errors(cls, fhir_claim_response, imis_claim):
@@ -76,7 +82,7 @@ class ClaimResponseConverter(BaseFHIRConverter):
             fhir_claim_response.error = [fhir_error]
 
     @classmethod
-    def build_fhir_communication_request_reference(cls, fhir_claim_response, imis_claim):
+    def build_fhir_request_reference(cls, fhir_claim_response, imis_claim):
         feedback = cls.get_imis_claim_feedback(imis_claim)
         if feedback:
             reference = CommunicationRequestConverter.build_fhir_resource_reference(feedback)
@@ -98,13 +104,13 @@ class ClaimResponseConverter(BaseFHIRConverter):
 
             if type == R4ClaimConfig.get_fhir_claim_item_code():
                 serviced = cls.get_imis_claim_item_by_code(code, imis_claim.id)
-            elif  type == R4ClaimConfig.get_fhir_claim_service_code():
+            elif type == R4ClaimConfig.get_fhir_claim_service_code():
                 serviced = cls.get_service_claim_item_by_code(code, imis_claim.id)
             else:
                 raise FHIRRequestProcessException(['Could not assign category {} for claim_item: {}'
                                                   .format(type, claim_item)])
 
-            cls._build_response_items(fhir_claim_response, claim_item, serviced, serviced.rejection_reason)
+            #cls._build_response_items(fhir_claim_response, claim_item, serviced, serviced.rejection_reason)
 
     @classmethod
     def _build_response_items(cls, fhir_claim_response, claim_item, imis_service, rejected_reason):
@@ -158,9 +164,9 @@ class ClaimResponseConverter(BaseFHIRConverter):
             cls.build_simple_codeable_concept(R4ClaimConfig.get_fhir_claim_item_general_adjudication_code())
         item_adjudication.reason = cls.build_fhir_adjudication_reason(item)
         item_adjudication.value = item.qty_approved
-        limitation_value = Money()
-        limitation_value.value = item.limitation_value
-        item_adjudication.amount = limitation_value
+        price_valuated = Money()
+        price_valuated.value = item.price_valuated
+        item_adjudication.amount = price_valuated
         claim_response_item.adjudication.append(item_adjudication)
 
     @classmethod
@@ -191,3 +197,135 @@ class ClaimResponseConverter(BaseFHIRConverter):
             fhir_claim_response.processNote.append(note)
             result = note
         return result
+
+    @classmethod
+    def build_patient_reference(cls, fhir_claim_response, imis_claim):
+        fhir_claim_response.patient = PatientConverter.build_fhir_resource_reference(imis_claim.insuree)
+
+    @classmethod
+    def build_fhir_total(cls, fhir_claim_response, imis_claim):
+        valuated = cls.build_fhir_total_valuated(imis_claim)
+        reinsured = cls.build_fhir_total_reinsured(imis_claim)
+        approved = cls.build_fhir_total_approved(imis_claim)
+        claimed = cls.build_fhir_total_claimed(imis_claim)
+
+        if valuated.amount.value is not None and reinsured.amount.value is None and \
+                approved.amount.value is None and claimed.amount.value is None:
+            fhir_claim_response.total = [valuated]
+
+        elif valuated.amount.value is None and reinsured.amount.value is not None and \
+                approved.amount.value is None and claimed.amount.value is None:
+            fhir_claim_response.total = [reinsured]
+
+        elif valuated.amount.value is None and reinsured.amount.value is None and \
+                approved.amount.value is not None and claimed.amount.value is None:
+            fhir_claim_response.total = [approved]
+
+        elif valuated.amount.value is None and reinsured.amount.value is None and \
+                approved.amount.value is None and claimed.amount.value is not None:
+            fhir_claim_response.total = [claimed]
+
+        elif valuated.amount.value is not None and reinsured.amount.value is not None and \
+                approved.amount.value is None and claimed.amount.value is None:
+            fhir_claim_response.total = [valuated, reinsured]
+
+        elif valuated.amount.value is not None and reinsured.amount.value is None and \
+                approved.amount.value is not None and claimed.amount.value is None:
+            fhir_claim_response.total = [valuated, approved]
+
+        elif valuated.amount.value is not None and reinsured.amount.value is None and \
+                approved.amount.value is None and claimed.amount.value is not None:
+            fhir_claim_response.total = [valuated, claimed]
+
+        elif valuated.amount.value is None and reinsured.amount.value is not None and \
+                approved.amount.value is not None and claimed.amount.value is None:
+            fhir_claim_response.total = [reinsured, approved]
+
+        elif valuated.amount.value is None and reinsured.amount.value is not None and \
+                approved.amount.value is None and claimed.amount.value is not None:
+            fhir_claim_response.total = [reinsured, claimed]
+
+        elif valuated.amount.value is None and reinsured.amount.value is None and \
+                approved.amount.value is not None and claimed.amount.value is not None:
+            fhir_claim_response.total = [approved, claimed]
+
+        elif valuated.amount.value is not None and reinsured.amount.value is not None and \
+                approved.amount.value is not None and claimed.amount.value is None:
+            fhir_claim_response.total = [valuated, reinsured, approved]
+
+        elif valuated.amount.value is not None and reinsured.amount.value is not None and \
+                approved.amount.value is None and claimed.amount.value is not None:
+            fhir_claim_response.total = [valuated, reinsured, claimed]
+
+        elif valuated.amount.value is None and reinsured.amount.value is not None and \
+                approved.amount.value is not None and claimed.amount.value is not None:
+            fhir_claim_response.total = [reinsured, approved, claimed]
+
+        else:
+            fhir_claim_response.total = [valuated, reinsured, approved, claimed]
+
+
+    @classmethod
+    def build_fhir_total_valuated(cls, imis_claim):
+        fhir_total = ClaimResponseTotal()
+        money = Money()
+        fhir_total.amount = money
+
+        if imis_claim.valuated is not None:
+            fhir_total.category = cls.build_codeable_concept("valuated",
+                                                             "http://terminology.hl7.org/CodeSystem/adjudication.html")
+
+            fhir_total.amount.value = imis_claim.valuated
+            fhir_total.amount.currency = core.currency
+
+        return fhir_total
+
+    @classmethod
+    def build_fhir_total_reinsured(cls, imis_claim):
+        fhir_total = ClaimResponseTotal()
+        money = Money()
+        fhir_total.amount = money
+
+        if imis_claim.reinsured is not None:
+            fhir_total.category = cls.build_codeable_concept("reinsured",
+                                                             "http://terminology.hl7.org/CodeSystem/adjudication.html")
+
+            fhir_total.amount.value = imis_claim.reinsured
+            fhir_total.amount.currency = core.currency
+
+        return fhir_total
+
+    @classmethod
+    def build_fhir_total_approved(cls, imis_claim):
+        fhir_total = ClaimResponseTotal()
+        money = Money()
+        fhir_total.amount = money
+
+        if imis_claim.approved is not None:
+            fhir_total.category = cls.build_codeable_concept("approved",
+                                                             "http://terminology.hl7.org/CodeSystem/adjudication.html")
+
+            fhir_total.amount.value = imis_claim.approved
+            fhir_total.amount.currency = core.currency
+
+        return fhir_total
+
+    @classmethod
+    def build_fhir_total_claimed(cls, imis_claim):
+        fhir_total = ClaimResponseTotal()
+        money = Money()
+        fhir_total.amount = money
+
+        if imis_claim.claimed is not None:
+            fhir_total.category = cls.build_codeable_concept("claimed",
+                                                             "http://terminology.hl7.org/CodeSystem/adjudication.html")
+
+            fhir_total.amount.value = imis_claim.claimed
+            fhir_total.amount.currency = core.currency
+
+        return fhir_total
+
+    @classmethod
+    def build_fhir_communication_request_reference(cls, fhir_claim_response, imis_claim):
+        request = CommunicationRequestConverter.build_fhir_resource_reference(imis_claim)
+        fhir_claim_response.communicationRequest = [request]

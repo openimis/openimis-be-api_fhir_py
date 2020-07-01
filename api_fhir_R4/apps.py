@@ -15,6 +15,7 @@ DEFAULT_CFG = {
         "female": "F",
         "other": "O"
     },
+    "default_uuid_code": "UUID",
     "default_value_of_patient_head_attribute": False,
     "default_value_of_patient_card_issued_attribute": False,
     "default_value_of_location_offline_attribute": False,
@@ -39,9 +40,16 @@ DEFAULT_CFG = {
     },
     "R4_fhir_location_role_type": {
         "system": "http://hl7.org/fhir/v3/ServiceDeliveryLocationRoleType/vs.html",
-        "fhir_code_for_hospital": "HOSP",
-        "fhir_code_for_dispensary": "CSC",
-        "fhir_code_for_health_center": "PC",
+        "fhir_code_for_hospital": "H",
+        "fhir_code_for_dispensary": "D",
+        "fhir_code_for_health_center": "C",
+    },
+    "R4_fhir_location_physical_type": {
+        "system": "http://terminology.hl7.org/CodeSystem/location-physical-type.html",
+        "fhir_code_for_region": "R",
+        "fhir_code_for_district": "D",
+        "fhir_code_for_ward": "W",
+        "fhir_code_for_village": "V"
     },
     "R4_fhir_issue_type_config": {
         "fhir_code_for_exception": "exception",

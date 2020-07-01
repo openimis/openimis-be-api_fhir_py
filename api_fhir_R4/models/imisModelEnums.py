@@ -15,6 +15,13 @@ class ImisHfLevel(Enum):
     DISPENSARY = "D"
 
 
+class ImisLocationType(Enum):
+    REGION = "R"
+    DISTRICT = "D"
+    WARD = "W"
+    VILLAGE = "V"
+
+
 class ImisClaimIcdTypes(Enum):
     ICD_0 = "icd_0"
     ICD_1 = "icd_1"

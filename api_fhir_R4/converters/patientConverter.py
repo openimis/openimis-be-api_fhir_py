@@ -22,6 +22,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_telecom(fhir_patient, imis_insuree)
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
         cls.build_fhir_extentions(fhir_patient, imis_insuree)
+        cls.build_poverty_status(fhir_patient, imis_insuree)
         return fhir_patient
 
     @classmethod
@@ -268,8 +269,24 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                      extension.valueString = ""
 
             fhir_patient.extension.append(extension)
-        build_extension(fhir_patient, imis_insuree,"head")
-        build_extension(fhir_patient, imis_insuree,"validity_from")
-        build_extension(fhir_patient, imis_insuree,"family.location.code")
-        build_extension(fhir_patient, imis_insuree,"education.education")
-        build_extension(fhir_patient, imis_insuree,"profession.profession")
+        build_extension(fhir_patient, imis_insuree, "head")
+        build_extension(fhir_patient, imis_insuree, "validity_from")
+        build_extension(fhir_patient, imis_insuree, "family.location.code")
+        build_extension(fhir_patient, imis_insuree, "education.education")
+        build_extension(fhir_patient, imis_insuree, "profession.profession")
+
+    @classmethod
+    def build_poverty_status(cls, fhir_patient, imis_insuree):
+        poverty_status = cls.build_poverty_status_extension(imis_insuree)
+        fhir_patient.extension.append(poverty_status)
+
+    @classmethod
+    def build_poverty_status_extension(cls, imis_insuree):
+        extension = Extension()
+        extension.url = "povertyStatus"
+        extension.valueBoolean = imis_insuree.family.poverty
+        return extension
+
+
+
+
