@@ -15,7 +15,6 @@ DEFAULT_CFG = {
         "female": "F",
         "other": "O"
     },
-    "default_uuid_code": "UUID",
     "default_value_of_patient_head_attribute": False,
     "default_value_of_patient_card_issued_attribute": False,
     "default_value_of_location_offline_attribute": False,
@@ -23,12 +22,17 @@ DEFAULT_CFG = {
     "default_response_page_size": 10,
     "R4_fhir_identifier_type_config": {
         "system": "https://hl7.org/fhir/valueset-identifier-type.html",
+        "fhir_code_for_imis_db_uuid_type": "UUID",
         "fhir_code_for_imis_db_id_type": "ACSN",
         "fhir_code_for_imis_chfid_type": "SB",
         "fhir_code_for_imis_passport_type": "PPN",
         "fhir_code_for_imis_facility_id_type": "FI",
         "fhir_code_for_imis_claim_admin_code_type": "FILL",
         "fhir_code_for_imis_claim_code_type": "MR",
+        "fhir_code_for_imis_location_code_type": "LC",
+        "fhir_code_for_imis_diagnosis_code_type": "DC",
+        "fhir_code_for_imis_item_code_type": "IC",
+        "fhir_code_for_imis_service_code_type": "SC"
     },
     "R4_fhir_marital_status_config": {
         "system": "http://hl7.org/fhir/valueset-marital-status.html",
@@ -40,9 +44,9 @@ DEFAULT_CFG = {
     },
     "R4_fhir_location_role_type": {
         "system": "http://hl7.org/fhir/v3/ServiceDeliveryLocationRoleType/vs.html",
-        "fhir_code_for_hospital": "H",
-        "fhir_code_for_dispensary": "D",
-        "fhir_code_for_health_center": "C",
+        "fhir_code_for_hospital": "HOSP",
+        "fhir_code_for_dispensary": "CSC",
+        "fhir_code_for_health_center": "PC",
     },
     "R4_fhir_location_physical_type": {
         "system": "http://terminology.hl7.org/CodeSystem/location-physical-type.html",
@@ -50,6 +54,12 @@ DEFAULT_CFG = {
         "fhir_code_for_district": "D",
         "fhir_code_for_ward": "W",
         "fhir_code_for_village": "V"
+    },
+    "R4_fhir_hf_service_type": {
+        "system": "http://hl7.org/fhir/valueset-service-type.html",
+        "fhir_code_for_in_patient": "I",
+        "fhir_code_for_out_patient": "O",
+        "fhir_code_for_both": "B"
     },
     "R4_fhir_issue_type_config": {
         "fhir_code_for_exception": "exception",

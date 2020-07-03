@@ -107,3 +107,10 @@ class FHIRApiActivityDefinitionPermissions(FHIRApiPermissions):
     permissions_patch = []
     permissions_delete = []
 
+class FHIRApiHealthServicePermissions(FHIRApiPermissions):
+    permissions_get = LocationConfig.gql_query_health_facilities_perms
+    permissions_post = []
+    permissions_put = []
+    permissions_patch = []
+    permissions_delete = []
+

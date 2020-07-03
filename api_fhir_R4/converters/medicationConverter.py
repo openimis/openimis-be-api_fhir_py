@@ -50,7 +50,7 @@ class MedicationConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_fhir_uuid_identifier(identifiers, imis_medication)
         item_code = cls.build_fhir_identifier(imis_medication.code,
                                               R4IdentifierConfig.get_fhir_identifier_type_system(),
-                                              R4IdentifierConfig.get_fhir_uuid_type_code())
+                                              R4IdentifierConfig.get_fhir_item_code_type())
         identifiers.append(item_code)
         fhir_medication.identifier = identifiers
 

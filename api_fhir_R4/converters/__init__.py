@@ -66,7 +66,7 @@ class BaseFHIRConverter(ABC):
         if imis_object.uuid is not None:
             identifier = cls.build_fhir_identifier(imis_object.uuid,
                                                    R4IdentifierConfig.get_fhir_identifier_type_system(),
-                                                   GeneralConfiguration.get_default_uuid_code())
+                                                   R4IdentifierConfig.get_fhir_uuid_type_code())
             identifiers.append(identifier)
 
     @classmethod
@@ -121,3 +121,4 @@ from api_fhir_R4.converters.claimResponseConverter import ClaimResponseConverter
 from api_fhir_R4.converters.medicationConverter import MedicationConverter
 from api_fhir_R4.converters.conditionConverter import ConditionConverter
 from api_fhir_R4.converters.activityDefinitionConverter import ActivityDefinitionConverter
+from api_fhir_R4.converters.healthcareServiceConverter import HealthcareServiceConverter

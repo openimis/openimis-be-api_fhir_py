@@ -90,6 +90,22 @@ class LocationConfiguration(BaseConfiguration):  # pragma: no cover
     def get_fhir_code_for_village(cls):
         raise NotImplementedError('`get_fhir_code_for_village()` must be implemented.')
 
+    @classmethod
+    def get_fhir_hf_service_type_system(cls):
+        raise NotImplementedError('`get_fhir_hf_service_type_system()` must be implemented')
+
+    @classmethod
+    def get_fhir_code_for_in_patient(cls):
+        raise NotImplementedError('`get_fhir_code_for_in_patient()` must be implemented')
+
+    @classmethod
+    def get_fhir_code_for_out_patient(cls):
+        raise NotImplementedError('`get_fhir_code_for_out_patient()` must be implemented')
+
+    @classmethod
+    def get_fhir_code_for_both(cls):
+        raise NotImplementedError('`get_fhir_code_for_both()` must be implemented')
+
 
 class MaritalConfiguration(BaseConfiguration):  # pragma: no cover
 

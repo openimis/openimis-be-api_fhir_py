@@ -44,9 +44,13 @@ class ConditionConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_fhir_identifiers(cls, fhir_condition, imis_condition):
         identifiers = []
+        icd_id = cls.build_fhir_identifier(imis_condition.id,
+                                             R4IdentifierConfig.get_fhir_identifier_type_system(),
+                                             R4IdentifierConfig.get_fhir_acsn_type_code())
+        identifiers.append(icd_id)
         icd_code = cls.build_fhir_identifier(imis_condition.code,
                                              R4IdentifierConfig.get_fhir_identifier_type_system(),
-                                             R4IdentifierConfig.get_fhir_uuid_type_code())
+                                             R4IdentifierConfig.get_fhir_diagnosis_code_type())
         identifiers.append(icd_code)
         fhir_condition.identifier = identifiers
 

@@ -56,7 +56,7 @@ class ActivityDefinitionConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_fhir_uuid_identifier(identifiers, imis_activity_definition)
         serv_code = cls.build_fhir_identifier(imis_activity_definition.code,
                                               R4IdentifierConfig.get_fhir_identifier_type_system(),
-                                              R4IdentifierConfig.get_fhir_uuid_type_code())
+                                              R4IdentifierConfig.get_fhir_service_code_type())
         identifiers.append(serv_code)
         fhir_activity_definition.identifier = identifiers
 

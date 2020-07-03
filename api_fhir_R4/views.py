@@ -2,11 +2,11 @@ from api_fhir_R4.converters import OperationOutcomeConverter
 from api_fhir_R4.permissions import FHIRApiClaimPermissions, FHIRApiCoverageEligibilityRequestPermissions, \
     FHIRApiCoverageRequestPermissions, FHIRApiCommunicationRequestPermissions, FHIRApiPractitionerPermissions, \
     FHIRApiHFPermissions, FHIRApiInsureePermissions, FHIRApiMedicationPermissions, FHIRApiConditionPermissions, \
-    FHIRApiActivityDefinitionPermissions
+    FHIRApiActivityDefinitionPermissions, FHIRApiHealthServicePermissions
 from claim.models import ClaimAdmin, Claim, Feedback
 from django.db.models import OuterRef, Exists
 from insuree.models import Insuree
-from location.models import HealthFacility
+from location.models import HealthFacility, Location
 from policy.models import Policy
 from medical.models import Item, Diagnosis, Service
 
@@ -22,7 +22,7 @@ from api_fhir_R4.configurations import R4CoverageEligibilityConfiguration as Con
 from api_fhir_R4.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
     PractitionerSerializer, ClaimSerializer, CoverageEligibilityRequestSerializer, \
     PolicyCoverageEligibilityRequestSerializer, ClaimResponseSerializer, CommunicationRequestSerializer, \
-    MedicationSerializer, ConditionSerializer, ActivityDefinitionSerializer
+    MedicationSerializer, ConditionSerializer, ActivityDefinitionSerializer, HealthcareServiceSerializer
 from api_fhir_R4.serializers.coverageSerializer import CoverageSerializer
 
 
@@ -71,7 +71,7 @@ class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
         return Insuree.get_queryset(None, self.request.user)
 
 
-class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
+class LocationViewSet(BaseFHIRView, viewsets.ModelViewSet):
     lookup_field = 'uuid'
     serializer_class = LocationSerializer
     permission_classes = (FHIRApiHFPermissions,)
@@ -86,7 +86,7 @@ class HFViewSet(BaseFHIRView, viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 
     def get_queryset(self):
-        return HealthFacility.get_queryset(None, self.request.user)
+        return Location.get_queryset(None, self.request.user)
 
 
 class PractitionerRoleViewSet(BaseFHIRView, viewsets.ModelViewSet):
@@ -177,7 +177,7 @@ class MedicationViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListMode
 
 
 class ConditionViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
-    lookup_field = 'code'
+    lookup_field = 'id'
     serializer_class = ConditionSerializer
     permission_classes = (FHIRApiConditionPermissions,)
 
@@ -192,3 +192,12 @@ class ActivityDefinitionViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.
 
     def get_queryset(self):
         return Service.get_queryset(None, self.request.user)
+
+
+class HealthcareServiceViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    lookup_field = 'uuid'
+    serializer_class = HealthcareServiceSerializer
+    permission_classes = (FHIRApiHealthServicePermissions,)
+
+    def get_queryset(self):
+        return HealthFacility.get_queryset(None, self.request.user)

@@ -259,7 +259,7 @@ from api_fhir_R4.models.extension import Extension
 from api_fhir_R4.models.fhirdate import FHIRDate
 from api_fhir_R4.models.humanName import HumanName, NameUse
 from api_fhir_R4.models.identifier import Identifier, IdentifierUse
-from api_fhir_R4.models.imisModelEnums import ImisMaritalStatus, ImisClaimIcdTypes
+from api_fhir_R4.models.imisModelEnums import ImisMaritalStatus, ImisClaimIcdTypes, ImisLocationType, ImisHfLevel
 from api_fhir_R4.models.location import LocationPosition, LocationMode, Location, LocationStatus, \
     LocationHoursOfOperation
 from api_fhir_R4.models.meta import Meta
@@ -309,6 +309,8 @@ from api_fhir_R4.models.activityDefinition import ActivityDefinition, ActivityDe
     ActivityDefinitionParticipant, PublicationStatus, RequestIntent, RequestPriority, RequestResourceType
 from api_fhir_R4.models.contactDetail import ContactDetail
 from api_fhir_R4.models.relatedArtifact import RelatedArtifact, RelatedArtifactType
+from api_fhir_R4.models.healthcareService import HealthcareNotAvailable, HealthcareService, \
+    HealthcareServiceAvailableTime, HealthcareServiceEligibility, DaysOfWeek
 
 
 
