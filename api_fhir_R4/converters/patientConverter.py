@@ -4,7 +4,8 @@ from location.models import Location
 
 from api_fhir_R4.configurations import R4IdentifierConfig, GeneralConfiguration, R4MaritalConfig
 from api_fhir_R4.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
-from api_fhir_R4.models import Patient, AdministrativeGender, ImisMaritalStatus, Extension
+from api_fhir_R4.converters.healthcareServiceConverter import HealthcareServiceConverter
+from api_fhir_R4.models import Patient, AdministrativeGender, ImisMaritalStatus, Extension, PatientLink, Attachment
 from api_fhir_R4.models.address import AddressUse, AddressType
 from api_fhir_R4.utils import TimeUtils, DbManagerUtils
 
@@ -23,6 +24,9 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
         cls.build_fhir_extentions(fhir_patient, imis_insuree)
         cls.build_poverty_status(fhir_patient, imis_insuree)
+        cls.build_fhir_related_person(fhir_patient, imis_insuree)
+        cls.build_fhir_photo(fhir_patient, imis_insuree)
+        cls.build_fhir_general_practitioner(fhir_patient, imis_insuree)
         return fhir_patient
 
     @classmethod
@@ -39,6 +43,8 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_imis_marital(imis_insuree, fhir_patient)
         cls.build_imis_contacts(imis_insuree, fhir_patient)
         cls.build_imis_addresses(imis_insuree, fhir_patient)
+        cls.build_imis_related_person(imis_insuree, errors)
+        cls.build_imis_photo(imis_insuree, fhir_patient, errors)
         cls.check_errors(errors)
         return imis_insuree
 
@@ -278,7 +284,8 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     @classmethod
     def build_poverty_status(cls, fhir_patient, imis_insuree):
         poverty_status = cls.build_poverty_status_extension(imis_insuree)
-        fhir_patient.extension.append(poverty_status)
+        if poverty_status.valueBoolean is not None:
+            fhir_patient.extension.append(poverty_status)
 
     @classmethod
     def build_poverty_status_extension(cls, imis_insuree):
@@ -286,6 +293,53 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         extension.url = "povertyStatus"
         extension.valueBoolean = imis_insuree.family.poverty
         return extension
+
+    @classmethod
+    def build_fhir_related_person(cls, fhir_patient, imis_insuree):
+        fhir_link = PatientLink()
+        if imis_insuree.relationship is not None:
+            fhir_link.other = PatientConverter.build_fhir_resource_reference(imis_insuree.family.head_insuree)
+            fhir_link.type = imis_insuree.relationship.relation
+            fhir_patient.link = [fhir_link]
+
+    @classmethod
+    def build_imis_related_person(cls, imis_insuree, errors):
+        fhir_link = PatientLink()
+        relation = fhir_link.type
+        head = fhir_link.other
+        if not cls.valid_condition(head is None, gettext('Missing patient `head` attribute'), errors):
+            imis_insuree.family.head_insuree = head
+        if not cls.valid_condition(relation is None, gettext('Missing patient `relation` attribute'), errors):
+            imis_insuree.relationship.relation = relation
+
+    @classmethod
+    def build_fhir_photo(cls, fhir_patient, imis_insuree):
+        photo = Attachment()
+        if imis_insuree.photo is not None:
+            photo.creation = imis_insuree.photo.date.isoformat()
+            url = imis_insuree.photo.folder + imis_insuree.photo.filename
+            photo.url = url
+            fhir_patient.photo = [photo]
+
+    @classmethod
+    def build_imis_photo(cls, imis_insuree, fhir_patient, errors):
+        url = fhir_patient.photo.url
+        url = url.split("\\", 2)
+        folder = url[0]
+        filename = url[1]
+        creation = fhir_patient.photo.creation
+        if not cls.valid_condition(creation is None, gettext('Missing patient `photo url` attribute'), errors):
+            imis_insuree.photo.date = TimeUtils.str_to_date(creation)
+        if not cls.valid_condition(folder is None, gettext('Missing patient `photo folder` attribute'), errors):
+            imis_insuree.photo.folder = folder
+        if not cls.valid_condition(filename is None, gettext('Missing patient `photo filename` attribute'), errors):
+            imis_insuree.photo.filename = filename
+
+    @classmethod
+    def build_fhir_general_practitioner(cls, fhir_patient, imis_insuree):
+        if imis_insuree.health_facility is not None:
+            fhir_patient.generalPractitioner = [HealthcareServiceConverter.\
+                build_fhir_resource_reference(imis_insuree.health_facility)]
 
 
 

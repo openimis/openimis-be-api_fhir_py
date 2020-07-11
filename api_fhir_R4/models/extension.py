@@ -42,4 +42,5 @@ class Extension(Element):
     valueTime = Property('valueTime', 'FHIRDate')
     valueTiming = Property('valueTiming', 'Timing')
     valueUnsignedInt = Property('valueUnsignedInt', int)
+    valueUsageContext = Property("valueUsageContext", "UsageContext")
     valueUri = Property('valueUri', str)

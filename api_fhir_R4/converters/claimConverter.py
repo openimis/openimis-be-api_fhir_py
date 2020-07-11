@@ -1,16 +1,21 @@
 from claim import ClaimItemSubmit, ClaimServiceSubmit
 from claim.models import Claim, ClaimItem, ClaimService
 from medical.models import Diagnosis, Item, Service
+from insuree.models import InsureePolicy
+from policy.models import Policy
 from django.utils.translation import gettext
+import core
 
 from api_fhir_R4.configurations import R4IdentifierConfig, R4ClaimConfig
 from api_fhir_R4.converters import BaseFHIRConverter, LocationConverter, PatientConverter, PractitionerConverter, \
-    ReferenceConverterMixin
+    ReferenceConverterMixin, PractitionerRoleConverter
 from api_fhir_R4.converters.conditionConverter import ConditionConverter
 from api_fhir_R4.converters.medicationConverter import MedicationConverter
+from api_fhir_R4.converters.healthcareServiceConverter import HealthcareServiceConverter
 from api_fhir_R4.converters.activityDefinitionConverter import ActivityDefinitionConverter
+from api_fhir_R4.converters.coverageConventer import CoverageConventer
 from api_fhir_R4.models import Claim as FHIRClaim, ClaimItem as FHIRClaimItem, Period, ClaimDiagnosis, Money, \
-    ImisClaimIcdTypes, ClaimSupportingInfo, Quantity, Condition, Extension, Reference, CodeableConcept
+    ImisClaimIcdTypes, ClaimSupportingInfo, Quantity, Condition, Extension, Reference, CodeableConcept, ClaimInsurance
 from api_fhir_R4.utils import TimeUtils, FhirUtils, DbManagerUtils
 
 
@@ -21,7 +26,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         fhir_claim = FHIRClaim()
         cls.build_fhir_pk(fhir_claim, imis_claim.uuid)
         fhir_claim.created = imis_claim.date_claimed.isoformat()
-        fhir_claim.facility = LocationConverter.build_fhir_resource_reference(imis_claim.health_facility)
+        fhir_claim.facility = HealthcareServiceConverter.build_fhir_resource_reference(imis_claim.health_facility)
         cls.build_fhir_identifiers(fhir_claim, imis_claim)
         fhir_claim.patient = PatientConverter.build_fhir_resource_reference(imis_claim.insuree)
         cls.build_fhir_billable_period(fhir_claim, imis_claim)
@@ -31,7 +36,11 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_fhir_type(fhir_claim, imis_claim)
         cls.build_fhir_supportingInfo(fhir_claim, imis_claim)
         cls.build_fhir_items(fhir_claim, imis_claim)
-        #cls.build_fhir_provider(fhir_claim, imis_claim)
+        cls.build_fhir_provider(fhir_claim, imis_claim)
+        cls.build_fhir_use(fhir_claim)
+        cls.build_fhir_priority(fhir_claim)
+        cls.build_fhir_status(fhir_claim)
+        cls.build_fhir_insurance(fhir_claim, imis_claim)
         return fhir_claim
 
     @classmethod
@@ -251,6 +260,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
             total_claimed = 0
         fhir_total = Money()
         fhir_total.value = total_claimed
+        fhir_total.currency = core.currency
         fhir_claim.total = fhir_total
 
     @classmethod
@@ -334,6 +344,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         fhir_item.sequence = FhirUtils.get_next_array_sequential_id(fhir_claim.item)
         unit_price = Money()
         unit_price.value = item.price_asked
+        unit_price.currency = core.currency
         fhir_item.unitPrice = unit_price
         fhir_quantity = Quantity()
         fhir_quantity.value = item.qty_provided
@@ -343,7 +354,7 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         item_explanation_code = R4ClaimConfig.get_fhir_claim_item_explanation_code()
         information = cls.build_fhir_string_information(fhir_claim.supportingInfo, item_explanation_code, item.explanation)
         if information:
-            fhir_item.informationLinkId = [information.sequence]
+            fhir_item.informationSequence = [information.sequence]
 
         extension = Extension()
 
@@ -445,7 +456,8 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_fhir_provider(cls, fhir_claim, imis_claim):
-        fhir_claim.provider = imis_claim.adjuster
+        #fhir_claim.provider = imis_claim.adjuster
+        fhir_claim.provider = PractitionerRoleConverter.build_fhir_resource_reference(imis_claim.admin)
 
     @classmethod
     def build_imis_adjuster(cls, imis_claim, fhir_claim, errors):
@@ -453,3 +465,33 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
         if not cls.valid_condition(adjuster is None,
                                    gettext('Missing claim `adjuster` attribute'), errors):
             imis_claim.adjuster = adjuster
+
+    @classmethod
+    def build_fhir_use(cls, fhir_claim):
+        fhir_claim.use = "claim"
+
+    @classmethod
+    def build_fhir_priority(cls, fhir_claim):
+        fhir_claim.priority = cls.build_codeable_concept("normal", None, None)
+
+    @classmethod
+    def build_fhir_status(cls, fhir_claim):
+        fhir_claim.status = "active"
+
+    @classmethod
+    def build_fhir_insurance(cls, fhir_claim, imis_claim):
+        fhir_insurance = ClaimInsurance()
+
+        imis_insuree_policy = InsureePolicy.objects \
+            .filter(insuree=imis_claim.insuree) \
+            .select_related("policy") \
+            .values("policy") #policyID = 32
+        for pol in imis_insuree_policy:
+            policy = Policy.objects.filter(id=pol["policy"])
+
+            fhir_insurance.coverage = CoverageConventer.build_fhir_resource_reference(policy[0])
+
+        fhir_insurance.sequence = 0
+        fhir_insurance.focal = True
+
+        fhir_claim.insurance = [fhir_insurance]

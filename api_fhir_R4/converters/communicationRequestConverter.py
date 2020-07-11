@@ -16,6 +16,7 @@ class CommunicationRequestConverter(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_fhir_pk(fhir_communication_request, imis_feedback.uuid)
         cls.build_fhir_identifiers(fhir_communication_request, imis_feedback)
         cls.build_fhir_reason_codes(fhir_communication_request, imis_feedback)
+        cls.build_fhir_status(fhir_communication_request)
         return fhir_communication_request
 
     @classmethod
@@ -57,3 +58,7 @@ class CommunicationRequestConverter(BaseFHIRConverter, ReferenceConverterMixin):
             reasons.append(cls.build_codeable_concept(Config.get_fhir_asessment_code(),
                                                       text=str(imis_feedback.asessment)))
         fhir_communication_request.reasonCode = reasons
+
+    @classmethod
+    def build_fhir_status(cls, fhir_claim_response):
+        fhir_claim_response.status = "active"

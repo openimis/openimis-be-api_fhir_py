@@ -1,11 +1,13 @@
 from api_fhir_R4.configurations import R4CoverageConfig
-from api_fhir_R4.converters import BaseFHIRConverter, PractitionerConverter
+from api_fhir_R4.converters import BaseFHIRConverter, PractitionerConverter, ReferenceConverterMixin
 from api_fhir_R4.models import Coverage, Reference, Period, Contract, Money, Extension, ContractTermAssetValuedItem, \
     ContractTermOfferParty, CoverageClass
 from product.models import ProductItem, ProductService
+from policy.models import Policy
+from api_fhir_R4.utils import DbManagerUtils
 
 
-class CoverageConventer(BaseFHIRConverter):
+class CoverageConventer(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_policy):
@@ -18,6 +20,19 @@ class CoverageConventer(BaseFHIRConverter):
         cls.build_coverage_class(fhir_coverage, imis_policy)
         cls.build_coverage_extension(fhir_coverage, imis_policy)
         return fhir_coverage
+
+    @classmethod
+    def get_reference_obj_id(cls, imis_policy):
+        return imis_policy.uuid
+
+    @classmethod
+    def get_fhir_resource_type(cls):
+        return Coverage
+
+    @classmethod
+    def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
+        imis_policy_code = cls.get_resource_id_from_reference(reference)
+        return DbManagerUtils.get_object_or_none(Policy, code=imis_policy_code)
 
     @classmethod
     def build_coverage_identifier(cls, fhir_coverage, imis_policy):

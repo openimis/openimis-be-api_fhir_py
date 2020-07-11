@@ -2,7 +2,8 @@ from django.utils.translation import gettext
 from location.models import HealthFacility, Location, HealthFacilityCatchment
 
 from api_fhir_R4.configurations import GeneralConfiguration, R4IdentifierConfig, R4LocationConfig
-from api_fhir_R4.converters import BaseFHIRConverter, ReferenceConverterMixin, LocationConverter
+from api_fhir_R4.converters import BaseFHIRConverter, ReferenceConverterMixin
+from api_fhir_R4.converters.locationConverter import LocationConverter
 from api_fhir_R4.models import HealthcareService as FHIRHealthcareService, ContactPointSystem, ContactPointUse
 from api_fhir_R4.models.address import AddressUse, AddressType
 from api_fhir_R4.models.imisModelEnums import ImisHfLevel
@@ -49,12 +50,12 @@ class HealthcareServiceConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def get_fhir_resource_type(cls):
-        return Location
+        return FHIRHealthcareService
 
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
-        location_uuid = cls.get_resource_id_from_reference(reference)
-        return DbManagerUtils.get_object_or_none(HealthFacility, uuid=location_uuid)
+        healthfacility_uuid = cls.get_resource_id_from_reference(reference)
+        return DbManagerUtils.get_object_or_none(HealthFacility, uuid=healthfacility_uuid)
 
     @classmethod
     def createDefaultInsuree(cls, audit_user_id):
@@ -115,13 +116,13 @@ class HealthcareServiceConverter(BaseFHIRConverter, ReferenceConverterMixin):
         text = ""
         if imis_hf.level == ImisHfLevel.HEALTH_CENTER.value:
             code = R4LocationConfig.get_fhir_code_for_health_center()
-            text = "hospital center"
+            text = "Hospital center"
         elif imis_hf.level == ImisHfLevel.HOSPITAL.value:
             code = R4LocationConfig.get_fhir_code_for_hospital()
-            text = "hospital"
+            text = "Hospital"
         elif imis_hf.level == ImisHfLevel.DISPENSARY.value:
             code = R4LocationConfig.get_fhir_code_for_dispensary()
-            text = "dispensary"
+            text = "Dispensary"
 
         fhir_hcs.category = \
             [cls.build_codeable_concept(code, R4LocationConfig.get_fhir_location_role_type_system(), text=text)]
@@ -145,8 +146,7 @@ class HealthcareServiceConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_fhir_healthcare_service_extra_details(cls, fhir_hcs, imis_hf):
-        fhir_hcs.extraDetails = cls.build_fhir_address(imis_hf.address, AddressUse.HOME.value,
-                                                       AddressType.PHYSICAL.value)
+        fhir_hcs.extraDetails = imis_hf.address
 
     @classmethod
     def build_imis_hf_address(cls, imis_hf, fhir_hcs):
@@ -222,13 +222,13 @@ class HealthcareServiceConverter(BaseFHIRConverter, ReferenceConverterMixin):
         text = ""
         if imis_hf.care_type == HealthFacility.CARE_TYPE_IN_PATIENT:
             code = R4LocationConfig.get_fhir_code_for_in_patient()
-            text = "in-patient"
+            text = "In-patient"
         elif imis_hf.care_type == HealthFacility.CARE_TYPE_OUT_PATIENT:
             code = R4LocationConfig.get_fhir_code_for_out_patient()
-            text = "out-patient"
+            text = "Out-patient"
         elif imis_hf.care_type == HealthFacility.CARE_TYPE_BOTH:
             code = R4LocationConfig.get_fhir_code_for_both()
-            text = "both"
+            text = "Both"
 
         fhir_hcs.type = \
             [cls.build_codeable_concept(code, R4LocationConfig.get_fhir_hf_service_type_system(), text=text)]

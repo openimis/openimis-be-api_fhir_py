@@ -1,6 +1,8 @@
 from medical.models import Diagnosis
-from api_fhir_R4.converters import R4IdentifierConfig, BaseFHIRConverter, ReferenceConverterMixin
+from insuree.models import Insuree
+from api_fhir_R4.converters import R4IdentifierConfig, BaseFHIRConverter, ReferenceConverterMixin, PatientConverter
 from api_fhir_R4.models.condition import Condition as FHIRCondition
+from api_fhir_R4.models import Reference
 from django.utils.translation import gettext
 from api_fhir_R4.utils import DbManagerUtils, TimeUtils
 
@@ -10,10 +12,11 @@ class ConditionConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def to_fhir_obj(cls, imis_condition):
         fhir_condition = FHIRCondition()
-        cls.build_fhir_pk(fhir_condition, imis_condition.id)
+        cls.build_fhir_pk(fhir_condition, str(imis_condition.id))  # id as string because of db, has to be changed to uuid
         cls.build_fhir_identifiers(fhir_condition, imis_condition)
         cls.build_fhir_codes(fhir_condition, imis_condition)
         cls.build_fhir_recorded_date(fhir_condition, imis_condition)
+        cls.build_fhir_subject(fhir_condition)
         return fhir_condition
 
     @classmethod
@@ -44,7 +47,7 @@ class ConditionConverter(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_fhir_identifiers(cls, fhir_condition, imis_condition):
         identifiers = []
-        icd_id = cls.build_fhir_identifier(imis_condition.id,
+        icd_id = cls.build_fhir_identifier(str(imis_condition.id),    # because of db as string, has to be changed to uuid
                                              R4IdentifierConfig.get_fhir_identifier_type_system(),
                                              R4IdentifierConfig.get_fhir_acsn_type_code())
         identifiers.append(icd_id)
@@ -89,3 +92,10 @@ class ConditionConverter(BaseFHIRConverter, ReferenceConverterMixin):
         if not cls.valid_condition(icd_name is None,
                                    gettext('Missing condition `icd_name` attribute'), errors):
             imis_condition.name = icd_name
+
+    @classmethod
+    def build_fhir_subject(cls, fhir_condition):
+        reference = Reference()
+        reference.type = "Patient"
+        fhir_condition.subject = reference
+

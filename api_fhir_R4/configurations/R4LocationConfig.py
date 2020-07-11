@@ -16,15 +16,15 @@ class R4LocationConfig(LocationConfiguration):
 
     @classmethod
     def get_fhir_code_for_hospital(cls):
-        return cls.get_config().R4_fhir_location_role_type.get('fhir_code_for_hospital', "HOSP")
+        return cls.get_config().R4_fhir_location_role_type.get('fhir_code_for_hospital', "H")
 
     @classmethod
     def get_fhir_code_for_dispensary(cls):
-        return cls.get_config().R4_fhir_location_role_type.get('fhir_code_for_dispensary', "CSC")
+        return cls.get_config().R4_fhir_location_role_type.get('fhir_code_for_dispensary', "D")
 
     @classmethod
     def get_fhir_code_for_health_center(cls):
-        return cls.get_config().R4_fhir_location_role_type.get('fhir_code_for_health_center', "PC")
+        return cls.get_config().R4_fhir_location_role_type.get('fhir_code_for_health_center', "C")
 
     @classmethod
     def get_fhir_location_physical_type_system(cls):
