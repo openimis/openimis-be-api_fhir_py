@@ -1,4 +1,4 @@
 include LICENSE.md
 include README.md
 include CONTRIBUTING.md
-include ./tests/test/*.json
+include api_fhir/tests/test/*.json
